@@ -38,7 +38,7 @@ publishing {
         }
     }
     repositories {
-        mavenNav("helsearbeidsgiver-${rootProject.name}")
+        mavenNav("hag-${rootProject.name}")
     }
 }
 
