@@ -16,3 +16,9 @@ data class Refusjon(
     val refusjonOpphører: LocalDate? = null,
     val refusjonEndringer: List<RefusjonEndring>? = null,
 )
+
+@Serializable
+data class RefusjonEndring(
+    val beløp: Double? = null,
+    val dato: LocalDate? = null,
+)

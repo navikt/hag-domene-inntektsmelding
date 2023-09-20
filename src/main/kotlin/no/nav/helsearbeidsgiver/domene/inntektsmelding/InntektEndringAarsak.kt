@@ -17,21 +17,15 @@ import java.time.LocalDate
 sealed class InntektEndringAarsak
 
 @Serializable
-@SerialName("Nyansatt")
-data object Nyansatt : InntektEndringAarsak()
-
-@Serializable
-@SerialName("Tariffendring")
-data class Tariffendring(
-    val gjelderFra: LocalDate,
-    val bleKjent: LocalDate,
+@SerialName("Bonus")
+data class Bonus(
+    val aarligBonus: Double? = null,
+    val datoForBonus: LocalDate? = null,
 ) : InntektEndringAarsak()
 
 @Serializable
-@SerialName("Sykefravaer")
-data class Sykefravaer(
-    val liste: List<Periode>,
-) : InntektEndringAarsak()
+@SerialName("Feilregistrert")
+data object Feilregistrert : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Ferie")
@@ -40,10 +34,8 @@ data class Ferie(
 ) : InntektEndringAarsak()
 
 @Serializable
-@SerialName("VarigLonnsendring")
-data class VarigLonnsendring(
-    val gjelderFra: LocalDate,
-) : InntektEndringAarsak()
+@SerialName("Nyansatt")
+data object Nyansatt : InntektEndringAarsak()
 
 @Serializable
 @SerialName("NyStilling")
@@ -55,13 +47,6 @@ data class NyStilling(
 @SerialName("NyStillingsprosent")
 data class NyStillingsprosent(
     val gjelderFra: LocalDate,
-) : InntektEndringAarsak()
-
-@Serializable
-@SerialName("Bonus")
-data class Bonus(
-    val aarligBonus: Double? = null,
-    val datoForBonus: LocalDate? = null,
 ) : InntektEndringAarsak()
 
 @Serializable
@@ -77,5 +62,20 @@ data class Permittering(
 ) : InntektEndringAarsak()
 
 @Serializable
-@SerialName("Feilregistrert")
-data object Feilregistrert : InntektEndringAarsak()
+@SerialName("Sykefravaer")
+data class Sykefravaer(
+    val liste: List<Periode>,
+) : InntektEndringAarsak()
+
+@Serializable
+@SerialName("Tariffendring")
+data class Tariffendring(
+    val gjelderFra: LocalDate,
+    val bleKjent: LocalDate,
+) : InntektEndringAarsak()
+
+@Serializable
+@SerialName("VarigLonnsendring")
+data class VarigLonnsendring(
+    val gjelderFra: LocalDate,
+) : InntektEndringAarsak()

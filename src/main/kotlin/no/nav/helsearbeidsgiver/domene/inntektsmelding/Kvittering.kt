@@ -12,7 +12,7 @@ import java.time.OffsetDateTime
 @Serializable
 data class Kvittering(
     val kvitteringDokument: KvitteringSimba? = null,
-    val kvitteringEkstern: KvitteringEkstern? = null
+    val kvitteringEkstern: KvitteringEkstern? = null,
 )
 
 @Serializable
@@ -42,5 +42,5 @@ data class KvitteringSimba(
 data class KvitteringEkstern(
     val avsenderSystem: String,
     val referanse: String,
-    val tidspunkt: OffsetDateTime
+    val tidspunkt: OffsetDateTime,
 )
