@@ -10,7 +10,13 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 
 @Serializable
-data class KvitteringResponse(
+data class Kvittering(
+    val kvitteringDokument: KvitteringSimba? = null,
+    val kvitteringEkstern: KvitteringEkstern? = null
+)
+
+@Serializable
+data class KvitteringSimba(
     val orgnrUnderenhet: String,
     val identitetsnummer: String,
     val fulltNavn: String,
@@ -30,4 +36,11 @@ data class KvitteringResponse(
     val bekreftOpplysninger: Boolean,
     val tidspunkt: OffsetDateTime,
     val forespurtData: List<String>? = null,
+)
+
+@Serializable
+data class KvitteringEkstern(
+    val avsenderSystem: String,
+    val referanse: String,
+    val tidspunkt: OffsetDateTime
 )
