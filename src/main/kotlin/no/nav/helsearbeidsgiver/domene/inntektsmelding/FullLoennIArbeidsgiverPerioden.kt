@@ -1,6 +1,8 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import no.nav.helsearbeidsgiver.utils.json.serializer.AsStringSerializer
 
 @Serializable
 data class FullLoennIArbeidsgiverPerioden(
@@ -9,7 +11,7 @@ data class FullLoennIArbeidsgiverPerioden(
     val utbetalt: Double? = null,
 )
 
-@Serializable
+@Serializable(BegrunnelseIngenEllerRedusertUtbetalingKodeSerializer::class)
 enum class BegrunnelseIngenEllerRedusertUtbetalingKode(val value: String) {
     ARBEID_OPPHOERT("ArbeidOpphoert"),
     BESKJED_GITT_FOR_SENT("BeskjedGittForSent"),
@@ -27,3 +29,19 @@ enum class BegrunnelseIngenEllerRedusertUtbetalingKode(val value: String) {
     STREIK_ELLER_LOCKOUT("StreikEllerLockout"),
     TIDLIGERE_VIRKSOMHET("TidligereVirksomhet"),
 }
+
+internal class BegrunnelseIngenEllerRedusertUtbetalingKodeSerializer : AsStringSerializer<BegrunnelseIngenEllerRedusertUtbetalingKode>(
+    serialName = "helsearbeidsgiver.kotlinx.BegrunnelseIngenEllerRedusertUtbetalingKodeSerializer",
+    parse = { json ->
+        BegrunnelseIngenEllerRedusertUtbetalingKode.entries.firstOrNull { begrunnelse ->
+            listOf(
+                begrunnelse.name,
+                begrunnelse.value,
+            )
+                .any {
+                    it.equals(json, ignoreCase = true)
+                }
+        }
+            ?: throw SerializationException("Fant ingen begrunnelse med 'name' eller 'value' som matchet '$json'.")
+    },
+)

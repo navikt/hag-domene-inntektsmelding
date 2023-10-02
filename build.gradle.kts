@@ -43,11 +43,16 @@ publishing {
 }
 
 dependencies {
+    val kotestVersion: String by project
     val kotlinxSerializationVersion: String by project
     val utilsVersion: String by project
 
     implementation("no.nav.helsearbeidsgiver:utils:$utilsVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
+
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.kotest:kotest-framework-datatest:$kotestVersion")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
 
 fun RepositoryHandler.mavenNav(repo: String): MavenArtifactRepository {
