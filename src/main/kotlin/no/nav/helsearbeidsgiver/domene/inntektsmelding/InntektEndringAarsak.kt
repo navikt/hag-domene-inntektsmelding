@@ -34,6 +34,10 @@ data class Ferie(
 ) : InntektEndringAarsak()
 
 @Serializable
+@SerialName("Ferietrekk")
+data object Ferietrekk : InntektEndringAarsak()
+
+@Serializable
 @SerialName("Nyansatt")
 data object Nyansatt : InntektEndringAarsak()
 
