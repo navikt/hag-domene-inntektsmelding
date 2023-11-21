@@ -21,6 +21,7 @@ data class Inntektsmelding(
     val fraværsperioder: List<Periode>,
     val arbeidsgiverperioder: List<Periode>,
     val beregnetInntekt: Double,
+    val inntektsdato: LocalDate? = null,
     val inntekt: Inntekt? = null,
     val fullLønnIArbeidsgiverPerioden: FullLoennIArbeidsgiverPerioden? = null,
     val refusjon: Refusjon,
