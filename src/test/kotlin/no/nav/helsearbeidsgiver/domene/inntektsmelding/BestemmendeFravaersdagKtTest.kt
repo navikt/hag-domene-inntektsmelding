@@ -36,7 +36,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
             actual shouldBe expected
         }
 
-        test("flere arbeidsgiverperioder uten gap, gap ignoreres") {
+        test("flere arbeidsgiverperioder uten gap, gap ignoreres IKKE") {
             // Kommenter inn når logikk endres til å overse kant-i-kant gap
 //            val expected = 1.februar
 
