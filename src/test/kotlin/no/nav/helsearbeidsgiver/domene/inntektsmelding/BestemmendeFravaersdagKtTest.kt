@@ -18,7 +18,6 @@ import no.nav.helsearbeidsgiver.utils.test.date.september
 class BestemmendeFravaersdagKtTest : FunSpec({
 
     context("arbeidsgiverperiode tilstede") {
-        // TODO legg til egenmeldings- og sykmeldingsperioder
 
         test("kun én arbeidsgiverperiode") {
             val expected = 1.januar
