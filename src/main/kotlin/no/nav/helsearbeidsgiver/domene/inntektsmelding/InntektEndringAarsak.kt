@@ -5,16 +5,31 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonTransformingSerializer
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import java.time.LocalDate
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
-// TODO bytt ved mulighet
-@JsonClassDiscriminator("typpe")
+@JsonClassDiscriminator("aarsak")
 sealed class InntektEndringAarsak
+
+@Serializer(forClass = InntektEndringAarsak::class)
+object InntektEndringAarsakTransformer : JsonTransformingSerializer<InntektEndringAarsak>(InntektEndringAarsak.serializer()) {
+    override fun transformDeserialize(element: JsonElement): JsonElement {
+        if (element is JsonObject && element.containsKey("typpe")) {
+            val mutableMap = element.toMutableMap()
+            mutableMap["aarsak"] = mutableMap.remove("typpe")!!
+            return JsonObject(mutableMap)
+        }
+        return element
+    }
+}
 
 @Serializable
 @SerialName("Bonus")
