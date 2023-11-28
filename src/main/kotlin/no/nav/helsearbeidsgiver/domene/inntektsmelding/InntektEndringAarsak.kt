@@ -23,9 +23,10 @@ sealed class InntektEndringAarsak
 object InntektEndringAarsakTransformer : JsonTransformingSerializer<InntektEndringAarsak>(InntektEndringAarsak.serializer()) {
     override fun transformDeserialize(element: JsonElement): JsonElement {
         if (element is JsonObject && element.containsKey("typpe")) {
-            val mutableMap = element.toMutableMap()
-            mutableMap["aarsak"] = mutableMap.remove("typpe")!!
-            return JsonObject(mutableMap)
+            val gammelJson = element.toMap()
+            val aarsak = gammelJson["typpe"] ?: throw IllegalArgumentException("Mangler felt 'typpe'.")
+            val nyJson = gammelJson.minus("typpe").plus("aarsak" to aarsak)
+            return JsonObject(nyJson)
         }
         return element
     }
