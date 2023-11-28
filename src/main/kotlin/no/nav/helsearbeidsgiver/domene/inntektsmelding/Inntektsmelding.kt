@@ -2,6 +2,8 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
@@ -10,6 +12,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 
 @Serializable
+@OptIn(ExperimentalSerializationApi::class)
 data class Inntektsmelding(
     val orgnrUnderenhet: String,
     val identitetsnummer: String,
@@ -17,7 +20,6 @@ data class Inntektsmelding(
     val virksomhetNavn: String,
     val behandlingsdager: List<LocalDate>,
     val egenmeldingsperioder: List<Periode>,
-    val bestemmendeFraværsdag: LocalDate,
     val fraværsperioder: List<Periode>,
     val arbeidsgiverperioder: List<Periode>,
     val beregnetInntekt: Double,
@@ -31,4 +33,10 @@ data class Inntektsmelding(
     val innsenderNavn: String? = null,
     val telefonnummer: String? = null,
     val forespurtData: List<String>? = null,
+    @EncodeDefault
+    val bestemmendeFraværsdag: LocalDate = bestemmendeFravaersdag(
+        arbeidsgiverperioder = arbeidsgiverperioder,
+        egenmeldingsperioder = egenmeldingsperioder,
+        sykmeldingsperioder = fraværsperioder,
+    ),
 )
