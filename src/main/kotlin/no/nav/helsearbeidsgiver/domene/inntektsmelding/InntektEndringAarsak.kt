@@ -5,7 +5,6 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlinx.serialization.json.JsonElement
@@ -19,7 +18,6 @@ import java.time.LocalDate
 @JsonClassDiscriminator("aarsak")
 sealed class InntektEndringAarsak
 
-@Serializer(forClass = InntektEndringAarsak::class)
 object InntektEndringAarsakTransformer : JsonTransformingSerializer<InntektEndringAarsak>(InntektEndringAarsak.serializer()) {
     override fun transformDeserialize(element: JsonElement): JsonElement {
         if (element is JsonObject && element.containsKey("typpe")) {
