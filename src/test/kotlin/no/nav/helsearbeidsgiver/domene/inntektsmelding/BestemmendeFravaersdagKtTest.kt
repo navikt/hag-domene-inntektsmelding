@@ -36,11 +36,8 @@ class BestemmendeFravaersdagKtTest : FunSpec({
             actual shouldBe expected
         }
 
-        test("flere arbeidsgiverperioder uten gap, gap ignoreres IKKE") {
-            // Kommenter inn når logikk endres til å overse kant-i-kant gap
-//            val expected = 1.februar
-
-            val expected = 13.februar
+        test("flere arbeidsgiverperioder kant i kant behandles som enkelt arbeidsgiverperiode") {
+            val expected = 1.februar
 
             // Arbeidsgiver overstyrer AGP
             val actual = bestemmendeFravaersdag(

@@ -10,26 +10,36 @@ fun bestemmendeFravaersdag(
     sykmeldingsperioder: List<Periode>,
 ): LocalDate =
     if (arbeidsgiverperioder.isNotEmpty()) {
-        arbeidsgiverperioder.maxOf(Periode::fom)
+        arbeidsgiverperioder
+            .slaaSammenPerioder { denne, neste ->
+                denne.tom.daysUntil(neste.fom) <= 1
+            }
     } else {
         (egenmeldingsperioder + sykmeldingsperioder)
-            .sortedBy { it.fom }
-            .reduce { sammenhengende, neste ->
-                if (sammenhengende.kanSlaasSammenMed(neste)) {
-                    Periode(
-                        fom = sammenhengende.fom,
-                        tom = maxOf(sammenhengende.tom, neste.tom),
-                    )
-                } else {
-                    neste
-                }
-            }
-            .fom
+            .slaaSammenPerioder(
+                kanSlaasSammen = ::kanSlaasSammenIgnorerHelgegap,
+            )
     }
+        .fom
 
-private fun Periode.kanSlaasSammenMed(other: Periode): Boolean {
-    val dagerAvstand = tom.daysUntil(other.fom)
-    return when (tom.dayOfWeek) {
+private fun List<Periode>.slaaSammenPerioder(
+    kanSlaasSammen: (Periode, Periode) -> Boolean,
+): Periode =
+    sortedBy { it.fom }
+        .reduce { sammenhengende, neste ->
+            if (kanSlaasSammen(sammenhengende, neste)) {
+                Periode(
+                    fom = sammenhengende.fom,
+                    tom = maxOf(sammenhengende.tom, neste.tom),
+                )
+            } else {
+                neste
+            }
+        }
+
+private fun kanSlaasSammenIgnorerHelgegap(denne: Periode, neste: Periode): Boolean {
+    val dagerAvstand = denne.tom.daysUntil(neste.fom)
+    return when (denne.tom.dayOfWeek) {
         DayOfWeek.FRIDAY -> dagerAvstand <= 3
         DayOfWeek.SATURDAY -> dagerAvstand <= 2
         else -> dagerAvstand <= 1
