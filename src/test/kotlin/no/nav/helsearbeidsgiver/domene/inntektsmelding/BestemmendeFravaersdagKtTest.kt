@@ -112,10 +112,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
         }
 
         test("arbeidsgiverperiode med gap til egenmeldingsperioder") {
-            // Kommenter inn når logikk endres til å velge fom fra egenmeldingsperioder
-//            val expected = 3.februar
-
-            val expected = 10.januar
+            val expected = 3.februar
 
             val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
@@ -133,10 +130,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
         }
 
         test("arbeidsgiverperiode med gap til sykmeldingsperioder") {
-            // Kommenter inn når logikk endres til å velge fom fra sykmeldingsperioder
-//            val expected = 8.juni
-
-            val expected = 13.mars
+            val expected = 8.juni
 
             val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(

@@ -8,19 +8,25 @@ fun bestemmendeFravaersdag(
     arbeidsgiverperioder: List<Periode>,
     egenmeldingsperioder: List<Periode>,
     sykmeldingsperioder: List<Periode>,
-): LocalDate =
-    if (arbeidsgiverperioder.isNotEmpty()) {
+): LocalDate {
+    val sykdomsperioder = egenmeldingsperioder + sykmeldingsperioder
+    val sykdomStart = sykdomsperioder.minOf(Periode::fom)
+
+    val agpSlutt = arbeidsgiverperioder.maxOfOrNull(Periode::tom)
+
+    return if (agpSlutt != null && agpSlutt.daysUntil(sykdomStart) <= 1) {
         arbeidsgiverperioder
             .slaaSammenPerioder { denne, neste ->
                 denne.tom.daysUntil(neste.fom) <= 1
             }
     } else {
-        (egenmeldingsperioder + sykmeldingsperioder)
+        sykdomsperioder
             .slaaSammenPerioder(
                 kanSlaasSammen = ::kanSlaasSammenIgnorerHelgegap,
             )
     }
         .fom
+}
 
 private fun List<Periode>.slaaSammenPerioder(
     kanSlaasSammen: (Periode, Periode) -> Boolean,
