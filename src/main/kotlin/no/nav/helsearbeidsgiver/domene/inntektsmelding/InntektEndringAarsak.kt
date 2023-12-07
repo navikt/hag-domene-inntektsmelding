@@ -18,10 +18,7 @@ sealed class InntektEndringAarsak
 
 @Serializable
 @SerialName("Bonus")
-data class Bonus(
-    val aarligBonus: Double? = null,
-    val datoForBonus: LocalDate? = null,
-) : InntektEndringAarsak()
+data class Bonus : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Feilregistrert")
@@ -30,7 +27,7 @@ data object Feilregistrert : InntektEndringAarsak()
 @Serializable
 @SerialName("Ferie")
 data class Ferie(
-    val liste: List<Periode>,
+    val perioder: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable
@@ -56,19 +53,19 @@ data class NyStillingsprosent(
 @Serializable
 @SerialName("Permisjon")
 data class Permisjon(
-    val liste: List<Periode>,
+    val perioder: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Permittering")
 data class Permittering(
-    val liste: List<Periode>,
+    val perioder: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Sykefravaer")
 data class Sykefravaer(
-    val liste: List<Periode>,
+    val perioder: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable
