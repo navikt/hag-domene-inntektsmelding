@@ -18,7 +18,7 @@ sealed class InntektEndringAarsak
 
 @Serializable
 @SerialName("Bonus")
-data class Bonus : InntektEndringAarsak()
+data object Bonus : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Feilregistrert")
