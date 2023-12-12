@@ -19,7 +19,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
 
     context("arbeidsgiverperiode tilstede") {
 
-        test("kun én arbeidsgiverperiode") {
+        test("siste fom i arbeidsgiverperioden er _lik_ siste fom i sykdomsperiodene") {
             val expected = 1.januar
 
             // Arbeidsgiver overstyrer AGP
@@ -27,9 +27,47 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 arbeidsgiverperioder = listOf(
                     1.januar til 16.januar,
                 ),
-                egenmeldingsperioder = emptyList(),
+                egenmeldingsperioder = listOf(
+                    1.januar til 3.januar,
+                ),
                 sykmeldingsperioder = listOf(
                     4.januar til 31.januar,
+                ),
+            )
+
+            actual shouldBe expected
+        }
+
+        test("siste fom i arbeidsgiverperioden er _før_ siste fom i sykdomsperiodene") {
+            val expected = 4.oktober
+
+            // Arbeidsgiver overstyrer AGP
+            val actual = bestemmendeFravaersdag(
+                arbeidsgiverperioder = listOf(
+                    2.oktober til 17.oktober,
+                ),
+                egenmeldingsperioder = emptyList(),
+                sykmeldingsperioder = listOf(
+                    4.oktober til 27.oktober,
+                ),
+            )
+
+            actual shouldBe expected
+        }
+
+        test("siste fom i arbeidsgiverperioden er _etter_ siste fom i sykdomsperiodene") {
+            val expected = 3.juli
+
+            // Arbeidsgiver overstyrer AGP
+            val actual = bestemmendeFravaersdag(
+                arbeidsgiverperioder = listOf(
+                    3.juli til 18.juli,
+                ),
+                egenmeldingsperioder = listOf(
+                    1.juli til 4.juli,
+                ),
+                sykmeldingsperioder = listOf(
+                    5.juli til 27.juli,
                 ),
             )
 
@@ -46,7 +84,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     13.februar til 16.februar,
                 ),
                 egenmeldingsperioder = listOf(
-                    3.februar til 5.februar,
+                    1.februar til 5.februar,
                 ),
                 sykmeldingsperioder = listOf(
                     6.februar til 28.februar,
@@ -56,7 +94,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
             actual shouldBe expected
         }
 
-        test("flere arbeidsgiverperioder med hverdagsgap") {
+        test("flere arbeidsgiverperioder med hverdagsgap behandles som oppdelt arbeidsgiverperiode") {
             val expected = 10.mars
 
             // Arbeidsgiver overstyrer AGP
@@ -70,14 +108,14 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     6.mars til 7.mars,
                 ),
                 sykmeldingsperioder = listOf(
-                    11.mars til 31.mars,
+                    9.mars til 31.mars,
                 ),
             )
 
             actual shouldBe expected
         }
 
-        test("flere arbeidsgiverperioder med helgegap") {
+        test("flere arbeidsgiverperioder med helgegap behandles som oppdelt arbeidsgiverperiode") {
             val expected = 15.april
 
             val actual = bestemmendeFravaersdag(
@@ -88,23 +126,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
                 egenmeldingsperioder = emptyList(),
                 sykmeldingsperioder = listOf(
-                    15.april til 17.april,
-                ),
-            )
-
-            actual shouldBe expected
-        }
-
-        test("arbeidsgiverperiode kant i kant med sykmeldingsperioder") {
-            val expected = 5.januar
-
-            val actual = bestemmendeFravaersdag(
-                arbeidsgiverperioder = listOf(
-                    5.januar til 21.januar,
-                ),
-                egenmeldingsperioder = emptyList(),
-                sykmeldingsperioder = listOf(
-                    22.januar til 22.februar,
+                    14.april til 17.april,
                 ),
             )
 
