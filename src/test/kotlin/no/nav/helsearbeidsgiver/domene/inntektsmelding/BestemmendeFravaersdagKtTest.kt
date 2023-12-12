@@ -63,11 +63,9 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 arbeidsgiverperioder = listOf(
                     3.juli til 18.juli,
                 ),
-                egenmeldingsperioder = listOf(
-                    1.juli til 4.juli,
-                ),
+                egenmeldingsperioder = emptyList(),
                 sykmeldingsperioder = listOf(
-                    5.juli til 27.juli,
+                    1.juli til 27.juli,
                 ),
             )
 
