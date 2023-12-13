@@ -9,26 +9,27 @@ fun bestemmendeFravaersdag(
     egenmeldingsperioder: List<Periode>,
     sykmeldingsperioder: List<Periode>,
 ): LocalDate {
-    val sykdomsperioder = egenmeldingsperioder + sykmeldingsperioder
-    val sykdomStart = sykdomsperioder.minOf(Periode::fom)
+    val sisteArbeidsgiverperiode = arbeidsgiverperioder.ifEmpty { null }
+        ?.sisteSammenhengendePeriode { denne, neste ->
+            denne.tom.daysUntil(neste.fom) <= 1
+        }
 
-    val agpSlutt = arbeidsgiverperioder.maxOfOrNull(Periode::tom)
+    val sisteSykdomsperiode = (egenmeldingsperioder + sykmeldingsperioder)
+        .sisteSammenhengendePeriode(
+            kanSlaasSammen = ::kanSlaasSammenIgnorerHelgegap,
+        )
 
-    return if (agpSlutt != null && agpSlutt.daysUntil(sykdomStart) <= 1) {
-        arbeidsgiverperioder
-            .slaaSammenPerioder { denne, neste ->
-                denne.tom.daysUntil(neste.fom) <= 1
-            }
+    return if (sisteArbeidsgiverperiode != null) {
+        maxOf(
+            sisteArbeidsgiverperiode.fom,
+            sisteSykdomsperiode.fom,
+        )
     } else {
-        sykdomsperioder
-            .slaaSammenPerioder(
-                kanSlaasSammen = ::kanSlaasSammenIgnorerHelgegap,
-            )
+        sisteSykdomsperiode.fom
     }
-        .fom
 }
 
-private fun List<Periode>.slaaSammenPerioder(
+private fun List<Periode>.sisteSammenhengendePeriode(
     kanSlaasSammen: (Periode, Periode) -> Boolean,
 ): Periode =
     sortedBy { it.fom }
