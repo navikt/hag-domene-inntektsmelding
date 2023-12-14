@@ -164,6 +164,26 @@ class BestemmendeFravaersdagKtTest : FunSpec({
 
             actual shouldBe expected
         }
+
+        test("egenmeldingsperioder eksluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
+            val expected = 31.mars
+
+            val actual = bestemmendeFravaersdag(
+                arbeidsgiverperioder = listOf(
+                    31.mars til 15.april,
+                ),
+                egenmeldingsperioder = listOf(
+                    31.mars til 31.mars,
+                ),
+                sykmeldingsperioder = listOf(
+                    1.april til 16.april,
+                    // Skal bli eksludert da foregående perioder er over 16 dager
+                    19.april til 24.april,
+                ),
+            )
+
+            actual shouldBe expected
+        }
     }
 
     context("arbeidsgiverperoide ikke tilstede") {
@@ -331,6 +351,29 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 sykmeldingsperioder = listOf(
                     17.desember til 20.desember,
                     21.desember til 29.desember,
+                ),
+            )
+
+            actual shouldBe expected
+        }
+
+        test("egenmeldingsperioder eksluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
+            val expected = 11.august
+
+            val actual = bestemmendeFravaersdag(
+                arbeidsgiverperioder = emptyList(),
+                egenmeldingsperioder = listOf(
+                    23.juli til 29.juli,
+                ),
+                sykmeldingsperioder = listOf(
+                    1.august til 5.august,
+                    6.august til 8.august,
+                    11.august til 12.august,
+                    // Resten skal bli eksludert da foregående perioder er over 16 dager
+                    15.august til 16.august,
+                    17.august til 18.august,
+                    21.august til 22.august,
+                    25.august til 30.august,
                 ),
             )
 
