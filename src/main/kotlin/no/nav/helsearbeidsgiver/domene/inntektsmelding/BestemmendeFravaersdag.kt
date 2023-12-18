@@ -19,7 +19,7 @@ fun bestemmendeFravaersdag(
         .slaaSammenSammenhengendePerioder(
             kanSlaasSammen = ::kanSlaasSammenIgnorerHelgegap,
         )
-        .filtrerBortUtgaaendePerioder()
+        .fjernPerioderEtterFoersteUtoverAgp()
         .last()
 
     return if (sisteArbeidsgiverperiode != null) {
@@ -51,7 +51,7 @@ private fun List<Periode>.slaaSammenSammenhengendePerioder(
             }
         }
 
-private fun List<Periode>.filtrerBortUtgaaendePerioder(): List<Periode> =
+private fun List<Periode>.fjernPerioderEtterFoersteUtoverAgp(): List<Periode> =
     filterIndexed { index, _ ->
         val antallForegaaendeDager = slice(0..<index)
             .sumOf {
