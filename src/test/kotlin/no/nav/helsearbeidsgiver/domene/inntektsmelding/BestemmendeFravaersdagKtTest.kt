@@ -177,7 +177,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
                 sykmeldingsperioder = listOf(
                     1.april til 16.april,
-                    // Skal bli eksludert da foregående perioder er over 16 dager
+                    // Skal bli ekskludert da foregående perioder er over 16 dager
                     19.april til 24.april,
                 ),
             )
@@ -369,7 +369,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     1.august til 5.august,
                     6.august til 8.august,
                     11.august til 12.august,
-                    // Resten skal bli eksludert da foregående perioder er over 16 dager
+                    // Resten skal bli ekskludert da foregående perioder er over 16 dager
                     15.august til 16.august,
                     17.august til 18.august,
                     21.august til 22.august,
