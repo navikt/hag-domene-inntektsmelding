@@ -11,14 +11,29 @@ import kotlin.collections.List
 
 @Serializable
 data class Refusjon(
-    val utbetalerHeleEllerDeler: Boolean,
-    val refusjonPrMnd: Double? = null,
-    val refusjonOpphører: LocalDate? = null,
-    val refusjonEndringer: List<RefusjonEndring>? = null,
+    val beloepPerMaaned: Double,
+    val endringer: List<RefusjonEndring>,
+    val sluttdato: LocalDate? = null,
 )
 
 @Serializable
 data class RefusjonEndring(
+    val beloep: Double,
+    val startdato: LocalDate,
+)
+
+@Deprecated("Bruk 'Refusjon' istedenfor.")
+@Serializable
+data class RefusjonDeprecated(
+    val utbetalerHeleEllerDeler: Boolean,
+    val refusjonPrMnd: Double? = null,
+    val refusjonOpphører: LocalDate? = null,
+    val refusjonEndringer: List<RefusjonEndringDeprecated>? = null,
+)
+
+@Deprecated("Bruk 'RefusjonEndring' istedenfor.")
+@Serializable
+data class RefusjonEndringDeprecated(
     val beløp: Double? = null,
     val dato: LocalDate? = null,
 )

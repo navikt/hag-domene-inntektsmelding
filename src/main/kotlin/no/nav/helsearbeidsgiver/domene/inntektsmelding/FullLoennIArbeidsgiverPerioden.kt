@@ -2,6 +2,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding
 
 import kotlinx.serialization.Serializable
 
+@Deprecated("Bruk 'RedusertLoennIAgp' istedenfor.")
 @Serializable
 data class FullLoennIArbeidsgiverPerioden(
     val utbetalerFullLønn: Boolean,

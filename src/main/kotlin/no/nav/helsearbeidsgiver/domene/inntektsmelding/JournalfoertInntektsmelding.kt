@@ -9,5 +9,5 @@ import kotlinx.serialization.json.JsonNames
 data class JournalfoertInntektsmelding(
     val journalpostId: String,
     @JsonNames("inntektsmeldingDokument") // TODO slett etter overgangsfase
-    val inntektsmelding: Inntektsmelding,
+    val inntektsmelding: InntektsmeldingDeprecated,
 )

@@ -10,6 +10,14 @@ import java.time.LocalDate
 @Serializable
 data class Naturalytelse(
     val naturalytelse: NaturalytelseKode,
+    val verdiBeloep: Double,
+    val sluttdato: LocalDate,
+)
+
+@Deprecated("Bruk 'Naturalytelse' istedenfor.")
+@Serializable
+data class NaturalytelseDeprecated(
+    val naturalytelse: NaturalytelseKode,
     val dato: LocalDate,
     val beløp: Double,
 )
