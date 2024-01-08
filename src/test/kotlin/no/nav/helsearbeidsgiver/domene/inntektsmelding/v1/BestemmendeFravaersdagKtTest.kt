@@ -1,4 +1,4 @@
-package no.nav.helsearbeidsgiver.domene.inntektsmelding
+package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe

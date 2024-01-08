@@ -1,4 +1,4 @@
-package no.nav.helsearbeidsgiver.domene.inntektsmelding
+package no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated
 
 import kotlinx.serialization.Serializable
 
