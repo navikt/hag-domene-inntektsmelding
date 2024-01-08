@@ -7,14 +7,28 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonTransformingSerializer
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import java.time.LocalDate
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
-// TODO bytt ved mulighet
-@JsonClassDiscriminator("typpe")
+@JsonClassDiscriminator("aarsak")
 sealed class InntektEndringAarsak
+
+object InntektEndringAarsakTransformer : JsonTransformingSerializer<InntektEndringAarsak>(InntektEndringAarsak.serializer()) {
+    override fun transformDeserialize(element: JsonElement): JsonElement {
+        if (element is JsonObject && element.containsKey("typpe")) {
+            val gammelJson = element.toMap()
+            val aarsak = gammelJson["typpe"] ?: throw IllegalArgumentException("Mangler felt 'typpe'.")
+            val nyJson = gammelJson.minus("typpe").plus("aarsak" to aarsak)
+            return JsonObject(nyJson)
+        }
+        return element
+    }
+}
 
 @Serializable
 @SerialName("Bonus")
