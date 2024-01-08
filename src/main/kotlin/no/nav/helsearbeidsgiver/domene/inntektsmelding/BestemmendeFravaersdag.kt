@@ -9,15 +9,18 @@ fun bestemmendeFravaersdag(
     egenmeldingsperioder: List<Periode>,
     sykmeldingsperioder: List<Periode>,
 ): LocalDate {
-    val sisteArbeidsgiverperiode = arbeidsgiverperioder.ifEmpty { null }
-        ?.sisteSammenhengendePeriode { denne, neste ->
+    val sisteArbeidsgiverperiode = arbeidsgiverperioder
+        .slaaSammenSammenhengendePerioder { denne, neste ->
             denne.tom.daysUntil(neste.fom) <= 1
         }
+        .lastOrNull()
 
     val sisteSykdomsperiode = (egenmeldingsperioder + sykmeldingsperioder)
-        .sisteSammenhengendePeriode(
+        .slaaSammenSammenhengendePerioder(
             kanSlaasSammen = ::kanSlaasSammenIgnorerHelgegap,
         )
+        .fjernPerioderEtterFoersteUtoverAgp()
+        .last()
 
     return if (sisteArbeidsgiverperiode != null) {
         maxOf(
@@ -29,20 +32,34 @@ fun bestemmendeFravaersdag(
     }
 }
 
-private fun List<Periode>.sisteSammenhengendePeriode(
+private fun List<Periode>.slaaSammenSammenhengendePerioder(
     kanSlaasSammen: (Periode, Periode) -> Boolean,
-): Periode =
+): List<Periode> =
     sortedBy { it.fom }
-        .reduce { sammenhengende, neste ->
-            if (kanSlaasSammen(sammenhengende, neste)) {
-                Periode(
-                    fom = sammenhengende.fom,
-                    tom = maxOf(sammenhengende.tom, neste.tom),
+        .fold(emptyList()) { slaattSammen, periode ->
+            val forrige = slaattSammen.lastOrNull()
+
+            if (forrige != null && kanSlaasSammen(forrige, periode)) {
+                val sammenhengende = Periode(
+                    fom = forrige.fom,
+                    tom = maxOf(forrige.tom, periode.tom),
                 )
+
+                slaattSammen.dropLast(1).plus(sammenhengende)
             } else {
-                neste
+                slaattSammen.plus(periode)
             }
         }
+
+private fun List<Periode>.fjernPerioderEtterFoersteUtoverAgp(): List<Periode> =
+    filterIndexed { index, _ ->
+        val antallForegaaendeDager = slice(0..<index)
+            .sumOf {
+                it.fom.daysUntil(it.tom) + 1
+            }
+
+        antallForegaaendeDager <= 16
+    }
 
 private fun kanSlaasSammenIgnorerHelgegap(denne: Periode, neste: Periode): Boolean {
     val dagerAvstand = denne.tom.daysUntil(neste.fom)
