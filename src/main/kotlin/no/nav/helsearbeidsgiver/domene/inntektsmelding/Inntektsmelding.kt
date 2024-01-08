@@ -13,11 +13,11 @@ import java.util.UUID
 data class Inntektsmelding(
     val id: UUID,
     val sykmeldt: Sykmeldt,
-    val innsender: Innsender,
+    val avsender: Avsender,
     val sykmeldingsperioder: List<Periode>,
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt,
     val refusjon: Refusjon,
     val aarsakInnsending: AarsakInnsending,
-    val innsendt: OffsetDateTime,
+    val mottatt: OffsetDateTime,
 )

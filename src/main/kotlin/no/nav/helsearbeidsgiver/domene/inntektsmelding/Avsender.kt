@@ -3,7 +3,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Innsender(
+data class Avsender(
     val orgnr: String,
     val orgNavn: String,
     val fnr: String,
