@@ -18,10 +18,7 @@ sealed class InntektEndringAarsak
 
 @Serializable
 @SerialName("Bonus")
-data class Bonus(
-    val aarligBonus: Double? = null,
-    val datoForBonus: LocalDate? = null,
-) : InntektEndringAarsak()
+data object Bonus : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Feilregistrert")
