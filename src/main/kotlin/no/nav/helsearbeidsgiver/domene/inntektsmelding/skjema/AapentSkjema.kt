@@ -9,7 +9,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.Refusjon
 @Serializable
 data class AapentSkjema(
     val sykmeldtFnr: String,
-    val innsender: SkjemaInnsender,
+    val avsender: SkjemaAvsender,
     val sykmeldingsperioder: List<Periode>,
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt,
