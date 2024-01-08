@@ -1,9 +1,10 @@
 @file:UseSerializers(LocalDateSerializer::class, OffsetDateTimeSerializer::class)
 
-package no.nav.helsearbeidsgiver.domene.inntektsmelding
+package no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import no.nav.helsearbeidsgiver.utils.json.serializer.OffsetDateTimeSerializer
 import java.time.LocalDate
