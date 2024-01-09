@@ -10,7 +10,7 @@ data class FullLoennIArbeidsgiverPerioden(
     val utbetalt: Double? = null,
 )
 
-/** Bruker UpperCamelCase for å matche kodeverkverdier.  */
+/** Bruker UpperCamelCase for å matche kodeverkverdier. */
 @Deprecated("Bruk 'v1.BegrunnelseRedusertLoennIAgp' istedenfor.")
 @Serializable
 enum class BegrunnelseIngenEllerRedusertUtbetalingKode {

@@ -15,7 +15,7 @@ data class RedusertLoennIAgp(
     val begrunnelse: BegrunnelseRedusertLoennIAgp,
 )
 
-/** Bruker UpperCamelCase for å matche kodeverkverdier.  */
+/** Bruker UpperCamelCase for å matche kodeverkverdier. */
 @Serializable
 enum class BegrunnelseRedusertLoennIAgp {
     ArbeidOpphoert,
