@@ -6,9 +6,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import java.time.LocalDate
-import kotlin.Boolean
-import kotlin.collections.List
 
+@Deprecated("Bruk 'v1.Refusjon' istedenfor.")
 @Serializable
 data class Refusjon(
     val utbetalerHeleEllerDeler: Boolean,
@@ -17,6 +16,7 @@ data class Refusjon(
     val refusjonEndringer: List<RefusjonEndring>? = null,
 )
 
+@Deprecated("Bruk 'v1.RefusjonEndring' istedenfor.")
 @Serializable
 data class RefusjonEndring(
     val beløp: Double? = null,

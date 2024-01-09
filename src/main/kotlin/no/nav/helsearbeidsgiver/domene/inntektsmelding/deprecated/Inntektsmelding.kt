@@ -13,6 +13,7 @@ import no.nav.helsearbeidsgiver.utils.json.serializer.OffsetDateTimeSerializer
 import java.time.LocalDate
 import java.time.OffsetDateTime
 
+@Deprecated("Bruk 'v1.Inntektsmelding' istedenfor.")
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 data class Inntektsmelding(
