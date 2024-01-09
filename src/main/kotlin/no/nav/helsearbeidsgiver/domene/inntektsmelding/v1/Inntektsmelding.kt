@@ -16,8 +16,8 @@ data class Inntektsmelding(
     val avsender: Avsender,
     val sykmeldingsperioder: List<Periode>,
     val agp: Arbeidsgiverperiode?,
-    val inntekt: Inntekt,
-    val refusjon: Refusjon,
+    val inntekt: Inntekt?,
+    val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
 )
