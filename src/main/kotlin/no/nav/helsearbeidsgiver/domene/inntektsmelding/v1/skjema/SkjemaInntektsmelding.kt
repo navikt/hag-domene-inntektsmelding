@@ -13,7 +13,7 @@ data class SkjemaInntektsmelding(
     val avsender: SkjemaAvsender,
     val sykmeldingsperioder: List<Periode>,
     val agp: Arbeidsgiverperiode?,
-    val inntekt: Inntekt,
-    val refusjon: Refusjon,
+    val inntekt: Inntekt?,
+    val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
 )
