@@ -1,4 +1,4 @@
-package no.nav.helsearbeidsgiver.domene.inntektsmelding
+package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import kotlinx.serialization.Serializable
 

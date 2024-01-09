@@ -1,19 +1,23 @@
-package no.nav.helsearbeidsgiver.domene.inntektsmelding
+package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import kotlinx.serialization.Serializable
 
-@Deprecated("Bruk 'v1.RedusertLoennIAgp' istedenfor.")
 @Serializable
-data class FullLoennIArbeidsgiverPerioden(
-    val utbetalerFullLønn: Boolean,
-    val begrunnelse: BegrunnelseIngenEllerRedusertUtbetalingKode? = null,
-    val utbetalt: Double? = null,
+data class Arbeidsgiverperiode(
+    val perioder: List<Periode>,
+    val egenmeldinger: List<Periode>,
+    val redusertLoennIAgp: RedusertLoennIAgp? = null,
+)
+
+@Serializable
+data class RedusertLoennIAgp(
+    val beloep: Double,
+    val begrunnelse: BegrunnelseRedusertLoennIAgp,
 )
 
 /** Bruker UpperCamelCase for å matche kodeverkverdier.  */
-@Deprecated("Bruk 'v1.BegrunnelseRedusertLoennIAgp' istedenfor.")
 @Serializable
-enum class BegrunnelseIngenEllerRedusertUtbetalingKode {
+enum class BegrunnelseRedusertLoennIAgp {
     ArbeidOpphoert,
     BeskjedGittForSent,
     BetvilerArbeidsufoerhet,
