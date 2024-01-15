@@ -2,14 +2,18 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding
 
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertBegrunnelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertEndringAarsak
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertInntekt
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertInntektToV0
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertNaturalYtelser
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertReduksjon
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertRefusjonToV0
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertToV0
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertToV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.BegrunnelseIngenEllerRedusertUtbetalingKode
@@ -30,9 +34,12 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Sykefravaer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.VarigLonnsendring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.BegrunnelseRedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -128,6 +135,64 @@ class UtilsTest : FunSpec({
 
         nyIM.aarsakInnsending shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending.Ny
     }
+
+    test("konverter fra nytt til gammelt IM-format") {
+        val orginal = lagGammelInntektsmelding()
+        val nyIM = convertToV1(orginal)
+        val gammelIM = convertToV0(nyIM)
+        gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser)
+        // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste
+    }
+
+    test("konverter inntekt fra nytt til gammelt IM-format") {
+        val belop = 1000.0
+        val dato = LocalDate.of(2024, 1, 1)
+        val nyInntekt = no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt(
+            belop,
+            dato,
+            listOf(no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse(no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
+            no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Feilregistrert,
+        )
+        val gammelInntekt = convertInntektToV0(nyInntekt)
+        gammelInntekt?.beregnetInntekt shouldBe belop
+        gammelInntekt?.endringÅrsak shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Feilregistrert
+        gammelInntekt?.bekreftet shouldBe true
+        gammelInntekt?.manueltKorrigert shouldBe true
+        val nyIM = convertToV1(lagGammelInntektsmelding()).copy(inntekt = nyInntekt)
+        val konvertert = convertToV0(nyIM)
+        konvertert.naturalytelser shouldBe listOf(Naturalytelse(NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, dato, belop))
+        konvertert.inntektsdato shouldBe dato
+        konvertert.beregnetInntekt shouldBe belop
+    }
+
+    test("konverter reduksjon til V0") {
+        val belop = 333.33
+        val periode = listOf(Periode(LocalDate.EPOCH, LocalDate.MAX))
+        val nyIM = convertToV1(lagGammelInntektsmelding()).copy(
+            agp = Arbeidsgiverperiode(
+                periode,
+                periode,
+                RedusertLoennIAgp(belop, BegrunnelseRedusertLoennIAgp.FerieEllerAvspasering),
+            ),
+        )
+        val konvertert = convertToV0(nyIM)
+        konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe BegrunnelseIngenEllerRedusertUtbetalingKode.FerieEllerAvspasering
+        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe false
+        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe belop
+        konvertert.arbeidsgiverperioder shouldBe periode
+        konvertert.egenmeldingsperioder shouldBe periode
+    }
+
+    test("konverter refusjon til V0") {
+        val belop = 123.45
+        val dato1 = LocalDate.of(2023, 2, 2)
+        val dato2 = LocalDate.of(2023, 2, 2)
+        val refusjon = no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon(belop, listOf(RefusjonEndring(belop, dato1)), dato2)
+        val gammelRefusjon = convertRefusjonToV0(refusjon)
+        gammelRefusjon.refusjonEndringer shouldBe listOf(no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.RefusjonEndring(belop, dato1))
+        gammelRefusjon.refusjonOpphører shouldBe dato2
+        gammelRefusjon.refusjonPrMnd shouldBe belop
+    }
 })
 
 fun lagPeriode(): List<Periode> {
@@ -150,7 +215,7 @@ fun lagGammelInntektsmelding(): Inntektsmelding {
         identitetsnummer = "123",
         fulltNavn = "testNavn",
         virksomhetNavn = "testBedrift",
-        behandlingsdager = listOf(dato),
+        behandlingsdager = emptyList(),
         egenmeldingsperioder = lagPeriode(),
         fraværsperioder = lagPeriode(),
         arbeidsgiverperioder = lagPeriode(),
@@ -164,6 +229,5 @@ fun lagGammelInntektsmelding(): Inntektsmelding {
         årsakInnsending = AarsakInnsending.NY,
         innsenderNavn = "innsender",
         telefonnummer = "22222222",
-
     )
 }
