@@ -6,14 +6,10 @@ import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertBegrunnelse
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertEndringAarsak
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convert
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertInntekt
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertInntektToV0
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertNaturalYtelser
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertReduksjon
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertRefusjonToV0
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertToV0
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertToV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.BegrunnelseIngenEllerRedusertUtbetalingKode
@@ -82,25 +78,25 @@ class UtilsTest : FunSpec({
 
     test("convertEndringAarsak") {
         val bonus = Bonus(1.0, LocalDate.EPOCH)
-        convertEndringAarsak(bonus) shouldBe BonusV1
-        convertEndringAarsak(Bonus(null, null)) shouldBe BonusV1
-        convertEndringAarsak(Feilregistrert) shouldBe FeilregistrertV1
-        convertEndringAarsak(Ferie(lagPeriode())) shouldBe FerieV1(lagPeriode())
-        convertEndringAarsak(Ferietrekk) shouldBe FerietrekkV1
-        convertEndringAarsak(Nyansatt) shouldBe NyansattV1
-        convertEndringAarsak(NyStilling(dato)) shouldBe NyStillingV1(dato)
-        convertEndringAarsak(NyStillingsprosent(dato)) shouldBe NyStillingsprosentV1(dato)
-        convertEndringAarsak(Permisjon(lagPeriode())) shouldBe PermisjonV1(lagPeriode())
-        convertEndringAarsak(Permittering(lagPeriode())) shouldBe PermitteringV1(
+        bonus.convert() shouldBe BonusV1
+        Bonus(null, null).convert() shouldBe BonusV1
+        Feilregistrert.convert() shouldBe FeilregistrertV1
+        Ferie(lagPeriode()).convert() shouldBe FerieV1(lagPeriode())
+        Ferietrekk.convert() shouldBe FerietrekkV1
+        Nyansatt.convert() shouldBe NyansattV1
+        NyStilling(dato).convert() shouldBe NyStillingV1(dato)
+        NyStillingsprosent(dato).convert() shouldBe NyStillingsprosentV1(dato)
+        Permisjon(lagPeriode()).convert() shouldBe PermisjonV1(lagPeriode())
+        Permittering(lagPeriode()).convert() shouldBe PermitteringV1(
             lagPeriode(),
         )
-        convertEndringAarsak(Sykefravaer(lagPeriode())) shouldBe SykefravaerV1(
+        Sykefravaer(lagPeriode()).convert() shouldBe SykefravaerV1(
             lagPeriode(),
         )
-        convertEndringAarsak(Tariffendring(dato, dato)) shouldBe TariffendringV1(
+        Tariffendring(dato, dato).convert() shouldBe TariffendringV1(
             dato, dato,
         )
-        convertEndringAarsak(VarigLonnsendring(dato)) shouldBe VarigLoennsendringV1(
+        VarigLonnsendring(dato).convert() shouldBe VarigLoennsendringV1(
             dato,
         )
     }
@@ -117,7 +113,7 @@ class UtilsTest : FunSpec({
     }
 
     test("convertReduksjon") {
-        convertReduksjon(lagGammelInntektsmelding()) shouldBe null
+        lagGammelInntektsmelding().convertReduksjon() shouldBe null
         val utbetalt = 10000.0
         val im_med_reduksjon = lagGammelInntektsmelding().copy(
             fullLønnIArbeidsgiverPerioden =
@@ -131,7 +127,7 @@ class UtilsTest : FunSpec({
     test("convertBegrunnelse") {
         val gamleBegrunnelser = BegrunnelseIngenEllerRedusertUtbetalingKode.entries.toList()
         val nyeBegrunnelser = BegrunnelseRedusertLoennIAgpV1.entries.toList()
-        gamleBegrunnelser.forEachIndexed { index, begrunnelse -> convertBegrunnelse(begrunnelse) shouldBe nyeBegrunnelser[index] }
+        gamleBegrunnelser.forEachIndexed { index, begrunnelse -> begrunnelse.convert() shouldBe nyeBegrunnelser[index] }
     }
 
     test("håndterer tomme lister og null-verdier") {
@@ -156,7 +152,7 @@ class UtilsTest : FunSpec({
     test("konverter fra nytt til gammelt IM-format") {
         val orginal = lagGammelInntektsmelding()
         val nyIM = convertToV1(orginal)
-        val gammelIM = convertToV0(nyIM)
+        val gammelIM = nyIM.convert()
         gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser)
         // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste
     }
@@ -170,13 +166,13 @@ class UtilsTest : FunSpec({
             listOf(NaturalytelseV1(NaturalytelseKodeV1.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
             FeilregistrertV1,
         )
-        val gammelInntekt = convertInntektToV0(nyInntekt)
+        val gammelInntekt = nyInntekt.convert()
         gammelInntekt?.beregnetInntekt shouldBe belop
         gammelInntekt?.endringÅrsak shouldBe Feilregistrert
         gammelInntekt?.bekreftet shouldBe true
         gammelInntekt?.manueltKorrigert shouldBe true
         val nyIM = convertToV1(lagGammelInntektsmelding()).copy(inntekt = nyInntekt)
-        val konvertert = convertToV0(nyIM)
+        val konvertert = nyIM.convert()
         konvertert.naturalytelser shouldBe listOf(Naturalytelse(NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, dato, belop))
         konvertert.inntektsdato shouldBe dato
         konvertert.beregnetInntekt shouldBe belop
@@ -192,7 +188,7 @@ class UtilsTest : FunSpec({
                 RedusertLoennIAgpV1(belop, BegrunnelseRedusertLoennIAgpV1.FerieEllerAvspasering),
             ),
         )
-        val konvertert = convertToV0(nyIM)
+        val konvertert = nyIM.convert()
         konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe BegrunnelseIngenEllerRedusertUtbetalingKode.FerieEllerAvspasering
         konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe false
         konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe belop
@@ -205,7 +201,7 @@ class UtilsTest : FunSpec({
         val dato1 = LocalDate.of(2023, 2, 2)
         val dato2 = LocalDate.of(2023, 2, 2)
         val refusjon = RefusjonV1(belop, listOf(RefusjonEndringV1(belop, dato1)), dato2)
-        val gammelRefusjon = convertRefusjonToV0(refusjon)
+        val gammelRefusjon = refusjon.convert()
         gammelRefusjon.refusjonEndringer shouldBe listOf(RefusjonEndring(belop, dato1))
         gammelRefusjon.refusjonOpphører shouldBe dato2
         gammelRefusjon.refusjonPrMnd shouldBe belop

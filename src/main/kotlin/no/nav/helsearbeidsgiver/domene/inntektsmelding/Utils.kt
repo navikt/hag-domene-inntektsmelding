@@ -68,7 +68,7 @@ object Utils {
             ArbeidsgiverperiodeV1(
                 inntektsmelding.arbeidsgiverperioder,
                 inntektsmelding.egenmeldingsperioder,
-                convertReduksjon(inntektsmelding),
+                inntektsmelding.convertReduksjon(),
             ),
             convertInntekt(inntektsmelding),
             convertRefusjon(inntektsmelding.refusjon),
@@ -100,156 +100,140 @@ object Utils {
         if (im.inntekt == null) {
             throw IllegalArgumentException("Inntekt er null")
         }
-        return InntektV1(im.inntekt.beregnetInntekt, LocalDate.EPOCH, convertNaturalYtelser(im.naturalytelser), convertEndringAarsak(im.inntekt.endringÅrsak))
+        return InntektV1(im.inntekt.beregnetInntekt, LocalDate.EPOCH, convertNaturalYtelser(im.naturalytelser), im.inntekt.endringÅrsak?.convert())
     }
 
-    fun convertEndringAarsak(endringÅrsak: InntektEndringAarsak?): InntektEndringAarsakV1? {
-        if (endringÅrsak == null) {
-            return null
-        }
-        return when (endringÅrsak) {
+    fun InntektEndringAarsak.convert(): InntektEndringAarsakV1 {
+        return when (this) {
             is Bonus -> BonusV1
             is Feilregistrert -> FeilregistrertV1
-            is Ferie -> FerieV1(perioder = endringÅrsak.liste)
+            is Ferie -> FerieV1(perioder = this.liste)
             is Ferietrekk -> FerietrekkV1
             is Nyansatt -> NyansattV1
-            is NyStilling -> NyStillingV1(gjelderFra = endringÅrsak.gjelderFra)
-            is NyStillingsprosent -> NyStillingsprosentV1(gjelderFra = endringÅrsak.gjelderFra)
-            is Permisjon -> PermisjonV1(perioder = endringÅrsak.liste)
-            is Permittering -> PermitteringV1(perioder = endringÅrsak.liste)
-            is Sykefravaer -> SykefravaerV1(perioder = endringÅrsak.liste)
-            is Tariffendring -> TariffendringV1(gjelderFra = endringÅrsak.gjelderFra, bleKjent = endringÅrsak.bleKjent)
-            is VarigLonnsendring -> VarigLoennsendringV1(gjelderFra = endringÅrsak.gjelderFra)
+            is NyStilling -> NyStillingV1(gjelderFra = this.gjelderFra)
+            is NyStillingsprosent -> NyStillingsprosentV1(gjelderFra = this.gjelderFra)
+            is Permisjon -> PermisjonV1(perioder = this.liste)
+            is Permittering -> PermitteringV1(perioder = this.liste)
+            is Sykefravaer -> SykefravaerV1(perioder = this.liste)
+            is Tariffendring -> TariffendringV1(gjelderFra = this.gjelderFra, bleKjent = this.bleKjent)
+            is VarigLonnsendring -> VarigLoennsendringV1(gjelderFra = this.gjelderFra)
         }
     }
-
     fun convertNaturalYtelser(naturalytelser: List<Naturalytelse>?): List<NaturalytelseV1> {
         if (naturalytelser != null) {
-            return naturalytelser.map { ytelse -> convertNaturalYtelse(ytelse) }.toList()
+            return naturalytelser.map { ytelse -> ytelse.convert() }.toList()
         }
         return emptyList()
     }
 
-    private fun convertNaturalYtelse(ytelse: Naturalytelse): NaturalytelseV1 {
+    fun Naturalytelse.convert(): NaturalytelseV1 {
         return NaturalytelseV1(
-            NaturalytelseKodeV1.valueOf(ytelse.naturalytelse.name),
-            ytelse.beløp,
-            ytelse.dato,
+            NaturalytelseKodeV1.valueOf(this.naturalytelse.name),
+            this.beløp,
+            this.dato,
         )
     }
 
-    fun convertReduksjon(im: Inntektsmelding): RedusertLoennIAgpV1? {
-        if (im.fullLønnIArbeidsgiverPerioden == null || im.fullLønnIArbeidsgiverPerioden.utbetalt == null || im.fullLønnIArbeidsgiverPerioden.begrunnelse == null) {
+    fun Inntektsmelding.convertReduksjon(): RedusertLoennIAgpV1? {
+        if (this.fullLønnIArbeidsgiverPerioden == null || this.fullLønnIArbeidsgiverPerioden.utbetalt == null || this.fullLønnIArbeidsgiverPerioden.begrunnelse == null) {
             return null
         }
-        return RedusertLoennIAgpV1(im.fullLønnIArbeidsgiverPerioden.utbetalt, convertBegrunnelse(im.fullLønnIArbeidsgiverPerioden.begrunnelse))
+        return RedusertLoennIAgpV1(this.fullLønnIArbeidsgiverPerioden.utbetalt, this.fullLønnIArbeidsgiverPerioden.begrunnelse.convert())
     }
 
-    fun convertBegrunnelse(begrunnelse: BegrunnelseIngenEllerRedusertUtbetalingKode): BegrunnelseRedusertLoennIAgpV1 {
-        return BegrunnelseRedusertLoennIAgpV1.valueOf(begrunnelse.name)
+    fun BegrunnelseIngenEllerRedusertUtbetalingKode.convert(): BegrunnelseRedusertLoennIAgpV1 {
+        return BegrunnelseRedusertLoennIAgpV1.valueOf(this.name)
     }
 
-    fun convertToV0(im: InntektsmeldingV1): Inntektsmelding {
+    fun InntektsmeldingV1.convert(): Inntektsmelding {
         return Inntektsmelding(
-            orgnrUnderenhet = im.avsender.orgnr,
-            identitetsnummer = im.sykmeldt.fnr,
-            fulltNavn = im.sykmeldt.navn,
-            virksomhetNavn = im.avsender.orgNavn,
-            behandlingsdager = emptyList(), // TODO: Brukes ikke, V1 har ikke implementert behandlingsdager
-            egenmeldingsperioder = im.agp?.egenmeldinger ?: emptyList(),
-            fraværsperioder = im.sykmeldingsperioder,
-            arbeidsgiverperioder = im.agp?.perioder ?: emptyList(),
-            beregnetInntekt = im.inntekt?.beloep ?: 0.0,
-            inntektsdato = im.inntekt?.inntektsdato,
-            inntekt = convertInntektToV0(im.inntekt),
-            fullLønnIArbeidsgiverPerioden = convertReduksjonToV0(im.agp?.redusertLoennIAgp),
-            refusjon = convertRefusjonToV0(im.refusjon),
-            naturalytelser = convertNaturalYtelserToV0(im.inntekt?.naturalytelser),
-            tidspunkt = im.mottatt,
-            årsakInnsending = convertAarsakInnsendingToV0(im.aarsakInnsending),
-            innsenderNavn = im.avsender.navn,
-            telefonnummer = im.avsender.tlf,
+            orgnrUnderenhet = this.avsender.orgnr,
+            identitetsnummer = this.sykmeldt.fnr,
+            fulltNavn = this.sykmeldt.navn,
+            virksomhetNavn = this.avsender.orgNavn,
+            behandlingsdager = emptyList(), // TODO: Brukes ikke, V1 har ikke thisplementert behandlingsdager
+            egenmeldingsperioder = this.agp?.egenmeldinger ?: emptyList(),
+            fraværsperioder = this.sykmeldingsperioder,
+            arbeidsgiverperioder = this.agp?.perioder ?: emptyList(),
+            beregnetInntekt = this.inntekt?.beloep ?: 0.0,
+            inntektsdato = this.inntekt?.inntektsdato,
+            inntekt = if (this.inntekt == null) { null } else { this.inntekt.convert() },
+            fullLønnIArbeidsgiverPerioden = if (this.agp?.redusertLoennIAgp == null) { null } else { this.agp.redusertLoennIAgp.convert() },
+            refusjon = if (this.refusjon == null) { Refusjon(true, null, null, null) } else { this.refusjon.convert() },
+            naturalytelser = convertNaturalYtelserToV0(this.inntekt?.naturalytelser),
+            tidspunkt = this.mottatt,
+            årsakInnsending = this.aarsakInnsending.convert(),
+            innsenderNavn = this.avsender.navn,
+            telefonnummer = this.avsender.tlf,
             forespurtData = null, // Har ikke i V1....
         )
     }
 
-    private fun convertAarsakInnsendingToV0(aarsakInnsending: AarsakInnsendingV1): AarsakInnsending {
-        return AarsakInnsending.valueOf(aarsakInnsending.name.uppercase())
+    fun AarsakInnsendingV1.convert(): AarsakInnsending {
+        return AarsakInnsending.valueOf(this.name.uppercase())
     }
 
     private fun convertNaturalYtelserToV0(naturalytelser: List<NaturalytelseV1>?): List<Naturalytelse>? {
         if (naturalytelser != null) {
-            return naturalytelser.map { ytelse -> convertNaturalYtelseV0(ytelse) }.toList()
+            return naturalytelser.map { ytelse -> ytelse.convert() }.toList()
         }
         return emptyList()
     }
 
-    private fun convertNaturalYtelseV0(ytelse: NaturalytelseV1): Naturalytelse {
+    fun NaturalytelseV1.convert(): Naturalytelse {
         return Naturalytelse(
-            naturalytelse = NaturalytelseKode.valueOf(ytelse.naturalytelse.name),
-            dato = ytelse.sluttdato,
-            beløp = ytelse.verdiBeloep,
+            naturalytelse = NaturalytelseKode.valueOf(this.naturalytelse.name),
+            dato = this.sluttdato,
+            beløp = this.verdiBeloep,
         )
     }
 
-    fun convertRefusjonToV0(refusjon: RefusjonV1?): Refusjon {
-        if (refusjon == null) {
-            return Refusjon(true, null, null, null)
-        }
-        return Refusjon(false, refusjon.beloepPerMaaned, refusjon.sluttdato, convertRefusjonEndringerToV0(refusjon.endringer))
+    fun RefusjonV1.convert(): Refusjon {
+        return Refusjon(false, this.beloepPerMaaned, this.sluttdato, this.endringer.convert())
     }
 
-    private fun convertRefusjonEndringerToV0(endringer: List<RefusjonEndringV1>): List<RefusjonEndring>? {
-        return endringer.map { v1 ->
+    fun List<RefusjonEndringV1>.convert(): List<RefusjonEndring> {
+        return this.map { v1 ->
             RefusjonEndring(v1.beloep, v1.startdato)
         }.toList()
     }
 
-    private fun convertReduksjonToV0(redusertLoennIAgp: RedusertLoennIAgpV1?): FullLoennIArbeidsgiverPerioden? {
-        if (redusertLoennIAgp == null) {
-            return null
-        }
-        return FullLoennIArbeidsgiverPerioden(false, convertReduksjonBegrunnelseToV0(redusertLoennIAgp.begrunnelse), redusertLoennIAgp.beloep)
+    fun RedusertLoennIAgpV1.convert(): FullLoennIArbeidsgiverPerioden {
+        return FullLoennIArbeidsgiverPerioden(false, this.begrunnelse.convert(), this.beloep)
     }
 
-    private fun convertReduksjonBegrunnelseToV0(begrunnelse: BegrunnelseRedusertLoennIAgpV1): BegrunnelseIngenEllerRedusertUtbetalingKode? {
-        return BegrunnelseIngenEllerRedusertUtbetalingKode.valueOf(begrunnelse.name)
+    fun BegrunnelseRedusertLoennIAgpV1.convert(): BegrunnelseIngenEllerRedusertUtbetalingKode {
+        return BegrunnelseIngenEllerRedusertUtbetalingKode.valueOf(this.name)
     }
 
-    fun convertInntektToV0(inntekt: InntektV1?): Inntekt? {
-        if (inntekt == null) {
-            return null
-        }
-        val korrigert = inntekt.endringAarsak != null
+    fun InntektV1.convert(): Inntekt {
+        val korrigert = this.endringAarsak != null
         return Inntekt(
             true,
-            inntekt.beloep,
-            convertInntektEndringAarsakToV0(inntekt.endringAarsak),
+            this.beloep,
+            this.endringAarsak?.convert(),
             korrigert,
         )
     }
 
-    private fun convertInntektEndringAarsakToV0(endringAarsak: InntektEndringAarsakV1?): InntektEndringAarsak? {
-        if (endringAarsak == null) {
-            return null
-        }
-        var inntektEndringAarsak: InntektEndringAarsak? = when (endringAarsak) {
+    fun InntektEndringAarsakV1.convert(): InntektEndringAarsak {
+        var inntektEndringAarsak = when (this) {
             is BonusV1 -> Bonus()
             is FeilregistrertV1 -> Feilregistrert
-            is FerieV1 -> Ferie(liste = endringAarsak.perioder)
+            is FerieV1 -> Ferie(liste = this.perioder)
             is FerietrekkV1 -> Ferietrekk
             is NyansattV1 -> Nyansatt
-            is NyStillingV1 -> NyStilling(gjelderFra = endringAarsak.gjelderFra)
-            is NyStillingsprosentV1 -> NyStillingsprosent(gjelderFra = endringAarsak.gjelderFra)
-            is PermisjonV1 -> Permisjon(liste = endringAarsak.perioder)
-            is PermitteringV1 -> Permittering(liste = endringAarsak.perioder)
-            is SykefravaerV1 -> Sykefravaer(liste = endringAarsak.perioder)
+            is NyStillingV1 -> NyStilling(gjelderFra = this.gjelderFra)
+            is NyStillingsprosentV1 -> NyStillingsprosent(gjelderFra = this.gjelderFra)
+            is PermisjonV1 -> Permisjon(liste = this.perioder)
+            is PermitteringV1 -> Permittering(liste = this.perioder)
+            is SykefravaerV1 -> Sykefravaer(liste = this.perioder)
             is TariffendringV1 -> Tariffendring(
-                gjelderFra = endringAarsak.gjelderFra,
-                bleKjent = endringAarsak.bleKjent,
+                gjelderFra = this.gjelderFra,
+                bleKjent = this.bleKjent,
             )
 
-            is VarigLoennsendringV1 -> VarigLonnsendring(gjelderFra = endringAarsak.gjelderFra)
+            is VarigLoennsendringV1 -> VarigLonnsendring(gjelderFra = this.gjelderFra)
         }
         return inntektEndringAarsak
     }
