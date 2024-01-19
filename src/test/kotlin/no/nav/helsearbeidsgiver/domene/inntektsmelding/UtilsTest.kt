@@ -26,23 +26,40 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Inntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.NaturalytelseKode
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.NyStilling
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.NyStillingsprosent
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Nyansatt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Permisjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Permittering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Refusjon
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.RefusjonEndring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Sykefravaer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.VarigLonnsendring
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.BegrunnelseRedusertLoennIAgp
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending as AarsakInnsendingV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode as ArbeidsgiverperiodeV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.BegrunnelseRedusertLoennIAgp as BegrunnelseRedusertLoennIAgpV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus as BonusV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Feilregistrert as FeilregistrertV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferie as FerieV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferietrekk as FerietrekkV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse as NaturalytelseV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NaturalytelseKode as NaturalytelseKodeV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling as NyStillingV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStillingsprosent as NyStillingsprosentV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Nyansatt as NyansattV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permisjon as PermisjonV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permittering as PermitteringV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp as RedusertLoennIAgpV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring as RefusjonEndringV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer as SykefravaerV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring as TariffendringV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring as VarigLoennsendringV1
 
 class UtilsTest : FunSpec({
 
@@ -65,25 +82,25 @@ class UtilsTest : FunSpec({
 
     test("convertEndringAarsak") {
         val bonus = Bonus(1.0, LocalDate.EPOCH)
-        convertEndringAarsak(bonus) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
-        convertEndringAarsak(Bonus(null, null)) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
-        convertEndringAarsak(Feilregistrert) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Feilregistrert
-        convertEndringAarsak(Ferie(lagPeriode())) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferie(lagPeriode())
-        convertEndringAarsak(Ferietrekk) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferietrekk
-        convertEndringAarsak(Nyansatt) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Nyansatt
-        convertEndringAarsak(no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.NyStilling(dato)) shouldBe NyStilling(dato)
-        convertEndringAarsak(NyStillingsprosent(dato)) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStillingsprosent(dato)
-        convertEndringAarsak(Permisjon(lagPeriode())) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permisjon(lagPeriode())
-        convertEndringAarsak(Permittering(lagPeriode())) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permittering(
+        convertEndringAarsak(bonus) shouldBe BonusV1
+        convertEndringAarsak(Bonus(null, null)) shouldBe BonusV1
+        convertEndringAarsak(Feilregistrert) shouldBe FeilregistrertV1
+        convertEndringAarsak(Ferie(lagPeriode())) shouldBe FerieV1(lagPeriode())
+        convertEndringAarsak(Ferietrekk) shouldBe FerietrekkV1
+        convertEndringAarsak(Nyansatt) shouldBe NyansattV1
+        convertEndringAarsak(NyStilling(dato)) shouldBe NyStillingV1(dato)
+        convertEndringAarsak(NyStillingsprosent(dato)) shouldBe NyStillingsprosentV1(dato)
+        convertEndringAarsak(Permisjon(lagPeriode())) shouldBe PermisjonV1(lagPeriode())
+        convertEndringAarsak(Permittering(lagPeriode())) shouldBe PermitteringV1(
             lagPeriode(),
         )
-        convertEndringAarsak(Sykefravaer(lagPeriode())) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer(
+        convertEndringAarsak(Sykefravaer(lagPeriode())) shouldBe SykefravaerV1(
             lagPeriode(),
         )
-        convertEndringAarsak(Tariffendring(dato, dato)) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring(
+        convertEndringAarsak(Tariffendring(dato, dato)) shouldBe TariffendringV1(
             dato, dato,
         )
-        convertEndringAarsak(VarigLonnsendring(dato)) shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring(
+        convertEndringAarsak(VarigLonnsendring(dato)) shouldBe VarigLoennsendringV1(
             dato,
         )
     }
@@ -93,8 +110,8 @@ class UtilsTest : FunSpec({
         val gamleYtelser = NaturalytelseKode.entries.map {
             Naturalytelse(it, dato, belop)
         }.toList()
-        val nyeYtelser = no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NaturalytelseKode.entries.map {
-            no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse(it, belop, dato)
+        val nyeYtelser = NaturalytelseKodeV1.entries.map {
+            NaturalytelseV1(it, belop, dato)
         }.toList()
         convertNaturalYtelser(gamleYtelser) shouldBeEqual nyeYtelser
     }
@@ -108,18 +125,18 @@ class UtilsTest : FunSpec({
         )
         val agp = convertToV1(im_med_reduksjon).agp
         agp?.redusertLoennIAgp?.beloep shouldBe utbetalt
-        agp?.redusertLoennIAgp?.begrunnelse shouldBe BegrunnelseRedusertLoennIAgp.BetvilerArbeidsufoerhet
+        agp?.redusertLoennIAgp?.begrunnelse shouldBe BegrunnelseRedusertLoennIAgpV1.BetvilerArbeidsufoerhet
     }
 
     test("convertBegrunnelse") {
         val gamleBegrunnelser = BegrunnelseIngenEllerRedusertUtbetalingKode.entries.toList()
-        val nyeBegrunnelser = BegrunnelseRedusertLoennIAgp.entries.toList()
+        val nyeBegrunnelser = BegrunnelseRedusertLoennIAgpV1.entries.toList()
         gamleBegrunnelser.forEachIndexed { index, begrunnelse -> convertBegrunnelse(begrunnelse) shouldBe nyeBegrunnelser[index] }
     }
 
     test("håndterer tomme lister og null-verdier") {
         val im = convertToV1(lagGammelInntektsmeldingMedTommeOgNullVerdier())
-        im.aarsakInnsending shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending.Endring
+        im.aarsakInnsending shouldBe AarsakInnsendingV1.Endring
     }
 
     test("konverter im til V1") {
@@ -133,7 +150,7 @@ class UtilsTest : FunSpec({
         nyIM.avsender.orgnr shouldBe gammelIM.orgnrUnderenhet
         nyIM.avsender.tlf shouldBe gammelIM.telefonnummer
 
-        nyIM.aarsakInnsending shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending.Ny
+        nyIM.aarsakInnsending shouldBe AarsakInnsendingV1.Ny
     }
 
     test("konverter fra nytt til gammelt IM-format") {
@@ -150,12 +167,12 @@ class UtilsTest : FunSpec({
         val nyInntekt = no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt(
             belop,
             dato,
-            listOf(no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse(no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
-            no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Feilregistrert,
+            listOf(NaturalytelseV1(NaturalytelseKodeV1.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
+            FeilregistrertV1,
         )
         val gammelInntekt = convertInntektToV0(nyInntekt)
         gammelInntekt?.beregnetInntekt shouldBe belop
-        gammelInntekt?.endringÅrsak shouldBe no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Feilregistrert
+        gammelInntekt?.endringÅrsak shouldBe Feilregistrert
         gammelInntekt?.bekreftet shouldBe true
         gammelInntekt?.manueltKorrigert shouldBe true
         val nyIM = convertToV1(lagGammelInntektsmelding()).copy(inntekt = nyInntekt)
@@ -169,10 +186,10 @@ class UtilsTest : FunSpec({
         val belop = 333.33
         val periode = listOf(Periode(LocalDate.EPOCH, LocalDate.MAX))
         val nyIM = convertToV1(lagGammelInntektsmelding()).copy(
-            agp = Arbeidsgiverperiode(
+            agp = ArbeidsgiverperiodeV1(
                 periode,
                 periode,
-                RedusertLoennIAgp(belop, BegrunnelseRedusertLoennIAgp.FerieEllerAvspasering),
+                RedusertLoennIAgpV1(belop, BegrunnelseRedusertLoennIAgpV1.FerieEllerAvspasering),
             ),
         )
         val konvertert = convertToV0(nyIM)
@@ -187,9 +204,9 @@ class UtilsTest : FunSpec({
         val belop = 123.45
         val dato1 = LocalDate.of(2023, 2, 2)
         val dato2 = LocalDate.of(2023, 2, 2)
-        val refusjon = no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon(belop, listOf(RefusjonEndring(belop, dato1)), dato2)
+        val refusjon = RefusjonV1(belop, listOf(RefusjonEndringV1(belop, dato1)), dato2)
         val gammelRefusjon = convertRefusjonToV0(refusjon)
-        gammelRefusjon.refusjonEndringer shouldBe listOf(no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.RefusjonEndring(belop, dato1))
+        gammelRefusjon.refusjonEndringer shouldBe listOf(RefusjonEndring(belop, dato1))
         gammelRefusjon.refusjonOpphører shouldBe dato2
         gammelRefusjon.refusjonPrMnd shouldBe belop
     }
