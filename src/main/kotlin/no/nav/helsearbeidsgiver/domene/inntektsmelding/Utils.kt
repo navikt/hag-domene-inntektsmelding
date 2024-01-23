@@ -52,10 +52,10 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring as 
 
 object Utils {
 
-    fun convertToV1(inntektsmelding: Inntektsmelding): InntektsmeldingV1 {
+    fun convertToV1(inntektsmelding: Inntektsmelding, id: UUID): InntektsmeldingV1 {
         // TODO (inntektsmelding.behandlingsdager != null) -- må legge inn støtte for dette i nytt format
         return InntektsmeldingV1(
-            UUID.randomUUID(),
+            id,
             SykmeldtV1(inntektsmelding.identitetsnummer, inntektsmelding.fulltNavn),
             AvsenderV1(
                 inntektsmelding.orgnrUnderenhet,
@@ -82,8 +82,9 @@ object Utils {
     }
 
     private fun convertRefusjon(refusjon: Refusjon): RefusjonV1? {
+        if (!refusjon.utbetalerHeleEllerDeler) return null
         if (refusjon.refusjonPrMnd == null) {
-            // vurder å logge feil eller kast exception: skal ikke skje, men deprecated nullable-kode åpner for ugyldige data.
+            // Bør ikke skje, men deprecated nullable-kode åpner for ugyldige data.
             return null
         }
         return RefusjonV1(refusjon.refusjonPrMnd, convertRefusjonEndringer(refusjon.refusjonEndringer), refusjon.refusjonOpphører)
@@ -91,11 +92,18 @@ object Utils {
 
     private fun convertRefusjonEndringer(refusjonEndringer: List<RefusjonEndring>?): List<RefusjonEndringV1> {
         if (refusjonEndringer != null) {
-            return refusjonEndringer.map { ref -> RefusjonEndringV1(ref.beløp ?: 0.0, ref.dato ?: LocalDate.EPOCH) }.toList()
+            return refusjonEndringer.mapNotNull { ref -> convertRefusjonEndring(ref) }.toList()
         }
         return emptyList()
     }
 
+    private fun convertRefusjonEndring(ref: RefusjonEndring): RefusjonEndringV1? {
+        return if (ref.beløp == null || ref.dato == null) {
+            null
+        } else {
+            RefusjonEndringV1(ref.beløp, ref.dato)
+        }
+    }
     fun convertInntekt(im: Inntektsmelding): InntektV1? {
         if (im.inntekt == null) {
             throw IllegalArgumentException("Inntekt er null")
@@ -195,7 +203,7 @@ object Utils {
     fun List<RefusjonEndringV1>.convert(): List<RefusjonEndring> {
         return this.map { v1 ->
             RefusjonEndring(v1.beloep, v1.startdato)
-        }.toList()
+        }
     }
 
     fun RedusertLoennIAgpV1.convert(): FullLoennIArbeidsgiverPerioden {

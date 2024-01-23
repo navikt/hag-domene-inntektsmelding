@@ -36,6 +36,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.util.UUID
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending as AarsakInnsendingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode as ArbeidsgiverperiodeV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.BegrunnelseRedusertLoennIAgp as BegrunnelseRedusertLoennIAgpV1
@@ -60,6 +61,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring as 
 class UtilsTest : FunSpec({
 
     val dato = LocalDate.of(2023, 1, 1)
+    val nyID = UUID.randomUUID()
 
     test("convertInntekt") {
         val im = lagGammelInntektsmelding()
@@ -77,8 +79,7 @@ class UtilsTest : FunSpec({
     }
 
     test("convertEndringAarsak") {
-        val bonus = Bonus(1.0, LocalDate.EPOCH)
-        bonus.convert() shouldBe BonusV1
+        Bonus(1.0, LocalDate.EPOCH).convert() shouldBe BonusV1
         Bonus(null, null).convert() shouldBe BonusV1
         Feilregistrert.convert() shouldBe FeilregistrertV1
         Ferie(lagPeriode()).convert() shouldBe FerieV1(lagPeriode())
@@ -87,18 +88,10 @@ class UtilsTest : FunSpec({
         NyStilling(dato).convert() shouldBe NyStillingV1(dato)
         NyStillingsprosent(dato).convert() shouldBe NyStillingsprosentV1(dato)
         Permisjon(lagPeriode()).convert() shouldBe PermisjonV1(lagPeriode())
-        Permittering(lagPeriode()).convert() shouldBe PermitteringV1(
-            lagPeriode(),
-        )
-        Sykefravaer(lagPeriode()).convert() shouldBe SykefravaerV1(
-            lagPeriode(),
-        )
-        Tariffendring(dato, dato).convert() shouldBe TariffendringV1(
-            dato, dato,
-        )
-        VarigLonnsendring(dato).convert() shouldBe VarigLoennsendringV1(
-            dato,
-        )
+        Permittering(lagPeriode()).convert() shouldBe PermitteringV1(lagPeriode())
+        Sykefravaer(lagPeriode()).convert() shouldBe SykefravaerV1(lagPeriode())
+        Tariffendring(dato, dato).convert() shouldBe TariffendringV1(dato, dato)
+        VarigLonnsendring(dato).convert() shouldBe VarigLoennsendringV1(dato)
     }
 
     test("convertNaturalYtelse") {
@@ -117,9 +110,13 @@ class UtilsTest : FunSpec({
         val utbetalt = 10000.0
         val im_med_reduksjon = lagGammelInntektsmelding().copy(
             fullLønnIArbeidsgiverPerioden =
-            FullLoennIArbeidsgiverPerioden(false, BegrunnelseIngenEllerRedusertUtbetalingKode.BetvilerArbeidsufoerhet, utbetalt),
+            FullLoennIArbeidsgiverPerioden(
+                false,
+                BegrunnelseIngenEllerRedusertUtbetalingKode.BetvilerArbeidsufoerhet,
+                utbetalt,
+            ),
         )
-        val agp = convertToV1(im_med_reduksjon).agp
+        val agp = convertToV1(im_med_reduksjon, nyID).agp
         agp?.redusertLoennIAgp?.beloep shouldBe utbetalt
         agp?.redusertLoennIAgp?.begrunnelse shouldBe BegrunnelseRedusertLoennIAgpV1.BetvilerArbeidsufoerhet
     }
@@ -131,13 +128,13 @@ class UtilsTest : FunSpec({
     }
 
     test("håndterer tomme lister og null-verdier") {
-        val im = convertToV1(lagGammelInntektsmeldingMedTommeOgNullVerdier())
+        val im = convertToV1(lagGammelInntektsmeldingMedTommeOgNullVerdier(), nyID)
         im.aarsakInnsending shouldBe AarsakInnsendingV1.Endring
     }
 
     test("konverter im til V1") {
         val gammelIM = lagGammelInntektsmelding()
-        val nyIM = convertToV1(gammelIM)
+        val nyIM = convertToV1(gammelIM, nyID)
         nyIM.sykmeldt.fnr shouldBe gammelIM.identitetsnummer
         nyIM.sykmeldt.navn shouldBe gammelIM.fulltNavn
 
@@ -151,7 +148,7 @@ class UtilsTest : FunSpec({
 
     test("konverter fra nytt til gammelt IM-format") {
         val orginal = lagGammelInntektsmelding()
-        val nyIM = convertToV1(orginal)
+        val nyIM = convertToV1(orginal, nyID)
         val gammelIM = nyIM.convert()
         gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser)
         // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste
@@ -171,7 +168,7 @@ class UtilsTest : FunSpec({
         gammelInntekt?.endringÅrsak shouldBe Feilregistrert
         gammelInntekt?.bekreftet shouldBe true
         gammelInntekt?.manueltKorrigert shouldBe true
-        val nyIM = convertToV1(lagGammelInntektsmelding()).copy(inntekt = nyInntekt)
+        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID).copy(inntekt = nyInntekt)
         val konvertert = nyIM.convert()
         konvertert.naturalytelser shouldBe listOf(Naturalytelse(NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, dato, belop))
         konvertert.inntektsdato shouldBe dato
@@ -181,10 +178,11 @@ class UtilsTest : FunSpec({
     test("konverter reduksjon til V0") {
         val belop = 333.33
         val periode = listOf(Periode(LocalDate.EPOCH, LocalDate.MAX))
-        val nyIM = convertToV1(lagGammelInntektsmelding()).copy(
+        val egenmeldinger = listOf(Periode(LocalDate.MIN, LocalDate.EPOCH))
+        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID).copy(
             agp = ArbeidsgiverperiodeV1(
                 periode,
-                periode,
+                egenmeldinger,
                 RedusertLoennIAgpV1(belop, BegrunnelseRedusertLoennIAgpV1.FerieEllerAvspasering),
             ),
         )
@@ -193,7 +191,7 @@ class UtilsTest : FunSpec({
         konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe false
         konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe belop
         konvertert.arbeidsgiverperioder shouldBe periode
-        konvertert.egenmeldingsperioder shouldBe periode
+        konvertert.egenmeldingsperioder shouldBe egenmeldinger
     }
 
     test("konverter refusjon til V0") {
@@ -215,9 +213,17 @@ fun lagPeriode(): List<Periode> {
 
 fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding {
     return lagGammelInntektsmelding().copy(
-        behandlingsdager = emptyList(), egenmeldingsperioder = emptyList(),
-        inntektsdato = null, fraværsperioder = emptyList(), arbeidsgiverperioder = emptyList(), fullLønnIArbeidsgiverPerioden = null,
-        naturalytelser = null, årsakInnsending = AarsakInnsending.ENDRING, innsenderNavn = null, telefonnummer = null, forespurtData = null,
+        behandlingsdager = emptyList(),
+        egenmeldingsperioder = emptyList(),
+        inntektsdato = null,
+        fraværsperioder = emptyList(),
+        arbeidsgiverperioder = emptyList(),
+        fullLønnIArbeidsgiverPerioden = null,
+        naturalytelser = null,
+        årsakInnsending = AarsakInnsending.ENDRING,
+        innsenderNavn = null,
+        telefonnummer = null,
+        forespurtData = null,
     )
 }
 
