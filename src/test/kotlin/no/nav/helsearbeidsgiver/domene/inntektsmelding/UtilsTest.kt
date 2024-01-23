@@ -222,7 +222,6 @@ fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding {
 }
 
 fun lagGammelInntektsmelding(): Inntektsmelding {
-    val dato = LocalDate.of(2023, 1, 1)
     return Inntektsmelding(
         orgnrUnderenhet = "123",
         identitetsnummer = "123",
