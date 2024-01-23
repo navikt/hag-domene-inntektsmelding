@@ -77,8 +77,8 @@ object Utils {
         )
     }
 
-    private fun convertAarsakInnsending(årsakInnsending: AarsakInnsending): AarsakInnsendingV1 {
-        return AarsakInnsendingV1.valueOf(årsakInnsending.value)
+    private fun convertAarsakInnsending(aarsakInnsending: AarsakInnsending): AarsakInnsendingV1 {
+        return AarsakInnsendingV1.valueOf(aarsakInnsending.value)
     }
 
     private fun convertRefusjon(refusjon: Refusjon): RefusjonV1? {
