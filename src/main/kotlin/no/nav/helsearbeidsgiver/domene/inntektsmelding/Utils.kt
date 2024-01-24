@@ -54,6 +54,23 @@ object Utils {
 
     fun convertToV1(inntektsmelding: Inntektsmelding, id: UUID): InntektsmeldingV1 {
         // TODO (inntektsmelding.behandlingsdager != null) -- må legge inn støtte for dette i nytt format
+
+        // kutt ut feltet hvis det ikke finnes i forespurt data:
+        val agp = if (inntektsmelding.forespurtData?.contains("arbeidsgiverperiode") == true) {
+            ArbeidsgiverperiodeV1(
+                inntektsmelding.arbeidsgiverperioder,
+                inntektsmelding.egenmeldingsperioder,
+                inntektsmelding.convertReduksjon(),
+            )
+        } else {
+            null
+        }
+        val refusjon = if (inntektsmelding.forespurtData?.contains("refusjon") == true) {
+            convertRefusjon(inntektsmelding.refusjon)
+        } else {
+            null
+        }
+
         return InntektsmeldingV1(
             id,
             SykmeldtV1(inntektsmelding.identitetsnummer, inntektsmelding.fulltNavn),
@@ -65,13 +82,9 @@ object Utils {
                 inntektsmelding.telefonnummer ?: "",
             ),
             inntektsmelding.fraværsperioder,
-            ArbeidsgiverperiodeV1(
-                inntektsmelding.arbeidsgiverperioder,
-                inntektsmelding.egenmeldingsperioder,
-                inntektsmelding.convertReduksjon(),
-            ),
+            agp,
             convertInntekt(inntektsmelding),
-            convertRefusjon(inntektsmelding.refusjon),
+            refusjon,
             convertAarsakInnsending(inntektsmelding.årsakInnsending),
             inntektsmelding.tidspunkt,
         )
@@ -108,7 +121,11 @@ object Utils {
         if (im.inntekt == null) {
             throw IllegalArgumentException("Inntekt er null")
         }
-        return InntektV1(im.inntekt.beregnetInntekt, LocalDate.EPOCH, convertNaturalYtelser(im.naturalytelser), im.inntekt.endringÅrsak?.convert())
+        return if (im.forespurtData?.contains("inntekt") == true) {
+            InntektV1(im.inntekt.beregnetInntekt, LocalDate.EPOCH, convertNaturalYtelser(im.naturalytelser), im.inntekt.endringÅrsak?.convert())
+        } else {
+            null
+        }
     }
 
     fun InntektEndringAarsak.convert(): InntektEndringAarsakV1 {
@@ -143,7 +160,12 @@ object Utils {
     }
 
     fun Inntektsmelding.convertReduksjon(): RedusertLoennIAgpV1? {
-        if (this.fullLønnIArbeidsgiverPerioden == null || this.fullLønnIArbeidsgiverPerioden.utbetalt == null || this.fullLønnIArbeidsgiverPerioden.begrunnelse == null) {
+        if (this.fullLønnIArbeidsgiverPerioden == null || this.fullLønnIArbeidsgiverPerioden.utbetalt == null ||
+            this.fullLønnIArbeidsgiverPerioden.begrunnelse == null || this.fullLønnIArbeidsgiverPerioden.utbetalerFullLønn
+        ) {
+            return null
+        }
+        if (this.forespurtData?.contains("arbeidsgiverperiode") == false) { // vask bort agp dersom det har kommet med uten at vi har bedt om det
             return null
         }
         return RedusertLoennIAgpV1(this.fullLønnIArbeidsgiverPerioden.utbetalt, this.fullLønnIArbeidsgiverPerioden.begrunnelse.convert())
@@ -159,22 +181,27 @@ object Utils {
             identitetsnummer = this.sykmeldt.fnr,
             fulltNavn = this.sykmeldt.navn,
             virksomhetNavn = this.avsender.orgNavn,
-            behandlingsdager = emptyList(), // TODO: Brukes ikke, V1 har ikke thisplementert behandlingsdager
+            behandlingsdager = emptyList(), // TODO: Brukes ikke, V1 har ikke implementert behandlingsdager
             egenmeldingsperioder = this.agp?.egenmeldinger ?: emptyList(),
             fraværsperioder = this.sykmeldingsperioder,
             arbeidsgiverperioder = this.agp?.perioder ?: emptyList(),
             beregnetInntekt = this.inntekt?.beloep ?: 0.0,
             inntektsdato = this.inntekt?.inntektsdato,
-            inntekt = if (this.inntekt == null) { null } else { this.inntekt.convert() },
-            fullLønnIArbeidsgiverPerioden = if (this.agp?.redusertLoennIAgp == null) { null } else { this.agp.redusertLoennIAgp.convert() },
-            refusjon = if (this.refusjon == null) { Refusjon(true, null, null, null) } else { this.refusjon.convert() },
+            inntekt = this.inntekt?.convert(),
+            fullLønnIArbeidsgiverPerioden = this.agp?.redusertLoennIAgp?.convert() ?: FullLoennIArbeidsgiverPerioden(true, null, null),
+            refusjon = this.refusjon?.convert() ?: Refusjon(false, null, null, null),
             naturalytelser = convertNaturalYtelserToV0(this.inntekt?.naturalytelser),
             tidspunkt = this.mottatt,
             årsakInnsending = this.aarsakInnsending.convert(),
             innsenderNavn = this.avsender.navn,
             telefonnummer = this.avsender.tlf,
-            forespurtData = null, // Har ikke i V1....
+            forespurtData = this.getForespurtData(),
         )
+    }
+
+    fun InntektsmeldingV1.getForespurtData(): List<String>? {
+        val fullListe = mapOf("arbeidsgiverperiode" to this.agp, "inntekt" to this.inntekt, "refusjon" to this.refusjon)
+        return fullListe.filterValues { v -> v != null }.keys.toList()
     }
 
     fun AarsakInnsendingV1.convert(): AarsakInnsending {
@@ -197,7 +224,7 @@ object Utils {
     }
 
     fun RefusjonV1.convert(): Refusjon {
-        return Refusjon(false, this.beloepPerMaaned, this.sluttdato, this.endringer.convert())
+        return Refusjon(true, this.beloepPerMaaned, this.sluttdato, this.endringer.convert())
     }
 
     fun List<RefusjonEndringV1>.convert(): List<RefusjonEndring> {

@@ -11,6 +11,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertInntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertNaturalYtelser
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertReduksjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.convertToV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.getForespurtData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.BegrunnelseIngenEllerRedusertUtbetalingKode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Bonus
@@ -150,7 +151,7 @@ class UtilsTest : FunSpec({
         val orginal = lagGammelInntektsmelding()
         val nyIM = convertToV1(orginal, nyID)
         val gammelIM = nyIM.convert()
-        gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser)
+        gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser, Inntektsmelding::fullLønnIArbeidsgiverPerioden, Inntektsmelding::forespurtData)
         // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste
     }
 
@@ -204,6 +205,17 @@ class UtilsTest : FunSpec({
         gammelRefusjon.refusjonOpphører shouldBe dato2
         gammelRefusjon.refusjonPrMnd shouldBe belop
     }
+
+    test("generer forespurt data") {
+        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID)
+        nyIM.getForespurtData() shouldBe listOf("arbeidsgiverperiode", "inntekt", "refusjon")
+        val utenFelter = convertToV1(lagGammelInntektsmelding(), nyID).copy(
+            agp = null,
+            refusjon = null,
+            inntekt = null,
+        )
+        utenFelter.getForespurtData() shouldBe emptyList()
+    }
 })
 
 fun lagPeriode(): List<Periode> {
@@ -241,11 +253,12 @@ fun lagGammelInntektsmelding(): Inntektsmelding {
         inntektsdato = null,
         inntekt = Inntekt(true, 100.0, null, false),
         fullLønnIArbeidsgiverPerioden = null,
-        refusjon = Refusjon(true),
+        refusjon = Refusjon(true, 50.0, LocalDate.EPOCH, emptyList()),
         naturalytelser = null,
         tidspunkt = OffsetDateTime.now(),
         årsakInnsending = AarsakInnsending.NY,
         innsenderNavn = "innsender",
         telefonnummer = "22222222",
+        forespurtData = listOf("arbeidsgiverperiode", "refusjon", "inntekt"),
     )
 }
