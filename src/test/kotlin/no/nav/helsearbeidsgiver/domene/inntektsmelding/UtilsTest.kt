@@ -195,6 +195,33 @@ class UtilsTest : FunSpec({
         konvertert.egenmeldingsperioder shouldBe egenmeldinger
     }
 
+    test("konverter null-verdi for fullLønnIAGP") {
+        val orginal = lagGammelInntektsmeldingMedTommeOgNullVerdier().copy(
+            forespurtData = listOf("arbeidsgiverperiode"),
+            fullLønnIArbeidsgiverPerioden = null,
+            arbeidsgiverperioder = lagPeriode(),
+            fraværsperioder = lagPeriode(),
+        )
+        orginal.convertReduksjon() shouldBe null
+
+        val nyIM = convertToV1(orginal, nyID)
+
+        val konvertert = nyIM.convert()
+        konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe null
+        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe true
+        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe null
+    }
+
+    test("felt som mangler i forespurt data blir ikke konvertert til v1") {
+        val orginal = lagGammelInntektsmelding().copy(
+            forespurtData = emptyList(),
+        )
+        val nyIM = convertToV1(orginal, nyID)
+        nyIM.agp shouldBe null
+        nyIM.inntekt shouldBe null
+        nyIM.refusjon shouldBe null
+    }
+
     test("konverter refusjon til V0") {
         val belop = 123.45
         val dato1 = LocalDate.of(2023, 2, 2)
