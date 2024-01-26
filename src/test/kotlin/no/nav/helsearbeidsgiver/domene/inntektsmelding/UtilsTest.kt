@@ -153,6 +153,9 @@ class UtilsTest : FunSpec({
         val gammelIM = nyIM.convert()
         gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser, Inntektsmelding::fullLønnIArbeidsgiverPerioden)
         // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste, fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
+        gammelIM.inntektsdato shouldBe LocalDate.EPOCH
+        gammelIM.naturalytelser shouldBe emptyList()
+        gammelIM.fullLønnIArbeidsgiverPerioden shouldBe FullLoennIArbeidsgiverPerioden(true, null, null)
     }
 
     test("konverter inntekt fra nytt til gammelt IM-format") {
