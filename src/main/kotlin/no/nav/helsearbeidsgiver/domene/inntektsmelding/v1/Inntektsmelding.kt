@@ -12,6 +12,7 @@ import java.util.UUID
 @Serializable
 data class Inntektsmelding(
     val id: UUID,
+    val type: Type,
     val sykmeldt: Sykmeldt,
     val avsender: Avsender,
     val sykmeldingsperioder: List<Periode>,
@@ -20,4 +21,9 @@ data class Inntektsmelding(
     val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
-)
+) {
+    enum class Type {
+        FORESPURT,
+        SELVBESTEMT,
+    }
+}

@@ -12,5 +12,5 @@ data class Inntekt(
     val beloep: Double,
     val inntektsdato: LocalDate,
     val naturalytelser: List<Naturalytelse>,
-    val endringAarsak: InntektEndringAarsak? = null,
+    val endringAarsak: InntektEndringAarsak?,
 )
