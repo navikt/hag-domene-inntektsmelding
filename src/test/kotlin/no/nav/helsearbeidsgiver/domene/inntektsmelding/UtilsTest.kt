@@ -40,19 +40,20 @@ import java.time.OffsetDateTime
 import java.util.UUID
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending as AarsakInnsendingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode as ArbeidsgiverperiodeV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.BegrunnelseRedusertLoennIAgp as BegrunnelseRedusertLoennIAgpV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus as BonusV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Feilregistrert as FeilregistrertV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferie as FerieV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferietrekk as FerietrekkV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektsmeldingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse as NaturalytelseV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NaturalytelseKode as NaturalytelseKodeV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse.Kode as NaturalytelseKodeV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling as NyStillingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStillingsprosent as NyStillingsprosentV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Nyansatt as NyansattV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permisjon as PermisjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permittering as PermitteringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp as RedusertLoennIAgpV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp.Begrunnelse as BegrunnelseRedusertLoennIAgpV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring as RefusjonEndringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer as SykefravaerV1
@@ -117,7 +118,7 @@ class UtilsTest : FunSpec({
                 utbetalt,
             ),
         )
-        val agp = convertToV1(im_med_reduksjon, nyID).agp
+        val agp = convertToV1(im_med_reduksjon, nyID, InntektsmeldingV1.Type.FORESPURT).agp
         agp?.redusertLoennIAgp?.beloep shouldBe utbetalt
         agp?.redusertLoennIAgp?.begrunnelse shouldBe BegrunnelseRedusertLoennIAgpV1.BetvilerArbeidsufoerhet
     }
@@ -129,13 +130,16 @@ class UtilsTest : FunSpec({
     }
 
     test("håndterer tomme lister og null-verdier") {
-        val im = convertToV1(lagGammelInntektsmeldingMedTommeOgNullVerdier(), nyID)
+        val im = convertToV1(lagGammelInntektsmeldingMedTommeOgNullVerdier(), nyID, InntektsmeldingV1.Type.FORESPURT)
         im.aarsakInnsending shouldBe AarsakInnsendingV1.Endring
     }
 
     test("konverter im til V1") {
         val gammelIM = lagGammelInntektsmelding()
-        val nyIM = convertToV1(gammelIM, nyID)
+        val nyIM = convertToV1(gammelIM, nyID, InntektsmeldingV1.Type.FORESPURT)
+
+        nyIM.type shouldBe InntektsmeldingV1.Type.FORESPURT
+
         nyIM.sykmeldt.fnr shouldBe gammelIM.identitetsnummer
         nyIM.sykmeldt.navn shouldBe gammelIM.fulltNavn
 
@@ -149,7 +153,7 @@ class UtilsTest : FunSpec({
 
     test("konverter fra nytt til gammelt IM-format") {
         val orginal = lagGammelInntektsmelding()
-        val nyIM = convertToV1(orginal, nyID)
+        val nyIM = convertToV1(orginal, nyID, InntektsmeldingV1.Type.FORESPURT)
         val gammelIM = nyIM.convert()
         gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser, Inntektsmelding::fullLønnIArbeidsgiverPerioden)
         // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste, fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
@@ -172,7 +176,7 @@ class UtilsTest : FunSpec({
         gammelInntekt?.endringÅrsak shouldBe Feilregistrert
         gammelInntekt?.bekreftet shouldBe true
         gammelInntekt?.manueltKorrigert shouldBe true
-        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID).copy(inntekt = nyInntekt)
+        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID, InntektsmeldingV1.Type.FORESPURT).copy(inntekt = nyInntekt)
         val konvertert = nyIM.convert()
         konvertert.naturalytelser shouldBe listOf(Naturalytelse(NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, dato, belop))
         konvertert.inntektsdato shouldBe dato
@@ -183,7 +187,7 @@ class UtilsTest : FunSpec({
         val belop = 333.33
         val periode = listOf(Periode(LocalDate.EPOCH, LocalDate.MAX))
         val egenmeldinger = listOf(Periode(LocalDate.MIN, LocalDate.EPOCH))
-        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID).copy(
+        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID, InntektsmeldingV1.Type.FORESPURT).copy(
             agp = ArbeidsgiverperiodeV1(
                 periode,
                 egenmeldinger,
@@ -207,7 +211,7 @@ class UtilsTest : FunSpec({
         )
         orginal.convertReduksjon() shouldBe null
 
-        val nyIM = convertToV1(orginal, nyID)
+        val nyIM = convertToV1(orginal, nyID, InntektsmeldingV1.Type.FORESPURT)
 
         val konvertert = nyIM.convert()
         konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe null
@@ -219,7 +223,7 @@ class UtilsTest : FunSpec({
         val orginal = lagGammelInntektsmelding().copy(
             forespurtData = emptyList(),
         )
-        val nyIM = convertToV1(orginal, nyID)
+        val nyIM = convertToV1(orginal, nyID, InntektsmeldingV1.Type.FORESPURT)
         nyIM.agp shouldBe null
         nyIM.inntekt shouldBe null
         nyIM.refusjon shouldBe null
@@ -237,9 +241,9 @@ class UtilsTest : FunSpec({
     }
 
     test("generer forespurt data") {
-        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID)
+        val nyIM = convertToV1(lagGammelInntektsmelding(), nyID, InntektsmeldingV1.Type.FORESPURT)
         nyIM.getForespurtData() shouldBe listOf("arbeidsgiverperiode", "inntekt", "refusjon")
-        val utenFelter = convertToV1(lagGammelInntektsmelding(), nyID).copy(
+        val utenFelter = convertToV1(lagGammelInntektsmelding(), nyID, InntektsmeldingV1.Type.FORESPURT).copy(
             agp = null,
             refusjon = null,
             inntekt = null,

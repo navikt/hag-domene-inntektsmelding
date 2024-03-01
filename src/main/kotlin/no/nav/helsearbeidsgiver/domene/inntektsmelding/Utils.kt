@@ -27,7 +27,6 @@ import java.util.UUID
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending as AarsakInnsendingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode as ArbeidsgiverperiodeV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Avsender as AvsenderV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.BegrunnelseRedusertLoennIAgp as BegrunnelseRedusertLoennIAgpV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus as BonusV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Feilregistrert as FeilregistrertV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferie as FerieV1
@@ -36,13 +35,14 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt as InntektV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.InntektEndringAarsak as InntektEndringAarsakV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektsmeldingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse as NaturalytelseV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NaturalytelseKode as NaturalytelseKodeV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse.Kode as NaturalytelseKodeV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling as NyStillingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStillingsprosent as NyStillingsprosentV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Nyansatt as NyansattV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permisjon as PermisjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permittering as PermitteringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp as RedusertLoennIAgpV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp.Begrunnelse as BegrunnelseRedusertLoennIAgpV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring as RefusjonEndringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer as SykefravaerV1
@@ -52,7 +52,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring as 
 
 object Utils {
 
-    fun convertToV1(inntektsmelding: Inntektsmelding, id: UUID): InntektsmeldingV1 {
+    fun convertToV1(inntektsmelding: Inntektsmelding, id: UUID, type: InntektsmeldingV1.Type): InntektsmeldingV1 {
         // TODO (inntektsmelding.behandlingsdager != null) -- må legge inn støtte for dette i nytt format
 
         // kutt ut feltet hvis det ikke finnes i forespurt data:
@@ -73,6 +73,7 @@ object Utils {
 
         return InntektsmeldingV1(
             id,
+            type,
             SykmeldtV1(inntektsmelding.identitetsnummer, inntektsmelding.fulltNavn),
             AvsenderV1(
                 inntektsmelding.orgnrUnderenhet,

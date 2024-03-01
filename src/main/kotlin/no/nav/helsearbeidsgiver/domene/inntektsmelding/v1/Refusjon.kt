@@ -11,7 +11,7 @@ import java.time.LocalDate
 data class Refusjon(
     val beloepPerMaaned: Double,
     val endringer: List<RefusjonEndring>,
-    val sluttdato: LocalDate? = null,
+    val sluttdato: LocalDate?,
 )
 
 @Serializable

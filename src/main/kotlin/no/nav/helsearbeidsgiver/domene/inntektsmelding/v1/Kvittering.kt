@@ -9,8 +9,8 @@ import java.time.OffsetDateTime
 
 @Serializable
 data class Kvittering(
-    val lagretInntektmelding: Inntektsmelding? = null,
-    val kvitteringEkstern: KvitteringEkstern? = null,
+    val lagretInntektmelding: Inntektsmelding?,
+    val kvitteringEkstern: KvitteringEkstern?,
 )
 
 @Serializable
