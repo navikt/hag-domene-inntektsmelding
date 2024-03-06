@@ -149,6 +149,7 @@ class UtilsTest : FunSpec({
         nyIM.avsender.tlf shouldBe gammelIM.telefonnummer
 
         nyIM.aarsakInnsending shouldBe AarsakInnsendingV1.Ny
+        nyIM.vedtaksperiodeId shouldBe gammelIM.vedtaksperiodeId
     }
 
     test("konverter fra nytt til gammelt IM-format") {
@@ -160,6 +161,7 @@ class UtilsTest : FunSpec({
         gammelIM.inntektsdato shouldBe LocalDate.EPOCH
         gammelIM.naturalytelser shouldBe emptyList()
         gammelIM.fullLønnIArbeidsgiverPerioden shouldBe FullLoennIArbeidsgiverPerioden(true, null, null)
+        gammelIM.vedtaksperiodeId shouldBe nyIM.vedtaksperiodeId
     }
 
     test("konverter inntekt fra nytt til gammelt IM-format") {
@@ -294,5 +296,6 @@ fun lagGammelInntektsmelding(): Inntektsmelding {
         innsenderNavn = "innsender",
         telefonnummer = "22222222",
         forespurtData = listOf("arbeidsgiverperiode", "inntekt", "refusjon"),
+        vedtaksperiodeId = UUID.randomUUID(),
     )
 }
