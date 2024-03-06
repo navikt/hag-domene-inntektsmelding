@@ -21,7 +21,6 @@ data class Inntektsmelding(
     val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
-    val vedtaksperiodeId: UUID?,
 ) {
     enum class Type {
         FORESPURT,

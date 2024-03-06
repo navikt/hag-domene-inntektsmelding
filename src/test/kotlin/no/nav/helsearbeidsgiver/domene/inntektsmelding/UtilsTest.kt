@@ -149,19 +149,18 @@ class UtilsTest : FunSpec({
         nyIM.avsender.tlf shouldBe gammelIM.telefonnummer
 
         nyIM.aarsakInnsending shouldBe AarsakInnsendingV1.Ny
-        nyIM.vedtaksperiodeId shouldBe gammelIM.vedtaksperiodeId
     }
 
     test("konverter fra nytt til gammelt IM-format") {
         val orginal = lagGammelInntektsmelding()
         val nyIM = convertToV1(orginal, nyID, InntektsmeldingV1.Type.FORESPURT)
         val gammelIM = nyIM.convert()
-        gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser, Inntektsmelding::fullLønnIArbeidsgiverPerioden)
+        gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser, Inntektsmelding::fullLønnIArbeidsgiverPerioden, Inntektsmelding::vedtaksperiodeId)
         // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste, fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
         gammelIM.inntektsdato shouldBe LocalDate.EPOCH
         gammelIM.naturalytelser shouldBe emptyList()
         gammelIM.fullLønnIArbeidsgiverPerioden shouldBe FullLoennIArbeidsgiverPerioden(true, null, null)
-        gammelIM.vedtaksperiodeId shouldBe nyIM.vedtaksperiodeId
+        gammelIM.vedtaksperiodeId shouldBe null
     }
 
     test("konverter inntekt fra nytt til gammelt IM-format") {
