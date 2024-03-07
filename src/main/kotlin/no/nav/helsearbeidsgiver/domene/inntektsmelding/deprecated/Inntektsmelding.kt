@@ -1,4 +1,4 @@
-@file:UseSerializers(LocalDateSerializer::class, OffsetDateTimeSerializer::class)
+@file:UseSerializers(LocalDateSerializer::class, OffsetDateTimeSerializer::class, UuidSerializer::class)
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated
 
@@ -10,8 +10,10 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.bestemmendeFravaersdag
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import no.nav.helsearbeidsgiver.utils.json.serializer.OffsetDateTimeSerializer
+import no.nav.helsearbeidsgiver.utils.json.serializer.UuidSerializer
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @Deprecated("Bruk 'v1.Inntektsmelding' istedenfor.")
 @Serializable
@@ -42,4 +44,5 @@ data class Inntektsmelding(
         egenmeldingsperioder = egenmeldingsperioder,
         sykmeldingsperioder = fraværsperioder,
     ),
+    val vedtaksperiodeId: UUID? = null,
 )

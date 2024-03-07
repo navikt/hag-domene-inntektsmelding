@@ -197,6 +197,7 @@ object Utils {
             innsenderNavn = this.avsender.navn,
             telefonnummer = this.avsender.tlf,
             forespurtData = this.getForespurtData(),
+            vedtaksperiodeId = null,
         )
     }
 
