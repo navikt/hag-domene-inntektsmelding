@@ -44,5 +44,5 @@ data class Inntektsmelding(
         egenmeldingsperioder = egenmeldingsperioder,
         sykmeldingsperioder = fraværsperioder,
     ),
-    val vedtaksperiodeId: UUID?,
+    val vedtaksperiodeId: UUID? = null,
 )
