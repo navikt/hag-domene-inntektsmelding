@@ -2,6 +2,7 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.utils.json.serializer.OffsetDateTimeSerializer
@@ -22,8 +23,16 @@ data class Inntektsmelding(
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
 ) {
-    enum class Type {
-        FORESPURT,
-        SELVBESTEMT,
+    @Serializable
+    sealed class Type {
+        abstract val id: UUID
+
+        @Serializable
+        @SerialName("Forespurt")
+        data class Forespurt(override val id: UUID) : Type()
+
+        @Serializable
+        @SerialName("Selvbestemt")
+        data class Selvbestemt(override val id: UUID) : Type()
     }
 }
