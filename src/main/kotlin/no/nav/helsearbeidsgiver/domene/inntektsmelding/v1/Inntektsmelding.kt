@@ -29,7 +29,10 @@ data class Inntektsmelding(
 
         @Serializable
         @SerialName("Forespurt")
-        data class Forespurt(override val id: UUID) : Type()
+        data class Forespurt(
+            override val id: UUID,
+            val vedtaksperiodeId: UUID,
+        ) : Type()
 
         @Serializable
         @SerialName("Selvbestemt")
