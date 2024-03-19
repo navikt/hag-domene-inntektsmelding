@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 group = "no.nav.helsearbeidsgiver"
-version = "0.0.15"
+version = "0.0.16"
 
 plugins {
     kotlin("jvm")
