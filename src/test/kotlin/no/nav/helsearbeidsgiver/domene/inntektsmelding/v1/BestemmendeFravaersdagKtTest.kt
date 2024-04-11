@@ -20,10 +20,8 @@ class BestemmendeFravaersdagKtTest : FunSpec({
     context("arbeidsgiverperiode tilstede") {
 
         test("siste fom i arbeidsgiverperioden er _lik_ siste fom i sykdomsperiodene") {
-            val expected = 1.januar
-
             // Arbeidsgiver overstyrer AGP
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     1.januar til 16.januar,
                 ),
@@ -35,14 +33,12 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 1.januar
         }
 
         test("siste fom i arbeidsgiverperioden er _før_ siste fom i sykdomsperiodene") {
-            val expected = 4.oktober
-
             // Arbeidsgiver overstyrer AGP
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     2.oktober til 17.oktober,
                 ),
@@ -52,14 +48,12 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 4.oktober
         }
 
         test("siste fom i arbeidsgiverperioden er _etter_ siste fom i sykdomsperiodene") {
-            val expected = 3.juli
-
             // Arbeidsgiver overstyrer AGP
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     3.juli til 18.juli,
                 ),
@@ -69,14 +63,12 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 3.juli
         }
 
         test("flere arbeidsgiverperioder kant i kant behandles som enkelt arbeidsgiverperiode") {
-            val expected = 1.februar
-
             // Arbeidsgiver overstyrer AGP
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     1.februar til 12.februar,
                     13.februar til 16.februar,
@@ -89,14 +81,12 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 1.februar
         }
 
         test("flere arbeidsgiverperioder med hverdagsgap behandles som oppdelt arbeidsgiverperiode") {
-            val expected = 10.mars
-
             // Arbeidsgiver overstyrer AGP
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     // 8. mars 2018 er en torsdag
                     1.mars til 8.mars,
@@ -110,13 +100,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 10.mars
         }
 
         test("flere arbeidsgiverperioder med helgegap behandles som oppdelt arbeidsgiverperiode") {
-            val expected = 15.april
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     // 13. april 2018 er en fredag
                     1.april til 13.april,
@@ -128,13 +116,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 15.april
         }
 
         test("arbeidsgiverperiode med gap til egenmeldingsperioder") {
-            val expected = 3.februar
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     10.januar til 26.januar,
                 ),
@@ -146,13 +132,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 3.februar
         }
 
         test("arbeidsgiverperiode med gap til sykmeldingsperioder") {
-            val expected = 8.juni
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     13.mars til 29.mars,
                 ),
@@ -162,13 +146,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 8.juni
         }
 
         test("egenmeldingsperioder eksluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
-            val expected = 31.mars
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = listOf(
                     31.mars til 15.april,
                 ),
@@ -182,16 +164,14 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 31.mars
         }
     }
 
     context("arbeidsgiverperoide ikke tilstede") {
 
         test("uten egenmeldinger, kun én sykmeldingperiode") {
-            val expected = 17.september
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = emptyList(),
                 sykmeldingsperioder = listOf(
@@ -199,13 +179,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 17.september
         }
 
         test("uten egenmeldinger, flere sykmeldingperioder uten gap") {
-            val expected = 21.juni
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = emptyList(),
                 sykmeldingsperioder = listOf(
@@ -214,13 +192,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 21.juni
         }
 
         test("uten egenmeldinger, flere sykmeldingperioder med helgegap") {
-            val expected = 2.august
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = emptyList(),
                 sykmeldingsperioder = listOf(
@@ -230,13 +206,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 2.august
         }
 
         test("uten egenmeldinger, flere sykmeldingperioder med hverdagsgap") {
-            val expected = 14.november
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = emptyList(),
                 sykmeldingsperioder = listOf(
@@ -246,13 +220,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 14.november
         }
 
         test("kun én egenmeldingsperiode, uten gap til enkelt sykmeldingperiode") {
-            val expected = 2.mai
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     2.mai til 2.mai,
@@ -262,13 +234,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 2.mai
         }
 
         test("kun én egenmeldingsperiode, med helgegap til enkelt sykmeldingperiode") {
-            val expected = 2.mars
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     // 3. mars 2018 er en lørdag
@@ -279,13 +249,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 2.mars
         }
 
         test("kun én egenmeldingsperiode, med hverdagsgap til enkelt sykmeldingperiode") {
-            val expected = 9.januar
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     // 7. januar 2018 er en mandag
@@ -296,13 +264,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 9.januar
         }
 
         test("flere egenmeldings- og sykmeldingperioder uten gap") {
-            val expected = 2.juli
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     2.juli til 2.juli,
@@ -315,13 +281,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 2.juli
         }
 
         test("flere egenmeldings- og sykmeldingperioder med helgegap") {
-            val expected = 7.august
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     // 10. august 2018 er en fredag
@@ -335,13 +299,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 7.august
         }
 
         test("flere egenmeldings- og sykmeldingperioder med hverdagsgap") {
-            val expected = 10.desember
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     // 6. desember 2018 er en torsdag
@@ -354,13 +316,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 10.desember
         }
 
         test("egenmeldingsperioder eksluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
-            val expected = 11.august
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     23.juli til 29.juli,
@@ -377,13 +337,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 11.august
         }
 
         test("tåler usorterte egenmeldings- og sykmeldingsperioder") {
-            val expected = 2.februar
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     4.februar til 4.februar,
@@ -397,13 +355,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 2.februar
         }
 
         test("tåler egenmeldingsperioder mellom sykmeldingsperiodene") {
-            val expected = 6.april
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     6.april til 9.april,
@@ -415,13 +371,11 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 6.april
         }
 
         test("tåler overlappende egenmeldings- og sykmeldingsperioder") {
-            val expected = 1.oktober
-
-            val actual = bestemmendeFravaersdag(
+            val bf = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     1.oktober til 5.oktober,
@@ -435,7 +389,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 ),
             )
 
-            actual shouldBe expected
+            bf shouldBe 1.oktober
         }
     }
 })
