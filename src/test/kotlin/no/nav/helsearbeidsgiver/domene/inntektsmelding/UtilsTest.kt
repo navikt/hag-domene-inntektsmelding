@@ -21,6 +21,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Feilregistrert
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Ferie
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Ferietrekk
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.FullLoennIArbeidsgiverPerioden
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Innsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Inntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Naturalytelse
@@ -35,8 +36,14 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.RefusjonEndrin
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Sykefravaer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.VarigLonnsendring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
-import java.lang.IllegalArgumentException
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaAvsender
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
+import no.nav.helsearbeidsgiver.utils.test.date.februar
+import no.nav.helsearbeidsgiver.utils.test.date.januar
+import no.nav.helsearbeidsgiver.utils.test.date.mars
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -46,16 +53,15 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus as BonusV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Feilregistrert as FeilregistrertV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferie as FerieV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Ferietrekk as FerietrekkV1
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt as InntektV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektsmeldingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse as NaturalytelseV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse.Kode as NaturalytelseKodeV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling as NyStillingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStillingsprosent as NyStillingsprosentV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Nyansatt as NyansattV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permisjon as PermisjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permittering as PermitteringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp as RedusertLoennIAgpV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp.Begrunnelse as BegrunnelseRedusertLoennIAgpV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring as RefusjonEndringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer as SykefravaerV1
@@ -98,7 +104,10 @@ class UtilsTest : FunSpec({
         Permisjon(lagPeriode()).convert() shouldBe PermisjonV1(lagPeriode())
         Permittering(lagPeriode()).convert() shouldBe PermitteringV1(lagPeriode())
         Sykefravaer(lagPeriode()).convert() shouldBe SykefravaerV1(lagPeriode())
-        Tariffendring(foersteJanuar2023, foersteJanuar2023).convert() shouldBe TariffendringV1(foersteJanuar2023, foersteJanuar2023)
+        Tariffendring(foersteJanuar2023, foersteJanuar2023).convert() shouldBe TariffendringV1(
+            foersteJanuar2023,
+            foersteJanuar2023,
+        )
         VarigLonnsendring(foersteJanuar2023).convert() shouldBe VarigLoennsendringV1(foersteJanuar2023)
     }
 
@@ -107,7 +116,7 @@ class UtilsTest : FunSpec({
         val gamleYtelser = NaturalytelseKode.entries.map {
             Naturalytelse(it, foersteJanuar2023, belop)
         }.toList()
-        val nyeYtelser = NaturalytelseKodeV1.entries.map {
+        val nyeYtelser = NaturalytelseV1.Kode.entries.map {
             NaturalytelseV1(it, belop, foersteJanuar2023)
         }.toList()
         convertNaturalYtelser(gamleYtelser) shouldBeEqual nyeYtelser
@@ -126,12 +135,12 @@ class UtilsTest : FunSpec({
         )
         val agp = convertToV1(imMedReduksjon, inntektsmeldingId, forespurtType).agp
         agp?.redusertLoennIAgp?.beloep shouldBe utbetalt
-        agp?.redusertLoennIAgp?.begrunnelse shouldBe BegrunnelseRedusertLoennIAgpV1.BetvilerArbeidsufoerhet
+        agp?.redusertLoennIAgp?.begrunnelse shouldBe RedusertLoennIAgpV1.Begrunnelse.BetvilerArbeidsufoerhet
     }
 
     test("convertBegrunnelse") {
         val gamleBegrunnelser = BegrunnelseIngenEllerRedusertUtbetalingKode.entries.toList()
-        val nyeBegrunnelser = BegrunnelseRedusertLoennIAgpV1.entries.toList()
+        val nyeBegrunnelser = RedusertLoennIAgpV1.Begrunnelse.entries.toList()
         gamleBegrunnelser.forEachIndexed { index, begrunnelse -> begrunnelse.convert() shouldBe nyeBegrunnelser[index] }
     }
 
@@ -161,7 +170,13 @@ class UtilsTest : FunSpec({
         val orginal = lagGammelInntektsmelding()
         val nyIM = convertToV1(orginal, inntektsmeldingId, forespurtType)
         val gammelIM = nyIM.convert()
-        gammelIM.shouldBeEqualToIgnoringFields(orginal, Inntektsmelding::inntektsdato, Inntektsmelding::naturalytelser, Inntektsmelding::fullLønnIArbeidsgiverPerioden, Inntektsmelding::vedtaksperiodeId)
+        gammelIM.shouldBeEqualToIgnoringFields(
+            orginal,
+            Inntektsmelding::inntektsdato,
+            Inntektsmelding::naturalytelser,
+            Inntektsmelding::fullLønnIArbeidsgiverPerioden,
+            Inntektsmelding::vedtaksperiodeId,
+        )
         // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste, fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
         gammelIM.inntektsdato shouldBe LocalDate.EPOCH
         gammelIM.naturalytelser shouldBe emptyList()
@@ -172,10 +187,10 @@ class UtilsTest : FunSpec({
     test("konverter inntekt fra nytt til gammelt IM-format") {
         val belop = 1000.0
         val dato = LocalDate.of(2024, 1, 1)
-        val nyInntekt = no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt(
+        val nyInntekt = InntektV1(
             belop,
             dato,
-            listOf(NaturalytelseV1(NaturalytelseKodeV1.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
+            listOf(NaturalytelseV1(NaturalytelseV1.Kode.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
             FeilregistrertV1,
         )
         val gammelInntekt = nyInntekt.convert()
@@ -198,7 +213,7 @@ class UtilsTest : FunSpec({
             agp = ArbeidsgiverperiodeV1(
                 periode,
                 egenmeldinger,
-                RedusertLoennIAgpV1(belop, BegrunnelseRedusertLoennIAgpV1.FerieEllerAvspasering),
+                RedusertLoennIAgpV1(belop, RedusertLoennIAgpV1.Begrunnelse.FerieEllerAvspasering),
             ),
         )
         val konvertert = nyIM.convert()
@@ -257,6 +272,99 @@ class UtilsTest : FunSpec({
         )
         utenFelter.getForespurtData() shouldBe emptyList()
     }
+
+    context("konverter SkjemaInntektsmelding til Innsending") {
+
+        test("fullt skjema") {
+            fulltSkjema().convert() shouldBe fullInnsending()
+        }
+
+        test("fullt skjema uten redusert lønn i AGP") {
+            val skjema = fulltSkjema().let {
+                it.copy(
+                    agp = it.agp?.copy(
+                        redusertLoennIAgp = null,
+                    ),
+                )
+            }
+
+            val innsending = fullInnsending().copy(
+                fullLønnIArbeidsgiverPerioden = FullLoennIArbeidsgiverPerioden(
+                    utbetalerFullLønn = true,
+                    begrunnelse = null,
+                    utbetalt = null,
+                ),
+            )
+
+            skjema.convert() shouldBe innsending
+        }
+
+        test("skjema uten agp") {
+            val skjema = fulltSkjema().copy(
+                agp = null,
+            )
+
+            val innsending = fullInnsending().copy(
+                arbeidsgiverperioder = emptyList(),
+                egenmeldingsperioder = emptyList(),
+                fullLønnIArbeidsgiverPerioden = FullLoennIArbeidsgiverPerioden(
+                    utbetalerFullLønn = true,
+                    begrunnelse = null,
+                    utbetalt = null,
+                ),
+                forespurtData = listOf(
+                    "inntekt",
+                    "refusjon",
+                ),
+            )
+
+            skjema.convert() shouldBe innsending
+        }
+
+        test("skjema uten inntekt") {
+            val skjema = fulltSkjema().copy(
+                inntekt = null,
+            )
+
+            val innsending = fullInnsending().copy(
+                inntekt = Inntekt(
+                    bekreftet = true,
+                    beregnetInntekt = -1.0,
+                    endringÅrsak = null,
+                    manueltKorrigert = false,
+                ),
+                bestemmendeFraværsdag = 2.januar,
+                naturalytelser = emptyList(),
+                forespurtData = listOf(
+                    "arbeidsgiverperiode",
+                    "refusjon",
+                ),
+            )
+
+            skjema.convert() shouldBe innsending
+        }
+
+        test("skjema uten refusjon") {
+            val skjema = fulltSkjema().copy(
+                refusjon = null,
+            )
+
+            val innsending = fullInnsending().copy(
+                refusjon = Refusjon(
+                    utbetalerHeleEllerDeler = false,
+                    refusjonPrMnd = null,
+                    refusjonOpphører = null,
+                    refusjonEndringer = null,
+                ),
+                forespurtData = listOf(
+                    "arbeidsgiverperiode",
+                    "inntekt",
+                ),
+            )
+
+            skjema.convert() shouldBe innsending
+        }
+    }
 })
 
 fun lagPeriode(): List<Periode> {
@@ -304,3 +412,132 @@ fun lagGammelInntektsmelding(): Inntektsmelding {
         vedtaksperiodeId = UUID.randomUUID(),
     )
 }
+
+private fun fulltSkjema(): SkjemaInntektsmelding =
+    SkjemaInntektsmelding(
+        sykmeldtFnr = "03042400123",
+        avsender = SkjemaAvsender(
+            orgnr = "454989232",
+            tlf = "47475555",
+        ),
+        sykmeldingsperioder = listOf(
+            4.januar til 24.februar,
+            3.mars til 22.mars,
+        ),
+        agp = Arbeidsgiverperiode(
+            perioder = listOf(
+                2.januar til 17.januar,
+            ),
+            egenmeldinger = listOf(
+                2.januar til 2.januar,
+                3.januar til 4.januar,
+            ),
+            redusertLoennIAgp = RedusertLoennIAgpV1(
+                beloep = 10500.0,
+                begrunnelse = RedusertLoennIAgpV1.Begrunnelse.FerieEllerAvspasering,
+            ),
+        ),
+        inntekt = InntektV1(
+            beloep = 21000.0,
+            inntektsdato = 1.januar,
+            naturalytelser = listOf(
+                NaturalytelseV1(
+                    naturalytelse = NaturalytelseV1.Kode.FRITRANSPORT,
+                    verdiBeloep = 500.0,
+                    sluttdato = 10.januar,
+                ),
+                NaturalytelseV1(
+                    naturalytelse = NaturalytelseV1.Kode.OPSJONER,
+                    verdiBeloep = 2000.0,
+                    sluttdato = 20.januar,
+                ),
+            ),
+            endringAarsak = TariffendringV1(
+                gjelderFra = 1.februar,
+                bleKjent = 15.februar,
+            ),
+        ),
+        refusjon = RefusjonV1(
+            beloepPerMaaned = 3000.0,
+            endringer = listOf(
+                RefusjonEndringV1(
+                    beloep = 3500.0,
+                    startdato = 15.januar,
+                ),
+                RefusjonEndringV1(
+                    beloep = 2500.0,
+                    startdato = 15.februar,
+                ),
+            ),
+            sluttdato = 1.mars,
+        ),
+        aarsakInnsending = AarsakInnsendingV1.Endring,
+    )
+
+private fun fullInnsending(): Innsending =
+    Innsending(
+        identitetsnummer = "03042400123",
+        orgnrUnderenhet = "454989232",
+        telefonnummer = "47475555",
+        behandlingsdager = emptyList(),
+        arbeidsgiverperioder = listOf(
+            2.januar til 17.januar,
+        ),
+        egenmeldingsperioder = listOf(
+            2.januar til 2.januar,
+            3.januar til 4.januar,
+        ),
+        fraværsperioder = listOf(
+            4.januar til 24.februar,
+            3.mars til 22.mars,
+        ),
+        fullLønnIArbeidsgiverPerioden = FullLoennIArbeidsgiverPerioden(
+            utbetalerFullLønn = false,
+            begrunnelse = BegrunnelseIngenEllerRedusertUtbetalingKode.FerieEllerAvspasering,
+            utbetalt = 10500.0,
+        ),
+        inntekt = Inntekt(
+            bekreftet = true,
+            beregnetInntekt = 21000.0,
+            endringÅrsak = Tariffendring(
+                gjelderFra = 1.februar,
+                bleKjent = 15.februar,
+            ),
+            manueltKorrigert = true,
+        ),
+        bestemmendeFraværsdag = 1.januar,
+        naturalytelser = listOf(
+            Naturalytelse(
+                naturalytelse = NaturalytelseKode.FRITRANSPORT,
+                dato = 10.januar,
+                beløp = 500.0,
+            ),
+            Naturalytelse(
+                naturalytelse = NaturalytelseKode.OPSJONER,
+                dato = 20.januar,
+                beløp = 2000.0,
+            ),
+        ),
+        refusjon = Refusjon(
+            utbetalerHeleEllerDeler = true,
+            refusjonPrMnd = 3000.0,
+            refusjonOpphører = 1.mars,
+            refusjonEndringer = listOf(
+                RefusjonEndring(
+                    beløp = 3500.0,
+                    dato = 15.januar,
+                ),
+                RefusjonEndring(
+                    beløp = 2500.0,
+                    dato = 15.februar,
+                ),
+            ),
+        ),
+        forespurtData = listOf(
+            "arbeidsgiverperiode",
+            "inntekt",
+            "refusjon",
+        ),
+        årsakInnsending = AarsakInnsending.ENDRING,
+        bekreftOpplysninger = true,
+    )
