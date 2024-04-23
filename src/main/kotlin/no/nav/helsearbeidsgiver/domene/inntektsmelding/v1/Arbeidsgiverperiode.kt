@@ -1,13 +1,38 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import kotlinx.serialization.Serializable
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erNullEllerOverNullOgUnderMaks
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 
 @Serializable
 data class Arbeidsgiverperiode(
     val perioder: List<Periode>,
     val egenmeldinger: List<Periode>,
     val redusertLoennIAgp: RedusertLoennIAgp?,
-)
+) {
+    internal fun valider(): List<FeiletValidering> =
+        listOfNotNull(
+            // AGP kan ikke være tom, unntatt når arbeidsgiver betaler redusert lønn i AGP
+            valider(
+                vilkaar = perioder.isNotEmpty() || redusertLoennIAgp != null,
+                feilmelding = Feilmelding.AGP_IKKE_TOM,
+            ),
+
+            valider(
+                vilkaar = perioder.all(Periode::erGyldig),
+                feilmelding = Feilmelding.PERIODE,
+            ),
+
+            valider(
+                vilkaar = egenmeldinger.all(Periode::erGyldig),
+                feilmelding = Feilmelding.PERIODE,
+            ),
+
+            redusertLoennIAgp?.valider(),
+        )
+}
 
 @Serializable
 data class RedusertLoennIAgp(
@@ -33,4 +58,10 @@ data class RedusertLoennIAgp(
         StreikEllerLockout,
         TidligereVirksomhet,
     }
+
+    internal fun valider(): FeiletValidering? =
+        valider(
+            vilkaar = beloep.erNullEllerOverNullOgUnderMaks(),
+            feilmelding = Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL,
+        )
 }

@@ -11,7 +11,10 @@ import java.time.LocalDate
 data class Periode(
     val fom: LocalDate,
     val tom: LocalDate,
-)
+) {
+    internal fun erGyldig(): Boolean =
+        !fom.isAfter(tom)
+}
 
 infix fun LocalDate.til(tom: LocalDate): Periode =
     Periode(
