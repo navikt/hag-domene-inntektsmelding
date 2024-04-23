@@ -36,7 +36,7 @@ data class SkjemaInntektsmelding(
                 listOfNotNull(
                     valider(
                         vilkaar = it.isNotEmpty(),
-                        feilmelding = Feilmelding.IKKE_TOM,
+                        feilmelding = Feilmelding.SYKEMELDINGER_IKKE_TOM,
                     ),
 
                     valider(

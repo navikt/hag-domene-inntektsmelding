@@ -71,7 +71,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                     sykmeldingsperioder = emptyList(),
                 )
 
-                skjema.valider() shouldBe setOf(Feilmelding.IKKE_TOM)
+                skjema.valider() shouldBe setOf(Feilmelding.SYKEMELDINGER_IKKE_TOM)
             }
 
             test("ugyldig periode") {
