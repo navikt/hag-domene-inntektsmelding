@@ -251,7 +251,9 @@ class BestemmendeFravaersdagKtTest : FunSpec({
         }
 
         test("kun én egenmeldingsperiode, uten sykmeldingperioder (skal ikke skje)") {
-            val bf = bestemmendeFravaersdag(
+            val expected = 22.mars
+
+            val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = listOf(
                     22.mars til 1.mai,
@@ -259,7 +261,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 sykmeldingsperioder = emptyList(),
             )
 
-            bf shouldBe 22.mars
+            actual shouldBe expected
         }
 
         test("kun én egenmeldingsperiode, uten gap til enkelt sykmeldingperiode") {
