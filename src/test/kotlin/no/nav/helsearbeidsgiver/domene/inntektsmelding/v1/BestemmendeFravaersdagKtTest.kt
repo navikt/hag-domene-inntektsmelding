@@ -1,5 +1,6 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.utils.test.date.april
@@ -165,7 +166,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
             actual shouldBe expected
         }
 
-        test("egenmeldingsperioder eksluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
+        test("egenmeldingsperioder ekskluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
             val expected = 31.mars
 
             val actual = bestemmendeFravaersdag(
@@ -244,6 +245,20 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     5.november til 11.november,
                     14.november til 28.november,
                 ),
+            )
+
+            actual shouldBe expected
+        }
+
+        test("kun én egenmeldingsperiode, uten sykmeldingperioder (skal ikke skje)") {
+            val expected = 22.mars
+
+            val actual = bestemmendeFravaersdag(
+                arbeidsgiverperioder = emptyList(),
+                egenmeldingsperioder = listOf(
+                    22.mars til 1.mai,
+                ),
+                sykmeldingsperioder = emptyList(),
             )
 
             actual shouldBe expected
@@ -357,7 +372,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
             actual shouldBe expected
         }
 
-        test("egenmeldingsperioder eksluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
+        test("egenmeldingsperioder ekskluderer siste sykmeldingperioder (utgår fra inntektsmeldingsgrunnlag)") {
             val expected = 11.august
 
             val actual = bestemmendeFravaersdag(
@@ -436,6 +451,18 @@ class BestemmendeFravaersdagKtTest : FunSpec({
             )
 
             actual shouldBe expected
+        }
+    }
+
+    test("kaster exception når både egenmeldings- og sykmeldingsperioder mangler") {
+        shouldThrowExactly<NoSuchElementException> {
+            bestemmendeFravaersdag(
+                arbeidsgiverperioder = listOf(
+                    1.juli til 16.juli,
+                ),
+                egenmeldingsperioder = emptyList(),
+                sykmeldingsperioder = emptyList(),
+            )
         }
     }
 })
