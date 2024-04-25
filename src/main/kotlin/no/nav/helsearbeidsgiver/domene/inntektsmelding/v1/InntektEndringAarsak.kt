@@ -26,7 +26,7 @@ data object Feilregistrert : InntektEndringAarsak()
 @Serializable
 @SerialName("Ferie")
 data class Ferie(
-    val perioder: List<Periode>,
+    val ferier: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable
@@ -52,19 +52,19 @@ data class NyStillingsprosent(
 @Serializable
 @SerialName("Permisjon")
 data class Permisjon(
-    val perioder: List<Periode>,
+    val permisjoner: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Permittering")
 data class Permittering(
-    val perioder: List<Periode>,
+    val permitteringer: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable
 @SerialName("Sykefravaer")
 data class Sykefravaer(
-    val perioder: List<Periode>,
+    val sykefravaer: List<Periode>,
 ) : InntektEndringAarsak()
 
 @Serializable

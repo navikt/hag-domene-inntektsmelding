@@ -149,22 +149,21 @@ object Utils {
         }
     }
 
-    fun InntektEndringAarsak.convert(): InntektEndringAarsakV1 {
-        return when (this) {
+    fun InntektEndringAarsak.convert(): InntektEndringAarsakV1 =
+        when (this) {
             is Bonus -> BonusV1
             is Feilregistrert -> FeilregistrertV1
-            is Ferie -> FerieV1(perioder = this.liste)
+            is Ferie -> FerieV1(ferier = liste)
             is Ferietrekk -> FerietrekkV1
             is Nyansatt -> NyansattV1
             is NyStilling -> NyStillingV1(gjelderFra = this.gjelderFra)
             is NyStillingsprosent -> NyStillingsprosentV1(gjelderFra = this.gjelderFra)
-            is Permisjon -> PermisjonV1(perioder = this.liste)
-            is Permittering -> PermitteringV1(perioder = this.liste)
-            is Sykefravaer -> SykefravaerV1(perioder = this.liste)
+            is Permisjon -> PermisjonV1(permisjoner = liste)
+            is Permittering -> PermitteringV1(permitteringer = liste)
+            is Sykefravaer -> SykefravaerV1(sykefravaer = liste)
             is Tariffendring -> TariffendringV1(gjelderFra = this.gjelderFra, bleKjent = this.bleKjent)
             is VarigLonnsendring -> VarigLoennsendringV1(gjelderFra = this.gjelderFra)
         }
-    }
 
     fun convertNaturalYtelser(naturalytelser: List<Naturalytelse>?): List<NaturalytelseV1> {
         if (naturalytelser != null) {
@@ -293,14 +292,14 @@ object Utils {
         when (this) {
             is BonusV1 -> Bonus()
             is FeilregistrertV1 -> Feilregistrert
-            is FerieV1 -> Ferie(liste = this.perioder)
+            is FerieV1 -> Ferie(liste = ferier)
             is FerietrekkV1 -> Ferietrekk
             is NyansattV1 -> Nyansatt
             is NyStillingV1 -> NyStilling(gjelderFra = this.gjelderFra)
             is NyStillingsprosentV1 -> NyStillingsprosent(gjelderFra = this.gjelderFra)
-            is PermisjonV1 -> Permisjon(liste = this.perioder)
-            is PermitteringV1 -> Permittering(liste = this.perioder)
-            is SykefravaerV1 -> Sykefravaer(liste = this.perioder)
+            is PermisjonV1 -> Permisjon(liste = permisjoner)
+            is PermitteringV1 -> Permittering(liste = permitteringer)
+            is SykefravaerV1 -> Sykefravaer(liste = sykefravaer)
             is TariffendringV1 -> Tariffendring(
                 gjelderFra = this.gjelderFra,
                 bleKjent = this.bleKjent,
