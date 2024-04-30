@@ -303,6 +303,24 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 actual shouldBe expected
             }
 
+            test("helgegap mellom arbeidsgiverperioder og sykmeldingsperioder") {
+                // Sykmeldt kan ha vært syk i helgen også, og da er bestemmende fraværsdag 16. august, men
+                // i dagens løsning har vi ingen måte å vite dette på
+                val expected = 3.september
+
+                val actual = bestemmendeFravaersdag(
+                    arbeidsgiverperioder = listOf(
+                        // 31. august 2018 er en fredag
+                        16.august til 31.august,
+                    ),
+                    sykmeldingsperioder = listOf(
+                        3.september til 21.september,
+                    ),
+                )
+
+                actual shouldBe expected
+            }
+
             test("gap i arbeidsgiverperioder overstyrer sammenhengende sykmeldingsperioder") {
                 val expected = 16.september
 
