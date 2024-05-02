@@ -5,11 +5,13 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
+private const val PERIODE_GAP_MAKS_DAGER = 16
+
 internal fun LocalDate.daysUntil(other: LocalDate): Int =
     until(other, ChronoUnit.DAYS).toInt()
 
-internal fun agpPaavirkerIkkeSykmelding(agpSlutt: LocalDate, sykmeldingsperioderStart: LocalDate): Boolean =
-    agpSlutt.daysUntil(sykmeldingsperioderStart) > 16
+internal fun agpPaavirkerIkkeInntektsmelding(agpSlutt: LocalDate, sykmeldingsperioderStart: LocalDate): Boolean =
+    agpSlutt.daysUntil(sykmeldingsperioderStart) > PERIODE_GAP_MAKS_DAGER
 
 internal fun List<Periode>.slaaSammenSammenhengendePerioder(ignorerHelgegap: Boolean): List<Periode> {
     val kanSlaasSammen = if (ignorerHelgegap) {

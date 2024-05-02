@@ -1,9 +1,11 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.agpPaavirkerIkkeSykmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.agpPaavirkerIkkeInntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.slaaSammenSammenhengendePerioder
 import java.time.LocalDate
+
+private const val AGP_MAKS_DAGER = 16
 
 fun bestemmendeFravaersdag(
     arbeidsgiverperioder: List<Periode>,
@@ -16,7 +18,7 @@ fun bestemmendeFravaersdag(
 
     val sammenhengendeFravaersperioder = if (
         agpSlutt == null ||
-        agpPaavirkerIkkeSykmelding(agpSlutt, sykmeldingsperioderStart)
+        agpPaavirkerIkkeInntektsmelding(agpSlutt, sykmeldingsperioderStart)
     ) {
         sammenhengendeSykmeldingsperioder
     } else {
@@ -51,5 +53,5 @@ private fun List<Periode>.fjernPerioderEtterFoersteUtoverAgp(): List<Periode> =
                 it.fom.daysUntil(it.tom) + 1
             }
 
-        antallForegaaendeDager <= 16
+        antallForegaaendeDager <= AGP_MAKS_DAGER
     }
