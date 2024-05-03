@@ -22,10 +22,25 @@ fun bestemmendeFravaersdag(
     ) {
         sammenhengendeSykmeldingsperioder
     } else {
+        val sammenhengendeArbeidsgiverperioder =
+            arbeidsgiverperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
+
         val sammenhengendeSykmeldingsperioderUtenAgp = sammenhengendeSykmeldingsperioder.fjernDatoerTilOgMed(agpSlutt)
 
-        (arbeidsgiverperioder + sammenhengendeSykmeldingsperioderUtenAgp)
-            .slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
+        // Antar sykdom i helg i overgang fra AGP
+        // Fremtidig versjon: Spør AG om sykdom i helg i overgang
+        val overgangFraAgp = listOf(
+            sammenhengendeArbeidsgiverperioder.last(),
+            sammenhengendeSykmeldingsperioderUtenAgp.first(),
+        )
+            .slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
+
+        listOf(
+            sammenhengendeArbeidsgiverperioder.dropLast(1),
+            overgangFraAgp,
+            sammenhengendeSykmeldingsperioderUtenAgp.drop(1),
+        )
+            .flatten()
             .fjernPerioderEtterFoersteUtoverAgp()
     }
 
