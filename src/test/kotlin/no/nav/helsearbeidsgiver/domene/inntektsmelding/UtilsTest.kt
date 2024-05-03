@@ -44,6 +44,9 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.utils.test.date.februar
 import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.mars
+import no.nav.helsearbeidsgiver.utils.test.date.oktober
+import no.nav.helsearbeidsgiver.utils.test.date.september
+import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -207,8 +210,8 @@ class UtilsTest : FunSpec({
 
     test("konverter reduksjon til V0") {
         val belop = 333.33
-        val periode = listOf(Periode(LocalDate.EPOCH, LocalDate.MAX))
-        val egenmeldinger = listOf(Periode(LocalDate.MIN, LocalDate.EPOCH))
+        val periode = listOf(10.september til 20.september)
+        val egenmeldinger = listOf(10.september til 12.september)
         val nyIM = convertToV1(lagGammelInntektsmelding(), inntektsmeldingId, forespurtType).copy(
             agp = ArbeidsgiverperiodeV1(
                 periode,
@@ -226,10 +229,7 @@ class UtilsTest : FunSpec({
 
     test("konverter null-verdi for fullLønnIAGP") {
         val orginal = lagGammelInntektsmeldingMedTommeOgNullVerdier().copy(
-            forespurtData = listOf("arbeidsgiverperiode"),
             fullLønnIArbeidsgiverPerioden = null,
-            arbeidsgiverperioder = lagPeriode(),
-            fraværsperioder = lagPeriode(),
         )
         orginal.convertReduksjon() shouldBe null
 
@@ -377,7 +377,7 @@ fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding {
         behandlingsdager = emptyList(),
         egenmeldingsperioder = emptyList(),
         inntektsdato = null,
-        fraværsperioder = emptyList(),
+        fraværsperioder = listOf(1.januar til 1.januar),
         arbeidsgiverperioder = emptyList(),
         fullLønnIArbeidsgiverPerioden = null,
         naturalytelser = null,
@@ -388,21 +388,39 @@ fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding {
     )
 }
 
-fun lagGammelInntektsmelding(): Inntektsmelding {
-    return Inntektsmelding(
+private fun lagGammelInntektsmelding(): Inntektsmelding =
+    Inntektsmelding(
         orgnrUnderenhet = "123",
         identitetsnummer = "123",
         fulltNavn = "testNavn",
         virksomhetNavn = "testBedrift",
         behandlingsdager = emptyList(),
-        egenmeldingsperioder = lagPeriode(),
-        fraværsperioder = lagPeriode(),
-        arbeidsgiverperioder = lagPeriode(),
+        egenmeldingsperioder = listOf(
+            12.september til 13.september,
+        ),
+        fraværsperioder = listOf(
+            14.september til 20.september,
+            28.september til 21.oktober,
+        ),
+        arbeidsgiverperioder = listOf(
+            12.september til 20.september,
+            28.september til 4.oktober,
+        ),
         beregnetInntekt = 100.0,
         inntektsdato = null,
-        inntekt = Inntekt(true, 100.0, null, false),
+        inntekt = Inntekt(
+            bekreftet = true,
+            beregnetInntekt = 100.0,
+            endringÅrsak = null,
+            manueltKorrigert = false,
+        ),
         fullLønnIArbeidsgiverPerioden = null,
-        refusjon = Refusjon(true, 50.0, LocalDate.EPOCH, emptyList()),
+        refusjon = Refusjon(
+            utbetalerHeleEllerDeler = true,
+            refusjonPrMnd = 50.0,
+            refusjonOpphører = LocalDate.EPOCH,
+            refusjonEndringer = emptyList(),
+        ),
         naturalytelser = null,
         tidspunkt = OffsetDateTime.now(),
         årsakInnsending = AarsakInnsending.NY,
@@ -411,7 +429,6 @@ fun lagGammelInntektsmelding(): Inntektsmelding {
         forespurtData = listOf("arbeidsgiverperiode", "inntekt", "refusjon"),
         vedtaksperiodeId = UUID.randomUUID(),
     )
-}
 
 private fun fulltSkjema(): SkjemaInntektsmelding =
     SkjemaInntektsmelding(
