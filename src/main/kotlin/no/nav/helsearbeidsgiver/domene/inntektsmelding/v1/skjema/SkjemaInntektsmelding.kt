@@ -28,28 +28,15 @@ data class SkjemaInntektsmelding(
                     vilkaar = Fnr.erGyldig(sykmeldtFnr),
                     feilmelding = Feilmelding.FNR,
                 ),
+                valider(
+                    vilkaar = sykmeldingsperioder.isNotEmpty(),
+                    feilmelding = Feilmelding.SYKEMELDINGER_IKKE_TOM,
+                ),
             ),
 
             avsender.valider(),
-
-            sykmeldingsperioder.let {
-                listOfNotNull(
-                    valider(
-                        vilkaar = it.isNotEmpty(),
-                        feilmelding = Feilmelding.SYKEMELDINGER_IKKE_TOM,
-                    ),
-
-                    valider(
-                        vilkaar = it.all(Periode::erGyldig),
-                        feilmelding = Feilmelding.PERIODE,
-                    ),
-                )
-            },
-
             agp?.valider(),
-
             inntekt?.valider(),
-
             refusjon?.valider(),
 
             if (inntekt != null && refusjon != null) {

@@ -73,17 +73,6 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
                 skjema.valider() shouldBe setOf(Feilmelding.SYKEMELDINGER_IKKE_TOM)
             }
-
-            test("ugyldig periode") {
-                val skjema = fulltSkjema().copy(
-                    sykmeldingsperioder = listOf(
-                        6.august til 12.august,
-                        22.august til 14.august,
-                    ),
-                )
-
-                skjema.valider() shouldBe setOf(Feilmelding.PERIODE)
-            }
         }
 
         context(SkjemaInntektsmelding::agp.name) {
@@ -122,21 +111,6 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 skjema.valider().shouldBeEmpty()
             }
 
-            test("AGP har ugyldig periode") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        agp = it.agp?.copy(
-                            perioder = listOf(
-                                8.august til 18.august,
-                                27.august til 23.august,
-                            ),
-                        ),
-                    )
-                }
-
-                skjema.valider() shouldBe setOf(Feilmelding.PERIODE)
-            }
-
             test("egenmeldinger kan være tom") {
                 val skjema = fulltSkjema().let {
                     it.copy(
@@ -147,21 +121,6 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 }
 
                 skjema.valider().shouldBeEmpty()
-            }
-
-            test("egenmeldinger har ugyldig periode") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        agp = it.agp?.copy(
-                            egenmeldinger = listOf(
-                                1.august til 2.august,
-                                19.august til 3.august,
-                            ),
-                        ),
-                    )
-                }
-
-                skjema.valider() shouldBe setOf(Feilmelding.PERIODE)
             }
 
             context(Arbeidsgiverperiode::redusertLoennIAgp.name) {
@@ -390,28 +349,24 @@ class SkjemaInntektsmeldingTest : FunSpec({
             val skjema = fulltSkjema().let {
                 it.copy(
                     agp = it.agp?.copy(
-                        perioder = listOf(
-                            15.juni til 10.juni,
+                        redusertLoennIAgp = it.agp?.redusertLoennIAgp?.copy(
+                            beloep = -11.0,
                         ),
-                        egenmeldinger = listOf(
-                            13.juni til 9.juni,
-                        ),
+                    ),
+                    refusjon = it.refusjon?.copy(
+                        beloepPerMaaned = -22.0,
                     ),
                 )
             }
 
-            skjema.valider() shouldBe setOf(Feilmelding.PERIODE)
+            skjema.valider() shouldBe setOf(Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL)
         }
 
         test("ulike feilmeldinger bevares") {
             val skjema = fulltSkjema().let {
                 it.copy(
                     sykmeldtFnr = "120199",
-                    agp = it.agp?.copy(
-                        egenmeldinger = listOf(
-                            13.juni til 9.juni,
-                        ),
-                    ),
+                    sykmeldingsperioder = emptyList(),
                     refusjon = it.refusjon?.copy(
                         beloepPerMaaned = -17.0,
                     ),
@@ -420,7 +375,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             skjema.valider() shouldBe setOf(
                 Feilmelding.FNR,
-                Feilmelding.PERIODE,
+                Feilmelding.SYKEMELDINGER_IKKE_TOM,
                 Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL,
             )
         }

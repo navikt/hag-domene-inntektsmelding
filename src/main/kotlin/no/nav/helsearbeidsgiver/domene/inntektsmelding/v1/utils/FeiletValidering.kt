@@ -16,7 +16,6 @@ internal object Feilmelding {
     const val FNR = "Ugyldig fødsels- eller D-nummer"
     const val TLF = "Ugyldig telefonnummer"
     const val SYKEMELDINGER_IKKE_TOM = "Sykmeldingsperioder må fylles ut"
-    const val PERIODE = "Fra og med-dato må være før eller lik til og med-dato"
     const val BELOEP_STOERRE_ELLER_LIK_NULL = "Beløp må være større eller lik 0"
     const val AGP_IKKE_TOM = "Arbeidsgiverperioden må fylles ut, med mindre man betaler redusert lønn i perioden"
     const val REFUSJON_OVER_INNTEKT = "Refusjonsbeløp må være mindre eller lik inntekt"

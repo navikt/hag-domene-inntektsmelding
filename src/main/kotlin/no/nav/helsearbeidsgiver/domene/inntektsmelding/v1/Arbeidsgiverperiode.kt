@@ -20,16 +20,6 @@ data class Arbeidsgiverperiode(
                 feilmelding = Feilmelding.AGP_IKKE_TOM,
             ),
 
-            valider(
-                vilkaar = perioder.all(Periode::erGyldig),
-                feilmelding = Feilmelding.PERIODE,
-            ),
-
-            valider(
-                vilkaar = egenmeldinger.all(Periode::erGyldig),
-                feilmelding = Feilmelding.PERIODE,
-            ),
-
             redusertLoennIAgp?.valider(),
         )
 }
