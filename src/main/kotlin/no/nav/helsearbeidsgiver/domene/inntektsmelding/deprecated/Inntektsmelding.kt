@@ -41,7 +41,6 @@ data class Inntektsmelding(
     @EncodeDefault
     val bestemmendeFraværsdag: LocalDate = bestemmendeFravaersdag(
         arbeidsgiverperioder = arbeidsgiverperioder,
-        egenmeldingsperioder = egenmeldingsperioder,
         sykmeldingsperioder = fraværsperioder,
     ),
     val vedtaksperiodeId: UUID? = null,

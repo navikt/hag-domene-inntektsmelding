@@ -12,6 +12,12 @@ data class Periode(
     val fom: LocalDate,
     val tom: LocalDate,
 ) {
+    init {
+        if (!erGyldig()) {
+            throw IllegalArgumentException("Ugyldig periode: $fom til $tom")
+        }
+    }
+
     internal fun erGyldig(): Boolean =
         !fom.isAfter(tom)
 }
