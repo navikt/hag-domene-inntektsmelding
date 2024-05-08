@@ -7,6 +7,25 @@ import java.time.temporal.ChronoUnit
 
 private const val PERIODE_GAP_MAKS_DAGER = 16
 
+// TODO flytt til v1.Inntektsmelding når den er tatt i bruk i Simba
+fun utledEgenmeldinger(
+    arbeidsgiverperioder: List<Periode>,
+    sykmeldingsperioder: List<Periode>,
+): List<Periode> {
+    val agpSlutt = arbeidsgiverperioder.lastOrNull()?.tom
+    val sykmeldingsperioderStart = sykmeldingsperioder.first().fom
+
+    return if (agpSlutt == null || agpPaavirkerIkkeInntektsmelding(agpSlutt, sykmeldingsperioderStart)) {
+        emptyList()
+    } else {
+        arbeidsgiverperioder.tilDatoer()
+            .minus(
+                sykmeldingsperioder.tilDatoer(),
+            )
+            .tilPerioder()
+    }
+}
+
 internal fun LocalDate.daysUntil(other: LocalDate): Int =
     until(other, ChronoUnit.DAYS).toInt()
 
@@ -48,3 +67,17 @@ private fun erSammenhengendeIgnorerHelgegap(denne: Periode, neste: Periode): Boo
         else -> dagerAvstand <= 1
     }
 }
+
+private fun List<Periode>.tilDatoer(): Set<LocalDate> =
+    flatMap {
+        val antallDager = it.fom.daysUntil(it.tom) + 1
+
+        List(antallDager) { index ->
+            it.fom.plusDays(index.toLong())
+        }
+    }
+        .toSet()
+
+private fun Set<LocalDate>.tilPerioder(): List<Periode> =
+    map { Periode(it, it) }
+        .slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
