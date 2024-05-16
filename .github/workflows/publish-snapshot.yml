@@ -22,8 +22,8 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - name: Get Version
         run:  |
-          echo "CURRENT_VERSION=$(./gradlew :printVersion)"
-          echo "CURRENT_VERSION=$(./gradlew :printVersion)" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=$(./gradlew :printVersion --quiet)"
+          echo "CURRENT_VERSION=$(./gradlew :printVersion --quiet)" >> $GITHUB_ENV
         env:
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish artifact
