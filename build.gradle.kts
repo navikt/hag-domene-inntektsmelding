@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 group = "no.nav.helsearbeidsgiver"
-version = "0.0.18-SNAPSHOT"
+
 
 plugins {
     kotlin("jvm")
@@ -20,6 +20,10 @@ tasks {
     test {
         useJUnitPlatform()
     }
+}
+
+tasks.register("printVersion") {
+    printVersion()
 }
 
 java {
@@ -68,6 +72,6 @@ fun RepositoryHandler.mavenNav(repo: String): MavenArtifactRepository {
     }
 }
 
-fun printVersionName() {
-    println (version)
+fun printVersion() {
+    println(version)
 }
