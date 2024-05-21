@@ -303,7 +303,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 actual shouldBe expected
             }
 
-            test("arbeidsgiverperioder slutter etter sykmeldigsperioder") {
+            test("arbeidsgiverperioder slutter etter sykmeldingsperioder") {
                 val expected = 8.april
 
                 val actual = bestemmendeFravaersdag(
