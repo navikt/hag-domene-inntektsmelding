@@ -7,6 +7,8 @@ on:
 
 jobs:
   publish-snapshot:
+    env:
+      ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -24,10 +26,6 @@ jobs:
         run:  |
           echo "CURRENT_VERSION=$(./gradlew :printVersion --quiet)"
           echo "CURRENT_VERSION=$(./gradlew :printVersion --quiet)" >> $GITHUB_ENV
-        env:
-          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish artifact
         if: ${{ endsWith(env.CURRENT_VERSION, '-SNAPSHOT') }}
         run: ./gradlew publish
-        env:
-          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
