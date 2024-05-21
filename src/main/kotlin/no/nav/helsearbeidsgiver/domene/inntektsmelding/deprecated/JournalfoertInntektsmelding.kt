@@ -11,4 +11,5 @@ data class JournalfoertInntektsmelding(
     val journalpostId: String,
     @JsonNames("inntektsmeldingDokument") // TODO slett etter overgangsfase
     val inntektsmelding: Inntektsmelding,
+    val selvbestemt: Boolean = false, // for å skille på selvbestemt og vanlig i spinosaurus, før V1 tas i bruk overalt
 )
