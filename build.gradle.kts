@@ -71,6 +71,5 @@ fun RepositoryHandler.mavenNav(repo: String): MavenArtifactRepository {
     }
 }
 
-fun printVersion() {
-    println(version)
-}
+fun printVersion() = println(version)
+
