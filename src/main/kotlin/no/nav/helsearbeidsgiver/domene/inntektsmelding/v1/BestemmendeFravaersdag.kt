@@ -29,9 +29,9 @@ fun bestemmendeFravaersdag(
 
         // Antar sykdom i helg i overgang fra AGP
         // Fremtidig versjon: Spør AG om sykdom i helg i overgang
-        val overgangFraAgp = listOf(
+        val overgangFraAgp = listOfNotNull(
             sammenhengendeArbeidsgiverperioder.last(),
-            sammenhengendeSykmeldingsperioderUtenAgp.first(),
+            sammenhengendeSykmeldingsperioderUtenAgp.firstOrNull(),
         )
             .slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
 
