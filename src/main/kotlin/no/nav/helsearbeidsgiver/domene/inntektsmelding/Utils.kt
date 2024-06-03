@@ -25,6 +25,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.RefusjonEndrin
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Sykefravaer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.VarigLonnsendring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.bestemmendeFravaersdag
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
@@ -309,14 +310,14 @@ object Utils {
             is VarigLoennsendringV1 -> VarigLonnsendring(gjelderFra = this.gjelderFra)
         }
 
-    fun SkjemaInntektsmelding.convert(aarsakInnsending: AarsakInnsendingV1): Innsending {
+    fun SkjemaInntektsmelding.convert(sykmeldingsperioder: List<Periode>, aarsakInnsending: AarsakInnsendingV1): Innsending {
         val arbeidsgiverperioder = agp?.perioder.orEmpty()
         val egenmeldingsperioder = agp?.egenmeldinger.orEmpty()
 
         return Innsending(
-            identitetsnummer = sykmeldtFnr,
-            orgnrUnderenhet = avsender.orgnr,
-            telefonnummer = avsender.tlf,
+            identitetsnummer = "",
+            orgnrUnderenhet = "",
+            telefonnummer = avsenderTlf,
             behandlingsdager = emptyList(),
             arbeidsgiverperioder = arbeidsgiverperioder,
             egenmeldingsperioder = egenmeldingsperioder,

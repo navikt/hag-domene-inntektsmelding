@@ -12,8 +12,6 @@ internal fun valider(vilkaar: Boolean, feilmelding: String): FeiletValidering? =
     }
 
 internal object Feilmelding {
-    const val ORGNR = "Ugyldig organisasjonsnummer"
-    const val FNR = "Ugyldig fødsels- eller D-nummer"
     const val TLF = "Ugyldig telefonnummer"
     const val SYKEMELDINGER_IKKE_TOM = "Sykmeldingsperioder må fylles ut"
     const val KREVER_BELOEP_STOERRE_ELLER_LIK_NULL = "Beløp må være større eller lik 0"

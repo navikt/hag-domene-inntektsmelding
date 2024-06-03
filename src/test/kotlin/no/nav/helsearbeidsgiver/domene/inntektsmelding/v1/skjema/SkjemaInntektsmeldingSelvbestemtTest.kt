@@ -1,11 +1,14 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.core.spec.style.scopes.ContainerScope
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
+import kotlinx.serialization.json.jsonObject
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
@@ -15,30 +18,107 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
+import no.nav.helsearbeidsgiver.utils.json.fromJson
+import no.nav.helsearbeidsgiver.utils.json.toJson
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
 import no.nav.helsearbeidsgiver.utils.test.date.mai
+import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
+import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 
-class SkjemaInntektsmeldingTest : FunSpec({
+@OptIn(ExperimentalSerializationApi::class)
+class SkjemaInntektsmeldingSelvbestemtTest : FunSpec({
 
-    context(SkjemaInntektsmelding::valider.name) {
+    context("innebygget validering") {
+        context(SkjemaInntektsmeldingSelvbestemt::sykmeldtFnr.name) {
+            test("ugyldig") {
+                val skjemaJson = fulltSkjema()
+                    .toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                    .jsonObject
+                    .plus(
+                        SkjemaInntektsmeldingSelvbestemt::sykmeldtFnr.name to "123".toJson(),
+                    )
+                    .toJson()
+
+                shouldThrowExactly<IllegalArgumentException> {
+                    skjemaJson.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                }
+            }
+        }
+
+        context(SkjemaInntektsmeldingSelvbestemt::avsender.name) {
+            test("ugyldig orgnr") {
+                val skjema = fulltSkjema()
+
+                val avsenderJson = skjema.avsender
+                    .toJson(SkjemaAvsender.serializer())
+                    .jsonObject
+                    .plus(
+                        SkjemaAvsender::orgnr.name to "0".toJson(),
+                    )
+                    .toJson()
+
+                val skjemaJson = skjema
+                    .toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                    .jsonObject
+                    .plus(
+                        SkjemaInntektsmeldingSelvbestemt::avsender.name to avsenderJson,
+                    )
+                    .toJson()
+
+                shouldThrowExactly<IllegalArgumentException> {
+                    skjemaJson.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                }
+            }
+        }
+
+        context(SkjemaInntektsmeldingSelvbestemt::inntekt.name) {
+            test("inntekt kan _ikke_ være 'null'") {
+                val skjemaJson = fulltSkjema()
+                    .toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                    .jsonObject
+                    .minus(SkjemaInntektsmeldingSelvbestemt::inntekt.name)
+                    .toJson()
+
+                shouldThrowExactly<MissingFieldException> {
+                    skjemaJson.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                }
+            }
+        }
+    }
+
+    context(SkjemaInntektsmeldingSelvbestemt::valider.name) {
 
         test("skjema uten feil valideres uten feilmeldinger") {
             fulltSkjema().valider().shouldBeEmpty()
         }
 
-        context(SkjemaInntektsmelding::avsenderTlf.name) {
+        context(SkjemaInntektsmeldingSelvbestemt::avsender.name) {
             test("ugyldig tlf") {
-                val skjema = fulltSkjema().copy(
-                    avsenderTlf = "hæ?",
-                )
+                val skjema = fulltSkjema().let {
+                    it.copy(
+                        avsender = it.avsender.copy(
+                            tlf = "hæ?",
+                        ),
+                    )
+                }
 
                 skjema.valider() shouldBe setOf(Feilmelding.TLF)
             }
         }
 
-        context(SkjemaInntektsmelding::agp.name) {
+        context(SkjemaInntektsmeldingSelvbestemt::sykmeldingsperioder.name) {
+            test("ugyldig tom liste") {
+                val skjema = fulltSkjema().copy(
+                    sykmeldingsperioder = emptyList(),
+                )
+
+                skjema.valider() shouldBe setOf(Feilmelding.SYKEMELDINGER_IKKE_TOM)
+            }
+        }
+
+        context(SkjemaInntektsmeldingSelvbestemt::agp.name) {
             test("AGP kan være 'null'") {
                 val skjema = fulltSkjema().copy(agp = null)
 
@@ -116,18 +196,13 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
         }
 
-        context(SkjemaInntektsmelding::inntekt.name) {
-            test("inntekt kan være 'null'") {
-                val skjema = fulltSkjema().copy(inntekt = null)
-
-                skjema.valider().shouldBeEmpty()
-            }
+        context(SkjemaInntektsmeldingSelvbestemt::inntekt.name) {
 
             context(Inntekt::beloep.name) {
                 testBeloep { beloep, forventetFeil ->
                     val skjema = fulltSkjema().let {
                         it.copy(
-                            inntekt = it.inntekt?.copy(
+                            inntekt = it.inntekt.copy(
                                 beloep = beloep,
                             ),
                         )
@@ -141,7 +216,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 test("'naturalytelser' kan være tom") {
                     val skjema = fulltSkjema().let {
                         it.copy(
-                            inntekt = it.inntekt?.copy(
+                            inntekt = it.inntekt.copy(
                                 naturalytelser = emptyList(),
                             ),
                         )
@@ -161,7 +236,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 ) { (beloep, forventetFeil) ->
                     val skjema = fulltSkjema().let {
                         it.copy(
-                            inntekt = it.inntekt?.copy(
+                            inntekt = it.inntekt.copy(
                                 naturalytelser = listOf(
                                     Naturalytelse(
                                         naturalytelse = Naturalytelse.Kode.BIL,
@@ -180,7 +255,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             test("'endringAarsak' kan være 'null'") {
                 val skjema = fulltSkjema().let {
                     it.copy(
-                        inntekt = it.inntekt?.copy(
+                        inntekt = it.inntekt.copy(
                             endringAarsak = null,
                         ),
                     )
@@ -190,7 +265,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
         }
 
-        context(SkjemaInntektsmelding::refusjon.name) {
+        context(SkjemaInntektsmeldingSelvbestemt::refusjon.name) {
             test("refusjon kan være 'null'") {
                 val skjema = fulltSkjema().copy(refusjon = null)
 
@@ -276,7 +351,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         test("refusjonsbeløp over inntekt") {
             val skjema = fulltSkjema().let {
                 it.copy(
-                    inntekt = it.inntekt?.copy(
+                    inntekt = it.inntekt.copy(
                         beloep = 15000.0,
                     ),
                     refusjon = it.refusjon?.copy(
@@ -291,7 +366,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         test("refusjonsbeløp i endring over inntekt") {
             val skjema = fulltSkjema().let {
                 it.copy(
-                    inntekt = it.inntekt?.copy(
+                    inntekt = it.inntekt.copy(
                         beloep = 8000.0,
                     ),
                     refusjon = it.refusjon?.copy(
@@ -328,16 +403,10 @@ class SkjemaInntektsmeldingTest : FunSpec({
         test("ulike feilmeldinger bevares") {
             val skjema = fulltSkjema().let {
                 it.copy(
-                    avsenderTlf = "112",
-                    inntekt = it.inntekt?.copy(
-                        naturalytelser = listOf(
-                            Naturalytelse(
-                                naturalytelse = Naturalytelse.Kode.OPSJONER,
-                                verdiBeloep = 0.0,
-                                sluttdato = 15.juni,
-                            ),
-                        ),
+                    avsender = it.avsender.copy(
+                        tlf = "112",
                     ),
+                    sykmeldingsperioder = emptyList(),
                     refusjon = it.refusjon?.copy(
                         beloepPerMaaned = -17.0,
                     ),
@@ -346,32 +415,25 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             skjema.valider() shouldBe setOf(
                 Feilmelding.TLF,
-                Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
+                Feilmelding.SYKEMELDINGER_IKKE_TOM,
                 Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             )
         }
     }
 })
 
-internal suspend fun ContainerScope.testBeloep(
-    testFn: (Double, Set<String>) -> Unit,
-) {
-    withData(
-        nameFn = { (beloep, forventetFeil) ->
-            "beløp $beloep gir ${forventetFeil.size} feil"
-        },
-        0.0 to emptySet(),
-        10000.0 to emptySet(),
-        -1.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL),
-        1_000_000.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL),
-    ) { (beloep, forventetFeil) ->
-        testFn(beloep, forventetFeil)
-    }
-}
-
-private fun fulltSkjema(): SkjemaInntektsmelding =
-    SkjemaInntektsmelding(
-        avsenderTlf = "45456060",
+private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
+    SkjemaInntektsmeldingSelvbestemt(
+        sykmeldtFnr = Fnr("11037400132"),
+        avsender = SkjemaAvsender(
+            orgnr = Orgnr("888414223"),
+            tlf = "45456060",
+        ),
+        sykmeldingsperioder = listOf(
+            5.juni til 20.juni,
+            21.juni til 30.juni,
+            6.juli til 25.juli,
+        ),
         agp = Arbeidsgiverperiode(
             perioder = listOf(
                 2.juni til 2.juni,
