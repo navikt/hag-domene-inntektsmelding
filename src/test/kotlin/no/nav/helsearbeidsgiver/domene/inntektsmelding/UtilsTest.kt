@@ -276,7 +276,7 @@ class UtilsTest : FunSpec({
     context("konverter SkjemaInntektsmelding til Innsending") {
 
         test("fullt skjema") {
-            fulltSkjema().convert() shouldBe fullInnsending()
+            fulltSkjema().convert(AarsakInnsendingV1.Endring) shouldBe fullInnsending()
         }
 
         test("fullt skjema uten redusert lønn i AGP") {
@@ -296,7 +296,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert() shouldBe innsending
+            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
         }
 
         test("skjema uten agp") {
@@ -318,7 +318,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert() shouldBe innsending
+            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
         }
 
         test("skjema uten inntekt") {
@@ -341,7 +341,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert() shouldBe innsending
+            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
         }
 
         test("skjema uten refusjon") {
@@ -362,7 +362,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert() shouldBe innsending
+            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
         }
     }
 })
@@ -488,7 +488,6 @@ private fun fulltSkjema(): SkjemaInntektsmelding =
             ),
             sluttdato = 1.mars,
         ),
-        aarsakInnsending = AarsakInnsendingV1.Endring,
     )
 
 private fun fullInnsending(): Innsending =

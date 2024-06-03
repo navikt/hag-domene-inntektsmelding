@@ -6,7 +6,6 @@ import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
@@ -458,5 +457,4 @@ private fun fulltSkjema(): SkjemaInntektsmelding =
             ),
             sluttdato = 30.juni,
         ),
-        aarsakInnsending = AarsakInnsending.Endring,
     )

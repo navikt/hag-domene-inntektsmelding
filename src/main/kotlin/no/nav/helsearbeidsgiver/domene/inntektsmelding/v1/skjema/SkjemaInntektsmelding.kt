@@ -1,7 +1,6 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
 import kotlinx.serialization.Serializable
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
@@ -19,7 +18,6 @@ data class SkjemaInntektsmelding(
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt?,
     val refusjon: Refusjon?,
-    val aarsakInnsending: AarsakInnsending,
 ) {
     fun valider(): Set<String> =
         listOfNotNull(
