@@ -5,8 +5,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.slaaSammenSammenhengendePerioder
 import java.time.LocalDate
 
-private const val AGP_MAKS_DAGER = 16
-
 fun bestemmendeFravaersdag(
     arbeidsgiverperioder: List<Periode>,
     sykmeldingsperioder: List<Periode>,

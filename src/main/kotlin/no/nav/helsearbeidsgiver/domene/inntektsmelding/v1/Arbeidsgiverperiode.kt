@@ -7,6 +7,8 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 
+internal const val AGP_MAKS_DAGER = 16
+
 @Serializable
 data class Arbeidsgiverperiode(
     val perioder: List<Periode>,
@@ -22,7 +24,7 @@ data class Arbeidsgiverperiode(
             ),
 
             valider(
-                vilkaar = perioder.sumOf { it.fom.daysUntil(it.tom) + 1 } <= 16,
+                vilkaar = perioder.sumOf { it.fom.daysUntil(it.tom) + 1 } <= AGP_MAKS_DAGER,
                 feilmelding = Feilmelding.AGP_MAKS_16,
             ),
 
