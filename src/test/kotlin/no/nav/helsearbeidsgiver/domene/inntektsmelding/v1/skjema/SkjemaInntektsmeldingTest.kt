@@ -110,6 +110,21 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 skjema.valider().shouldBeEmpty()
             }
 
+            test("AGP kan være maks 16 dager") {
+                val skjema = fulltSkjema().let {
+                    it.copy(
+                        agp = it.agp?.copy(
+                            perioder = listOf(
+                                8.august til 17.august,
+                                20.august til 31.august,
+                            ),
+                        ),
+                    )
+                }
+
+                skjema.valider() shouldBe setOf(Feilmelding.AGP_MAKS_16)
+            }
+
             test("egenmeldinger kan være tom") {
                 val skjema = fulltSkjema().let {
                     it.copy(

@@ -3,6 +3,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 
@@ -18,6 +19,11 @@ data class Arbeidsgiverperiode(
             valider(
                 vilkaar = perioder.isNotEmpty() || redusertLoennIAgp != null,
                 feilmelding = Feilmelding.AGP_IKKE_TOM,
+            ),
+
+            valider(
+                vilkaar = perioder.sumOf { it.fom.daysUntil(it.tom) + 1 } <= 16,
+                feilmelding = Feilmelding.AGP_MAKS_16,
             ),
 
             redusertLoennIAgp?.valider(),
