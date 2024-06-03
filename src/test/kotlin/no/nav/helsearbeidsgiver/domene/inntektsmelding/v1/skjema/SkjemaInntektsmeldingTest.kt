@@ -324,6 +324,23 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
         }
 
+        test("bestemmende fraværsdag før inntektsdato") {
+            val skjema = fulltSkjema().let {
+                it.copy(
+                    agp = it.agp?.copy(
+                        perioder = listOf(
+                            6.juni til 21.juni,
+                        ),
+                    ),
+                    inntekt = it.inntekt?.copy(
+                        inntektsdato = 7.juni,
+                    ),
+                )
+            }
+
+            skjema.valider() shouldBe setOf(Feilmelding.TEKNISK_FEIL)
+        }
+
         test("refusjonsbeløp over inntekt") {
             val skjema = fulltSkjema().let {
                 it.copy(
