@@ -2,6 +2,7 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding
 
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.Utils.getForespurtData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.BegrunnelseIngenEllerRedusertUtbetalingKode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Bonus
@@ -9,6 +10,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Feilregistrert
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Ferie
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Ferietrekk
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.FullLoennIArbeidsgiverPerioden
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Innsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.InntektEndringAarsak
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Inntektsmelding
@@ -24,6 +26,8 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.RefusjonEndrin
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Sykefravaer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.VarigLonnsendring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.bestemmendeFravaersdag
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import java.time.LocalDate
 import java.util.UUID
@@ -38,14 +42,12 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt as InntektV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.InntektEndringAarsak as InntektEndringAarsakV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding as InntektsmeldingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse as NaturalytelseV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse.Kode as NaturalytelseKodeV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStilling as NyStillingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.NyStillingsprosent as NyStillingsprosentV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Nyansatt as NyansattV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permisjon as PermisjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Permittering as PermitteringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp as RedusertLoennIAgpV1
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp.Begrunnelse as BegrunnelseRedusertLoennIAgpV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon as RefusjonV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring as RefusjonEndringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer as SykefravaerV1
@@ -175,7 +177,7 @@ object Utils {
 
     fun Naturalytelse.convert(): NaturalytelseV1 {
         return NaturalytelseV1(
-            NaturalytelseKodeV1.valueOf(this.naturalytelse.name),
+            NaturalytelseV1.Kode.valueOf(this.naturalytelse.name),
             this.beløp,
             this.dato,
         )
@@ -196,8 +198,8 @@ object Utils {
         )
     }
 
-    fun BegrunnelseIngenEllerRedusertUtbetalingKode.convert(): BegrunnelseRedusertLoennIAgpV1 {
-        return BegrunnelseRedusertLoennIAgpV1.valueOf(this.name)
+    fun BegrunnelseIngenEllerRedusertUtbetalingKode.convert(): RedusertLoennIAgpV1.Begrunnelse {
+        return RedusertLoennIAgpV1.Begrunnelse.valueOf(this.name)
     }
 
     fun InntektsmeldingV1.convert(): Inntektsmelding {
@@ -275,7 +277,7 @@ object Utils {
         return FullLoennIArbeidsgiverPerioden(false, this.begrunnelse.convert(), this.beloep)
     }
 
-    fun BegrunnelseRedusertLoennIAgpV1.convert(): BegrunnelseIngenEllerRedusertUtbetalingKode {
+    fun RedusertLoennIAgpV1.Begrunnelse.convert(): BegrunnelseIngenEllerRedusertUtbetalingKode {
         return BegrunnelseIngenEllerRedusertUtbetalingKode.valueOf(this.name)
     }
 
@@ -308,4 +310,56 @@ object Utils {
 
             is VarigLoennsendringV1 -> VarigLonnsendring(gjelderFra = this.gjelderFra)
         }
+
+    fun SkjemaInntektsmelding.convert(): Innsending {
+        val arbeidsgiverperioder = agp?.perioder.orEmpty()
+        val egenmeldingsperioder = agp?.egenmeldinger.orEmpty()
+
+        return Innsending(
+            identitetsnummer = sykmeldtFnr,
+            orgnrUnderenhet = avsender.orgnr,
+            telefonnummer = avsender.tlf,
+            behandlingsdager = emptyList(),
+            arbeidsgiverperioder = arbeidsgiverperioder,
+            egenmeldingsperioder = egenmeldingsperioder,
+            fraværsperioder = sykmeldingsperioder,
+            fullLønnIArbeidsgiverPerioden = agp?.redusertLoennIAgp?.convert()
+                ?: FullLoennIArbeidsgiverPerioden(
+                    utbetalerFullLønn = true,
+                    begrunnelse = null,
+                    utbetalt = null,
+                ),
+            inntekt = inntekt?.convert()
+                ?: Inntekt(
+                    bekreftet = true,
+                    // Blir erstattet av fastsatt inntekt (forslag fra Spleis)
+                    beregnetInntekt = -1.0,
+                    endringÅrsak = null,
+                    manueltKorrigert = false,
+                ),
+            bestemmendeFraværsdag = inntekt?.inntektsdato
+                ?: bestemmendeFravaersdag(
+                    arbeidsgiverperioder = arbeidsgiverperioder,
+                    sykmeldingsperioder = sykmeldingsperioder,
+                ),
+            naturalytelser = inntekt?.naturalytelser?.map { it.convert() }.orEmpty(),
+            refusjon = refusjon?.convert()
+                ?: Refusjon(
+                    utbetalerHeleEllerDeler = false,
+                    refusjonPrMnd = null,
+                    refusjonOpphører = null,
+                    refusjonEndringer = null,
+                ),
+            forespurtData = mapOf(
+                "arbeidsgiverperiode" to agp,
+                "inntekt" to inntekt,
+                "refusjon" to refusjon,
+            )
+                .filterValues { it != null }
+                .keys
+                .toList(),
+            årsakInnsending = aarsakInnsending.convert(),
+            bekreftOpplysninger = true,
+        )
+    }
 }
