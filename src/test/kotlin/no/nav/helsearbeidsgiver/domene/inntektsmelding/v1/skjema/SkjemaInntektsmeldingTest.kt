@@ -192,9 +192,9 @@ class SkjemaInntektsmeldingTest : FunSpec({
                         "beløp $beloep gir ${forventetFeil.size} feil"
                     },
                     1.0 to emptySet(),
-                    0.0 to setOf(Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL),
-                    -1.0 to setOf(Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL),
-                    1_000_000.0 to setOf(Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL),
+                    0.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
+                    -1.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
+                    1_000_000.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
                 ) { (beloep, forventetFeil) ->
                     val skjema = fulltSkjema().let {
                         it.copy(
@@ -359,7 +359,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 )
             }
 
-            skjema.valider() shouldBe setOf(Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL)
+            skjema.valider() shouldBe setOf(Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL)
         }
 
         test("ulike feilmeldinger bevares") {
@@ -376,7 +376,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             skjema.valider() shouldBe setOf(
                 Feilmelding.FNR,
                 Feilmelding.SYKEMELDINGER_IKKE_TOM,
-                Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL,
+                Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             )
         }
     }
@@ -391,8 +391,8 @@ private suspend fun ContainerScope.testBeloep(
         },
         0.0 to emptySet(),
         10000.0 to emptySet(),
-        -1.0 to setOf(Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL),
-        1_000_000.0 to setOf(Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL),
+        -1.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL),
+        1_000_000.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL),
     ) { (beloep, forventetFeil) ->
         testFn(beloep, forventetFeil)
     }

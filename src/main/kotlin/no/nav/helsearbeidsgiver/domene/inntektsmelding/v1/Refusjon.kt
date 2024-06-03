@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erNullEllerOverNullOgUnderMaks
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import java.time.LocalDate
@@ -20,13 +20,13 @@ data class Refusjon(
     internal fun valider(): List<FeiletValidering> =
         listOfNotNull(
             valider(
-                vilkaar = beloepPerMaaned.erNullEllerOverNullOgUnderMaks(),
-                feilmelding = Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL,
+                vilkaar = beloepPerMaaned.erStoerreEllerLikNullOgMindreEnnMaks(),
+                feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
 
             valider(
                 vilkaar = endringer.all(RefusjonEndring::erGyldig),
-                feilmelding = Feilmelding.BELOEP_STOERRE_ELLER_LIK_NULL,
+                feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
 
             valider(
@@ -42,5 +42,5 @@ data class RefusjonEndring(
     val startdato: LocalDate,
 ) {
     internal fun erGyldig(): Boolean =
-        beloep.erNullEllerOverNullOgUnderMaks()
+        beloep.erStoerreEllerLikNullOgMindreEnnMaks()
 }
