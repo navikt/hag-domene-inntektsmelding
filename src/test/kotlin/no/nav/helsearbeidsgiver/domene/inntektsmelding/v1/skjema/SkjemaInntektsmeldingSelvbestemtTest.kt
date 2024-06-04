@@ -154,6 +154,21 @@ class SkjemaInntektsmeldingSelvbestemtTest : FunSpec({
                 skjema.valider().shouldBeEmpty()
             }
 
+            test("AGP kan være maks 16 dager") {
+                val skjema = fulltSkjema().let {
+                    it.copy(
+                        agp = it.agp?.copy(
+                            perioder = listOf(
+                                8.august til 17.august,
+                                20.august til 31.august,
+                            ),
+                        ),
+                    )
+                }
+
+                skjema.valider() shouldBe setOf(Feilmelding.AGP_MAKS_16)
+            }
+
             test("egenmeldinger kan være tom") {
                 val skjema = fulltSkjema().let {
                     it.copy(
@@ -346,6 +361,23 @@ class SkjemaInntektsmeldingSelvbestemtTest : FunSpec({
 
                 skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_DATO)
             }
+        }
+
+        test("bestemmende fraværsdag før inntektsdato") {
+            val skjema = fulltSkjema().let {
+                it.copy(
+                    agp = it.agp?.copy(
+                        perioder = listOf(
+                            6.juni til 21.juni,
+                        ),
+                    ),
+                    inntekt = it.inntekt.copy(
+                        inntektsdato = 7.juni,
+                    ),
+                )
+            }
+
+            skjema.valider() shouldBe setOf(Feilmelding.TEKNISK_FEIL)
         }
 
         test("refusjonsbeløp over inntekt") {

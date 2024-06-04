@@ -18,7 +18,7 @@ data class Periode(
         }
     }
 
-    internal fun erGyldig(): Boolean =
+    private fun erGyldig(): Boolean =
         !fom.isAfter(tom)
 }
 
