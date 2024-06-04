@@ -5,10 +5,14 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.bestemmendeFravaersdag
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
+import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
+
+private val sikkerLogger = sikkerLogger()
 
 @Serializable
 data class SkjemaInntektsmelding(
@@ -36,6 +40,27 @@ data class SkjemaInntektsmelding(
             agp?.valider(),
             inntekt?.valider(),
             refusjon?.valider(),
+
+            // Må sjekke sykmeldingsperioder fordi beregning av bestemmende fraværsdag krever ikke-tom liste
+            if (agp != null && inntekt != null && sykmeldingsperioder.isNotEmpty()) {
+                val bestemmendeFravaersdag = bestemmendeFravaersdag(
+                    arbeidsgiverperioder = agp.perioder,
+                    sykmeldingsperioder = sykmeldingsperioder,
+                )
+
+                val feiletValidering = valider(
+                    vilkaar = !bestemmendeFravaersdag.isBefore(inntekt.inntektsdato),
+                    feilmelding = Feilmelding.TEKNISK_FEIL,
+                )
+
+                if (feiletValidering != null) {
+                    sikkerLogger.error("Bestemmende fraværsdag er før inntektsdato. Dette er ikke mulig. Bruker hindret fra å sende inn.")
+                }
+
+                listOfNotNull(feiletValidering)
+            } else {
+                emptyList()
+            },
 
             if (inntekt != null && refusjon != null) {
                 listOfNotNull(
