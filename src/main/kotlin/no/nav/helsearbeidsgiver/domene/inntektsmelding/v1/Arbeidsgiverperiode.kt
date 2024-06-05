@@ -12,6 +12,7 @@ internal const val AGP_MAKS_DAGER = 16
 @Serializable
 data class Arbeidsgiverperiode(
     val perioder: List<Periode>,
+    // TODO vurder å fjerne om man heller kan utlede fra AGP og sykmeldingsperioder
     val egenmeldinger: List<Periode>,
     val redusertLoennIAgp: RedusertLoennIAgp?,
 ) {

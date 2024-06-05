@@ -38,7 +38,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.VarigLonnsendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaAvsender
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.utils.test.date.februar
@@ -46,7 +45,6 @@ import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.mars
 import no.nav.helsearbeidsgiver.utils.test.date.oktober
 import no.nav.helsearbeidsgiver.utils.test.date.september
-import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -276,7 +274,13 @@ class UtilsTest : FunSpec({
     context("konverter SkjemaInntektsmelding til Innsending") {
 
         test("fullt skjema") {
-            fulltSkjema().convert(AarsakInnsendingV1.Endring) shouldBe fullInnsending()
+
+            val innsending = fullInnsending().copy(
+                identitetsnummer = "",
+                orgnrUnderenhet = "",
+            )
+
+            fulltSkjema().convert(innsending.fraværsperioder, AarsakInnsendingV1.Endring) shouldBe innsending
         }
 
         test("fullt skjema uten redusert lønn i AGP") {
@@ -289,6 +293,8 @@ class UtilsTest : FunSpec({
             }
 
             val innsending = fullInnsending().copy(
+                identitetsnummer = "",
+                orgnrUnderenhet = "",
                 fullLønnIArbeidsgiverPerioden = FullLoennIArbeidsgiverPerioden(
                     utbetalerFullLønn = true,
                     begrunnelse = null,
@@ -296,7 +302,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
+            skjema.convert(innsending.fraværsperioder, AarsakInnsendingV1.Endring) shouldBe innsending
         }
 
         test("skjema uten agp") {
@@ -305,6 +311,8 @@ class UtilsTest : FunSpec({
             )
 
             val innsending = fullInnsending().copy(
+                identitetsnummer = "",
+                orgnrUnderenhet = "",
                 arbeidsgiverperioder = emptyList(),
                 egenmeldingsperioder = emptyList(),
                 fullLønnIArbeidsgiverPerioden = FullLoennIArbeidsgiverPerioden(
@@ -318,7 +326,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
+            skjema.convert(innsending.fraværsperioder, AarsakInnsendingV1.Endring) shouldBe innsending
         }
 
         test("skjema uten inntekt") {
@@ -327,6 +335,8 @@ class UtilsTest : FunSpec({
             )
 
             val innsending = fullInnsending().copy(
+                identitetsnummer = "",
+                orgnrUnderenhet = "",
                 inntekt = Inntekt(
                     bekreftet = true,
                     beregnetInntekt = -1.0,
@@ -341,7 +351,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
+            skjema.convert(innsending.fraværsperioder, AarsakInnsendingV1.Endring) shouldBe innsending
         }
 
         test("skjema uten refusjon") {
@@ -350,6 +360,8 @@ class UtilsTest : FunSpec({
             )
 
             val innsending = fullInnsending().copy(
+                identitetsnummer = "",
+                orgnrUnderenhet = "",
                 refusjon = Refusjon(
                     utbetalerHeleEllerDeler = false,
                     refusjonPrMnd = null,
@@ -362,7 +374,7 @@ class UtilsTest : FunSpec({
                 ),
             )
 
-            skjema.convert(AarsakInnsendingV1.Endring) shouldBe innsending
+            skjema.convert(innsending.fraværsperioder, AarsakInnsendingV1.Endring) shouldBe innsending
         }
     }
 })
@@ -432,15 +444,7 @@ private fun lagGammelInntektsmelding(): Inntektsmelding =
 
 private fun fulltSkjema(): SkjemaInntektsmelding =
     SkjemaInntektsmelding(
-        sykmeldtFnr = "03042400123",
-        avsender = SkjemaAvsender(
-            orgnr = "454989232",
-            tlf = "47475555",
-        ),
-        sykmeldingsperioder = listOf(
-            4.januar til 24.februar,
-            3.mars til 22.mars,
-        ),
+        avsenderTlf = "47475555",
         agp = Arbeidsgiverperiode(
             perioder = listOf(
                 2.januar til 17.januar,

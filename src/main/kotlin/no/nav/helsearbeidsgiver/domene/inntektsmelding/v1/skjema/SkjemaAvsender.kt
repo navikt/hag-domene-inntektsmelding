@@ -9,16 +9,11 @@ import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 
 @Serializable
 data class SkjemaAvsender(
-    val orgnr: String,
+    val orgnr: Orgnr,
     val tlf: String,
 ) {
     internal fun valider(): List<FeiletValidering> =
         listOfNotNull(
-            valider(
-                vilkaar = Orgnr.erGyldig(orgnr),
-                feilmelding = Feilmelding.ORGNR,
-            ),
-
             valider(
                 vilkaar = tlf.erGyldigTlf(),
                 feilmelding = Feilmelding.TLF,
