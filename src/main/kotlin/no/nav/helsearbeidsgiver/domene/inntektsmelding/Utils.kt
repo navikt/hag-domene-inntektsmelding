@@ -29,6 +29,8 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.bestemmendeFravaersdag
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
+import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
+import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 import java.time.LocalDate
 import java.util.UUID
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending as AarsakInnsendingV1
@@ -84,13 +86,12 @@ object Utils {
             id = inntektsmeldingId,
             type = type,
             sykmeldt = SykmeldtV1(
-                fnr = inntektsmelding.identitetsnummer,
+                fnr = inntektsmelding.identitetsnummer.let(::Fnr),
                 navn = inntektsmelding.fulltNavn,
             ),
             avsender = AvsenderV1(
-                orgnr = inntektsmelding.orgnrUnderenhet,
+                orgnr = inntektsmelding.orgnrUnderenhet.let(::Orgnr),
                 orgNavn = inntektsmelding.virksomhetNavn,
-                fnr = "",
                 navn = inntektsmelding.innsenderNavn ?: "",
                 tlf = inntektsmelding.telefonnummer ?: "",
             ),
@@ -208,8 +209,8 @@ object Utils {
         }
 
         return Inntektsmelding(
-            orgnrUnderenhet = avsender.orgnr,
-            identitetsnummer = sykmeldt.fnr,
+            orgnrUnderenhet = avsender.orgnr.verdi,
+            identitetsnummer = sykmeldt.fnr.verdi,
             fulltNavn = sykmeldt.navn,
             virksomhetNavn = avsender.orgNavn,
             // Brukes ikke, V1 har ikke implementert behandlingsdager

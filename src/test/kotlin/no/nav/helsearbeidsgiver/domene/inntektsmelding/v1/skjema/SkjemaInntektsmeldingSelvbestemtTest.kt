@@ -26,6 +26,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.juni
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
+import java.util.UUID
 
 @OptIn(ExperimentalSerializationApi::class)
 class SkjemaInntektsmeldingSelvbestemtTest : FunSpec({
@@ -456,6 +457,7 @@ class SkjemaInntektsmeldingSelvbestemtTest : FunSpec({
 
 private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
     SkjemaInntektsmeldingSelvbestemt(
+        selvbestemtId = UUID.randomUUID(),
         sykmeldtFnr = Fnr("11037400132"),
         avsender = SkjemaAvsender(
             orgnr = Orgnr("888414223"),

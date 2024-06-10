@@ -1,12 +1,12 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import kotlinx.serialization.Serializable
+import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 
 @Serializable
 data class Avsender(
-    val orgnr: String,
+    val orgnr: Orgnr,
     val orgNavn: String,
-    val fnr: String,
     val navn: String,
     val tlf: String,
 )

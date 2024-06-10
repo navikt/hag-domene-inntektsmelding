@@ -19,6 +19,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
 import no.nav.helsearbeidsgiver.utils.test.date.mai
+import java.util.UUID
 
 class SkjemaInntektsmeldingTest : FunSpec({
 
@@ -386,6 +387,7 @@ internal suspend fun ContainerScope.testBeloep(
 
 private fun fulltSkjema(): SkjemaInntektsmelding =
     SkjemaInntektsmelding(
+        forespoerselId = UUID.randomUUID(),
         avsenderTlf = "45456060",
         agp = Arbeidsgiverperiode(
             perioder = listOf(
