@@ -45,6 +45,9 @@ import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.mars
 import no.nav.helsearbeidsgiver.utils.test.date.oktober
 import no.nav.helsearbeidsgiver.utils.test.date.september
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
+import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
+import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -156,12 +159,12 @@ class UtilsTest : FunSpec({
 
         nyIM.type shouldBe forespurtType
 
-        nyIM.sykmeldt.fnr shouldBe gammelIM.identitetsnummer
+        nyIM.sykmeldt.fnr.verdi shouldBe gammelIM.identitetsnummer
         nyIM.sykmeldt.navn shouldBe gammelIM.fulltNavn
 
         nyIM.avsender.navn shouldBe gammelIM.innsenderNavn
         nyIM.avsender.orgNavn shouldBe gammelIM.virksomhetNavn
-        nyIM.avsender.orgnr shouldBe gammelIM.orgnrUnderenhet
+        nyIM.avsender.orgnr.verdi shouldBe gammelIM.orgnrUnderenhet
         nyIM.avsender.tlf shouldBe gammelIM.telefonnummer
 
         nyIM.aarsakInnsending shouldBe AarsakInnsendingV1.Ny
@@ -402,8 +405,8 @@ fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding {
 
 private fun lagGammelInntektsmelding(): Inntektsmelding =
     Inntektsmelding(
-        orgnrUnderenhet = "123",
-        identitetsnummer = "123",
+        orgnrUnderenhet = Orgnr.genererGyldig().verdi,
+        identitetsnummer = Fnr.genererGyldig().verdi,
         fulltNavn = "testNavn",
         virksomhetNavn = "testBedrift",
         behandlingsdager = emptyList(),
@@ -444,6 +447,7 @@ private fun lagGammelInntektsmelding(): Inntektsmelding =
 
 private fun fulltSkjema(): SkjemaInntektsmelding =
     SkjemaInntektsmelding(
+        forespoerselId = UUID.randomUUID(),
         avsenderTlf = "47475555",
         agp = Arbeidsgiverperiode(
             perioder = listOf(

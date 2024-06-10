@@ -1,6 +1,9 @@
+@file:UseSerializers(UuidSerializer::class)
+
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
@@ -10,13 +13,16 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erGyldigTlf
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
+import no.nav.helsearbeidsgiver.utils.json.serializer.UuidSerializer
 import no.nav.helsearbeidsgiver.utils.log.sikkerLogger
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
+import java.util.UUID
 
 private val sikkerLogger = sikkerLogger()
 
 @Serializable
 data class SkjemaInntektsmelding(
+    val forespoerselId: UUID,
     val avsenderTlf: String,
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt?,
@@ -42,6 +48,7 @@ data class SkjemaInntektsmelding(
 
 @Serializable
 data class SkjemaInntektsmeldingSelvbestemt(
+    val selvbestemtId: UUID?,
     val sykmeldtFnr: Fnr,
     val avsender: SkjemaAvsender,
     val sykmeldingsperioder: List<Periode>,
