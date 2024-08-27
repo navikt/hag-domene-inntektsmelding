@@ -516,5 +516,5 @@ private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
             ),
             sluttdato = 30.juni,
         ),
-        vedtaksperiodeId = UUID.randomUUID()
+        vedtaksperiodeId = UUID.randomUUID(),
     )
