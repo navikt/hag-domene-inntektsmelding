@@ -26,16 +26,20 @@ data class Inntektsmelding(
     @Serializable
     sealed class Type {
         abstract val id: UUID
+        abstract val vedtaksperiodeId: UUID?
 
         @Serializable
         @SerialName("Forespurt")
         data class Forespurt(
             override val id: UUID,
-            val vedtaksperiodeId: UUID,
+            override val vedtaksperiodeId: UUID,
         ) : Type()
 
         @Serializable
         @SerialName("Selvbestemt")
-        data class Selvbestemt(override val id: UUID) : Type()
+        data class Selvbestemt(
+            override val id: UUID,
+            override val vedtaksperiodeId: UUID?,
+        ) : Type()
     }
 }

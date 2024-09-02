@@ -203,11 +203,6 @@ object Utils {
     }
 
     fun InntektsmeldingV1.convert(): Inntektsmelding {
-        val vedtaksperiodeId = when (type) {
-            is InntektsmeldingV1.Type.Forespurt -> type.vedtaksperiodeId
-            is InntektsmeldingV1.Type.Selvbestemt -> null
-        }
-
         return Inntektsmelding(
             orgnrUnderenhet = avsender.orgnr.verdi,
             identitetsnummer = sykmeldt.fnr.verdi,
@@ -235,7 +230,7 @@ object Utils {
             innsenderNavn = avsender.navn,
             telefonnummer = avsender.tlf,
             forespurtData = getForespurtData(),
-            vedtaksperiodeId = vedtaksperiodeId,
+            vedtaksperiodeId = type.vedtaksperiodeId,
         )
     }
 
