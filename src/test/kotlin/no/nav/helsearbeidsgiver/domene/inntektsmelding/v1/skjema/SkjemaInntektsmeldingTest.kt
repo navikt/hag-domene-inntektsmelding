@@ -31,9 +31,10 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
         context(SkjemaInntektsmelding::avsenderTlf.name) {
             test("ugyldig tlf") {
-                val skjema = fulltSkjema().copy(
-                    avsenderTlf = "hæ?",
-                )
+                val skjema =
+                    fulltSkjema().copy(
+                        avsenderTlf = "hæ?",
+                    )
 
                 skjema.valider() shouldBe setOf(Feilmelding.TLF)
             }
@@ -47,85 +48,100 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             test("AGP kan _ikke_ være tom når AG betaler full lønn i AGP") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        agp = it.agp?.copy(
-                            perioder = emptyList(),
-                            redusertLoennIAgp = null,
-                        ),
-                    )
-                }
+                val skjema =
+                    fulltSkjema().let {
+                        it.copy(
+                            agp =
+                                it.agp?.copy(
+                                    perioder = emptyList(),
+                                    redusertLoennIAgp = null,
+                                ),
+                        )
+                    }
 
                 skjema.valider() shouldBe setOf(Feilmelding.AGP_IKKE_TOM)
             }
 
             test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        agp = it.agp?.copy(
-                            perioder = emptyList(),
-                            redusertLoennIAgp = RedusertLoennIAgp(
-                                beloep = 22000.0,
-                                begrunnelse = RedusertLoennIAgp.Begrunnelse.FiskerMedHyre,
-                            ),
-                        ),
-                    )
-                }
+                val skjema =
+                    fulltSkjema().let {
+                        it.copy(
+                            agp =
+                                it.agp?.copy(
+                                    perioder = emptyList(),
+                                    redusertLoennIAgp =
+                                        RedusertLoennIAgp(
+                                            beloep = 22000.0,
+                                            begrunnelse = RedusertLoennIAgp.Begrunnelse.FiskerMedHyre,
+                                        ),
+                                ),
+                        )
+                    }
 
                 skjema.valider().shouldBeEmpty()
             }
 
             test("AGP kan være maks 16 dager") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        agp = it.agp?.copy(
-                            perioder = listOf(
-                                8.august til 17.august,
-                                20.august til 31.august,
-                            ),
-                        ),
-                    )
-                }
+                val skjema =
+                    fulltSkjema().let {
+                        it.copy(
+                            agp =
+                                it.agp?.copy(
+                                    perioder =
+                                        listOf(
+                                            8.august til 17.august,
+                                            20.august til 31.august,
+                                        ),
+                                ),
+                        )
+                    }
 
                 skjema.valider() shouldBe setOf(Feilmelding.AGP_MAKS_16)
             }
 
             test("egenmeldinger kan være tom") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        agp = it.agp?.copy(
-                            egenmeldinger = emptyList(),
-                        ),
-                    )
-                }
+                val skjema =
+                    fulltSkjema().let {
+                        it.copy(
+                            agp =
+                                it.agp?.copy(
+                                    egenmeldinger = emptyList(),
+                                ),
+                        )
+                    }
 
                 skjema.valider().shouldBeEmpty()
             }
 
             context(Arbeidsgiverperiode::redusertLoennIAgp.name) {
                 test("'redusertLoennIAgp' kan være 'null'") {
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            agp = it.agp?.copy(
-                                redusertLoennIAgp = null,
-                            ),
-                        )
-                    }
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                agp =
+                                    it.agp?.copy(
+                                        redusertLoennIAgp = null,
+                                    ),
+                            )
+                        }
 
                     skjema.valider().shouldBeEmpty()
                 }
 
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            agp = it.agp?.copy(
-                                redusertLoennIAgp = RedusertLoennIAgp(
-                                    beloep = beloep,
-                                    begrunnelse = RedusertLoennIAgp.Begrunnelse.Saerregler,
-                                ),
-                            ),
-                        )
-                    }
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                agp =
+                                    it.agp?.copy(
+                                        redusertLoennIAgp =
+                                            RedusertLoennIAgp(
+                                                beloep = beloep,
+                                                begrunnelse = RedusertLoennIAgp.Begrunnelse.Saerregler,
+                                            ),
+                                    ),
+                            )
+                        }
 
                     skjema.valider() shouldContainAll forventetFeil
                 }
@@ -141,13 +157,15 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             context(Inntekt::beloep.name) {
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            inntekt = it.inntekt?.copy(
-                                beloep = beloep,
-                            ),
-                        )
-                    }
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                inntekt =
+                                    it.inntekt?.copy(
+                                        beloep = beloep,
+                                    ),
+                            )
+                        }
 
                     skjema.valider() shouldContainAll forventetFeil
                 }
@@ -155,13 +173,15 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             context(Inntekt::naturalytelser.name) {
                 test("'naturalytelser' kan være tom") {
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            inntekt = it.inntekt?.copy(
-                                naturalytelser = emptyList(),
-                            ),
-                        )
-                    }
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                inntekt =
+                                    it.inntekt?.copy(
+                                        naturalytelser = emptyList(),
+                                    ),
+                            )
+                        }
 
                     skjema.valider().shouldBeEmpty()
                 }
@@ -175,32 +195,37 @@ class SkjemaInntektsmeldingTest : FunSpec({
                     -1.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
                     1_000_000.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
                 ) { (beloep, forventetFeil) ->
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            inntekt = it.inntekt?.copy(
-                                naturalytelser = listOf(
-                                    Naturalytelse(
-                                        naturalytelse = Naturalytelse.Kode.BIL,
-                                        verdiBeloep = beloep,
-                                        sluttdato = 20.juni,
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                inntekt =
+                                    it.inntekt?.copy(
+                                        naturalytelser =
+                                            listOf(
+                                                Naturalytelse(
+                                                    naturalytelse = Naturalytelse.Kode.BIL,
+                                                    verdiBeloep = beloep,
+                                                    sluttdato = 20.juni,
+                                                ),
+                                            ),
                                     ),
-                                ),
-                            ),
-                        )
-                    }
+                            )
+                        }
 
                     skjema.valider() shouldContainAll forventetFeil
                 }
             }
 
             test("'endringAarsak' kan være 'null'") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        inntekt = it.inntekt?.copy(
-                            endringAarsak = null,
-                        ),
-                    )
-                }
+                val skjema =
+                    fulltSkjema().let {
+                        it.copy(
+                            inntekt =
+                                it.inntekt?.copy(
+                                    endringAarsak = null,
+                                ),
+                        )
+                    }
 
                 skjema.valider().shouldBeEmpty()
             }
@@ -215,13 +240,15 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             context(Refusjon::beloepPerMaaned.name) {
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            refusjon = it.refusjon?.copy(
-                                beloepPerMaaned = beloep,
-                            ),
-                        )
-                    }
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                refusjon =
+                                    it.refusjon?.copy(
+                                        beloepPerMaaned = beloep,
+                                    ),
+                            )
+                        }
 
                     skjema.valider() shouldContainAll forventetFeil
                 }
@@ -229,149 +256,173 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             context(Refusjon::endringer.name) {
                 test("'endringer' kan være tom") {
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            refusjon = it.refusjon?.copy(
-                                endringer = emptyList(),
-                            ),
-                        )
-                    }
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                refusjon =
+                                    it.refusjon?.copy(
+                                        endringer = emptyList(),
+                                    ),
+                            )
+                        }
 
                     skjema.valider().shouldBeEmpty()
                 }
 
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = fulltSkjema().let {
-                        it.copy(
-                            refusjon = it.refusjon?.copy(
-                                endringer = listOf(
-                                    RefusjonEndring(
-                                        beloep = beloep,
-                                        startdato = 21.juni,
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                refusjon =
+                                    it.refusjon?.copy(
+                                        endringer =
+                                            listOf(
+                                                RefusjonEndring(
+                                                    beloep = beloep,
+                                                    startdato = 21.juni,
+                                                ),
+                                            ),
                                     ),
-                                ),
-                            ),
-                        )
-                    }
+                            )
+                        }
 
                     skjema.valider() shouldContainAll forventetFeil
                 }
             }
 
             test("'sluttdato' kan være 'null'") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        refusjon = it.refusjon?.copy(
-                            sluttdato = null,
-                        ),
-                    )
-                }
+                val skjema =
+                    fulltSkjema().let {
+                        it.copy(
+                            refusjon =
+                                it.refusjon?.copy(
+                                    sluttdato = null,
+                                ),
+                        )
+                    }
 
                 skjema.valider().shouldBeEmpty()
             }
 
             test("ugyldig dato i endring (må være før eller lik (non-null) 'sluttdato')") {
-                val skjema = fulltSkjema().let {
-                    it.copy(
-                        refusjon = it.refusjon?.copy(
-                            endringer = listOf(
-                                RefusjonEndring(
-                                    beloep = 4567.0,
-                                    startdato = 4.august,
+                val skjema =
+                    fulltSkjema().let {
+                        it.copy(
+                            refusjon =
+                                it.refusjon?.copy(
+                                    endringer =
+                                        listOf(
+                                            RefusjonEndring(
+                                                beloep = 4567.0,
+                                                startdato = 4.august,
+                                            ),
+                                        ),
+                                    sluttdato = 1.august,
                                 ),
-                            ),
-                            sluttdato = 1.august,
-                        ),
-                    )
-                }
+                        )
+                    }
 
                 skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_DATO)
             }
         }
 
         test("refusjonsbeløp over inntekt") {
-            val skjema = fulltSkjema().let {
-                it.copy(
-                    inntekt = it.inntekt?.copy(
-                        beloep = 15000.0,
-                    ),
-                    refusjon = it.refusjon?.copy(
-                        beloepPerMaaned = 15001.0,
-                    ),
-                )
-            }
+            val skjema =
+                fulltSkjema().let {
+                    it.copy(
+                        inntekt =
+                            it.inntekt?.copy(
+                                beloep = 15000.0,
+                            ),
+                        refusjon =
+                            it.refusjon?.copy(
+                                beloepPerMaaned = 15001.0,
+                            ),
+                    )
+                }
 
             skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
         }
 
         test("refusjonsbeløp i endring over inntekt") {
-            val skjema = fulltSkjema().let {
-                it.copy(
-                    inntekt = it.inntekt?.copy(
-                        beloep = 8000.0,
-                    ),
-                    refusjon = it.refusjon?.copy(
-                        endringer = listOf(
-                            RefusjonEndring(
-                                beloep = 8000.1,
-                                startdato = 8.juni,
+            val skjema =
+                fulltSkjema().let {
+                    it.copy(
+                        inntekt =
+                            it.inntekt?.copy(
+                                beloep = 8000.0,
                             ),
-                        ),
-                    ),
-                )
-            }
+                        refusjon =
+                            it.refusjon?.copy(
+                                endringer =
+                                    listOf(
+                                        RefusjonEndring(
+                                            beloep = 8000.1,
+                                            startdato = 8.juni,
+                                        ),
+                                    ),
+                            ),
+                    )
+                }
 
             skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
         }
 
         test("duplikate feilmeldinger fjernes") {
-            val skjema = fulltSkjema().let {
-                it.copy(
-                    agp = it.agp?.copy(
-                        redusertLoennIAgp = it.agp?.redusertLoennIAgp?.copy(
-                            beloep = -11.0,
-                        ),
-                    ),
-                    refusjon = it.refusjon?.copy(
-                        beloepPerMaaned = -22.0,
-                    ),
-                )
-            }
+            val skjema =
+                fulltSkjema().let {
+                    it.copy(
+                        agp =
+                            it.agp?.copy(
+                                redusertLoennIAgp =
+                                    it.agp?.redusertLoennIAgp?.copy(
+                                        beloep = -11.0,
+                                    ),
+                            ),
+                        refusjon =
+                            it.refusjon?.copy(
+                                beloepPerMaaned = -22.0,
+                            ),
+                    )
+                }
 
             skjema.valider() shouldBe setOf(Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL)
         }
 
         test("ulike feilmeldinger bevares") {
-            val skjema = fulltSkjema().let {
-                it.copy(
-                    avsenderTlf = "112",
-                    inntekt = it.inntekt?.copy(
-                        naturalytelser = listOf(
-                            Naturalytelse(
-                                naturalytelse = Naturalytelse.Kode.OPSJONER,
-                                verdiBeloep = 0.0,
-                                sluttdato = 15.juni,
+            val skjema =
+                fulltSkjema().let {
+                    it.copy(
+                        avsenderTlf = "112",
+                        inntekt =
+                            it.inntekt?.copy(
+                                naturalytelser =
+                                    listOf(
+                                        Naturalytelse(
+                                            naturalytelse = Naturalytelse.Kode.OPSJONER,
+                                            verdiBeloep = 0.0,
+                                            sluttdato = 15.juni,
+                                        ),
+                                    ),
                             ),
-                        ),
-                    ),
-                    refusjon = it.refusjon?.copy(
-                        beloepPerMaaned = -17.0,
-                    ),
-                )
-            }
+                        refusjon =
+                            it.refusjon?.copy(
+                                beloepPerMaaned = -17.0,
+                            ),
+                    )
+                }
 
-            skjema.valider() shouldBe setOf(
-                Feilmelding.TLF,
-                Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
-                Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
-            )
+            skjema.valider() shouldBe
+                setOf(
+                    Feilmelding.TLF,
+                    Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
+                    Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
+                )
         }
     }
 })
 
-internal suspend fun ContainerScope.testBeloep(
-    testFn: (Double, Set<String>) -> Unit,
-) {
+internal suspend fun ContainerScope.testBeloep(testFn: (Double, Set<String>) -> Unit) {
     withData(
         nameFn = { (beloep, forventetFeil) ->
             "beløp $beloep gir ${forventetFeil.size} feil"
@@ -389,52 +440,61 @@ private fun fulltSkjema(): SkjemaInntektsmelding =
     SkjemaInntektsmelding(
         forespoerselId = UUID.randomUUID(),
         avsenderTlf = "45456060",
-        agp = Arbeidsgiverperiode(
-            perioder = listOf(
-                2.juni til 2.juni,
-                4.juni til 18.juni,
+        agp =
+            Arbeidsgiverperiode(
+                perioder =
+                    listOf(
+                        2.juni til 2.juni,
+                        4.juni til 18.juni,
+                    ),
+                egenmeldinger =
+                    listOf(
+                        2.juni til 2.juni,
+                        4.juni til 5.juni,
+                    ),
+                redusertLoennIAgp =
+                    RedusertLoennIAgp(
+                        beloep = 34000.0,
+                        begrunnelse = RedusertLoennIAgp.Begrunnelse.LovligFravaer,
+                    ),
             ),
-            egenmeldinger = listOf(
-                2.juni til 2.juni,
-                4.juni til 5.juni,
+        inntekt =
+            Inntekt(
+                beloep = 50000.0,
+                inntektsdato = 31.mai,
+                naturalytelser =
+                    listOf(
+                        Naturalytelse(
+                            naturalytelse = Naturalytelse.Kode.OPSJONER,
+                            verdiBeloep = 4000.0,
+                            sluttdato = 15.juni,
+                        ),
+                        Naturalytelse(
+                            naturalytelse = Naturalytelse.Kode.ELEKTRONISKKOMMUNIKASJON,
+                            verdiBeloep = 555.0,
+                            sluttdato = 25.juni,
+                        ),
+                    ),
+                endringAarsak =
+                    Tariffendring(
+                        gjelderFra = 30.juni,
+                        bleKjent = 5.juli,
+                    ),
             ),
-            redusertLoennIAgp = RedusertLoennIAgp(
-                beloep = 34000.0,
-                begrunnelse = RedusertLoennIAgp.Begrunnelse.LovligFravaer,
+        refusjon =
+            Refusjon(
+                beloepPerMaaned = 10000.0,
+                endringer =
+                    listOf(
+                        RefusjonEndring(
+                            beloep = 8000.0,
+                            startdato = 10.juni,
+                        ),
+                        RefusjonEndring(
+                            beloep = 6000.0,
+                            startdato = 20.juni,
+                        ),
+                    ),
+                sluttdato = 30.juni,
             ),
-        ),
-        inntekt = Inntekt(
-            beloep = 50000.0,
-            inntektsdato = 31.mai,
-            naturalytelser = listOf(
-                Naturalytelse(
-                    naturalytelse = Naturalytelse.Kode.OPSJONER,
-                    verdiBeloep = 4000.0,
-                    sluttdato = 15.juni,
-                ),
-                Naturalytelse(
-                    naturalytelse = Naturalytelse.Kode.ELEKTRONISKKOMMUNIKASJON,
-                    verdiBeloep = 555.0,
-                    sluttdato = 25.juni,
-                ),
-            ),
-            endringAarsak = Tariffendring(
-                gjelderFra = 30.juni,
-                bleKjent = 5.juli,
-            ),
-        ),
-        refusjon = Refusjon(
-            beloepPerMaaned = 10000.0,
-            endringer = listOf(
-                RefusjonEndring(
-                    beloep = 8000.0,
-                    startdato = 10.juni,
-                ),
-                RefusjonEndring(
-                    beloep = 6000.0,
-                    startdato = 20.juni,
-                ),
-            ),
-            sluttdato = 30.juni,
-        ),
     )

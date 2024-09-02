@@ -37,6 +37,5 @@ data class Naturalytelse(
         YRKEBILTJENESTLIGBEHOVLISTEPRIS,
     }
 
-    internal fun erGyldig(): Boolean =
-        verdiBeloep.erStoerreEnnNullOgMindreEnnMaks()
+    internal fun erGyldig(): Boolean = verdiBeloep.erStoerreEnnNullOgMindreEnnMaks()
 }

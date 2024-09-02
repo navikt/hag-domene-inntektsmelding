@@ -9,10 +9,11 @@ import java.time.LocalDate
 
 class PeriodeTest : FunSpec({
 
-    val testFns = mapOf(
-        "constructor" to ::Periode,
-        "til" to { fom, tom -> fom til tom },
-    )
+    val testFns =
+        mapOf(
+            "constructor" to ::Periode,
+            "til" to { fom, tom -> fom til tom },
+        )
 
     context("gyldig periode") {
         withData(testFns) { lagPeriodeFn ->

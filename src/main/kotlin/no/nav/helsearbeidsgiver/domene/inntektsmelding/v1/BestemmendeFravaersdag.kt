@@ -14,33 +14,35 @@ fun bestemmendeFravaersdag(
 
     val sammenhengendeSykmeldingsperioder = sykmeldingsperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
 
-    val sammenhengendeFravaersperioder = if (
-        agpSlutt == null ||
-        agpPaavirkerIkkeInntektsmelding(agpSlutt, sykmeldingsperioderStart)
-    ) {
-        sammenhengendeSykmeldingsperioder
-    } else {
-        val sammenhengendeArbeidsgiverperioder =
-            arbeidsgiverperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
+    val sammenhengendeFravaersperioder =
+        if (
+            agpSlutt == null ||
+            agpPaavirkerIkkeInntektsmelding(agpSlutt, sykmeldingsperioderStart)
+        ) {
+            sammenhengendeSykmeldingsperioder
+        } else {
+            val sammenhengendeArbeidsgiverperioder =
+                arbeidsgiverperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
 
-        val sammenhengendeSykmeldingsperioderUtenAgp = sammenhengendeSykmeldingsperioder.fjernDatoerTilOgMed(agpSlutt)
+            val sammenhengendeSykmeldingsperioderUtenAgp = sammenhengendeSykmeldingsperioder.fjernDatoerTilOgMed(agpSlutt)
 
-        // Antar sykdom i helg i overgang fra AGP
-        // Fremtidig versjon: Spør AG om sykdom i helg i overgang
-        val overgangFraAgp = listOfNotNull(
-            sammenhengendeArbeidsgiverperioder.last(),
-            sammenhengendeSykmeldingsperioderUtenAgp.firstOrNull(),
-        )
-            .slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
+            // Antar sykdom i helg i overgang fra AGP
+            // Fremtidig versjon: Spør AG om sykdom i helg i overgang
+            val overgangFraAgp =
+                listOfNotNull(
+                    sammenhengendeArbeidsgiverperioder.last(),
+                    sammenhengendeSykmeldingsperioderUtenAgp.firstOrNull(),
+                )
+                    .slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
 
-        listOf(
-            sammenhengendeArbeidsgiverperioder.dropLast(1),
-            overgangFraAgp,
-            sammenhengendeSykmeldingsperioderUtenAgp.drop(1),
-        )
-            .flatten()
-            .fjernPerioderEtterFoersteUtoverAgp()
-    }
+            listOf(
+                sammenhengendeArbeidsgiverperioder.dropLast(1),
+                overgangFraAgp,
+                sammenhengendeSykmeldingsperioderUtenAgp.drop(1),
+            )
+                .flatten()
+                .fjernPerioderEtterFoersteUtoverAgp()
+        }
 
     return sammenhengendeFravaersperioder.last().fom
 }
@@ -49,10 +51,11 @@ private fun List<Periode>.fjernDatoerTilOgMed(grenseTom: LocalDate): List<Period
     mapNotNull {
         if (it.tom.isAfter(grenseTom)) {
             it.copy(
-                fom = maxOf(
-                    it.fom,
-                    grenseTom.plusDays(1),
-                ),
+                fom =
+                    maxOf(
+                        it.fom,
+                        grenseTom.plusDays(1),
+                    ),
             )
         } else {
             null
@@ -61,10 +64,11 @@ private fun List<Periode>.fjernDatoerTilOgMed(grenseTom: LocalDate): List<Period
 
 private fun List<Periode>.fjernPerioderEtterFoersteUtoverAgp(): List<Periode> =
     filterIndexed { index, _ ->
-        val antallForegaaendeDager = slice(0..<index)
-            .sumOf {
-                it.fom.daysUntil(it.tom) + 1
-            }
+        val antallForegaaendeDager =
+            slice(0..<index)
+                .sumOf {
+                    it.fom.daysUntil(it.tom) + 1
+                }
 
         antallForegaaendeDager <= AGP_MAKS_DAGER
     }

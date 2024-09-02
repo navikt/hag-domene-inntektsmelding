@@ -4,7 +4,10 @@ internal data class FeiletValidering(
     val feilmelding: String,
 )
 
-internal fun valider(vilkaar: Boolean, feilmelding: String): FeiletValidering? =
+internal fun valider(
+    vilkaar: Boolean,
+    feilmelding: String,
+): FeiletValidering? =
     if (vilkaar) {
         null
     } else {

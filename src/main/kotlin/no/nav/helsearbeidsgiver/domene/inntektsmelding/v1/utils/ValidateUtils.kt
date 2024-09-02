@@ -10,8 +10,6 @@ internal fun String.erGyldigTlf(): Boolean =
     )
         .any(::matches)
 
-internal fun Double.erStoerreEllerLikNullOgMindreEnnMaks(): Boolean =
-    this >= 0 && this < MAKS_GRENSE_BELOEP
+internal fun Double.erStoerreEllerLikNullOgMindreEnnMaks(): Boolean = this >= 0 && this < MAKS_GRENSE_BELOEP
 
-internal fun Double.erStoerreEnnNullOgMindreEnnMaks(): Boolean =
-    this > 0 && this < MAKS_GRENSE_BELOEP
+internal fun Double.erStoerreEnnNullOgMindreEnnMaks(): Boolean = this > 0 && this < MAKS_GRENSE_BELOEP

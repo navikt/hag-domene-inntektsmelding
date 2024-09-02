@@ -24,7 +24,6 @@ data class Inntekt(
                 vilkaar = beloep.erStoerreEllerLikNullOgMindreEnnMaks(),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
-
             valider(
                 vilkaar = naturalytelser.all(Naturalytelse::erGyldig),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
