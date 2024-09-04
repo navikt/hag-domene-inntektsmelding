@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 fun bestemmendeFravaersdag(
     arbeidsgiverperioder: List<Periode>,
-    sykefravaersperioder: List<Periode>, // sykmeldingsperioder (+ evt. egenmeldingerperioder)
+    sykefravaersperioder: List<Periode>, // sykmeldingsperioder (+ evt. egenmeldingsperioder)
 ): LocalDate {
     val agpSlutt = arbeidsgiverperioder.lastOrNull()?.tom
     val sykefravaersperioderStart = sykefravaersperioder.first().fom
