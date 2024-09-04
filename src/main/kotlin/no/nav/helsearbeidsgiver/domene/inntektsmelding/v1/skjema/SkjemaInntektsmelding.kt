@@ -85,7 +85,7 @@ private fun validerBestemmendeFravaersdagMotInntektsdato(
     if (agp != null && inntekt != null && sykmeldingsperioder.isNotEmpty()) {
         val bestemmendeFravaersdag = bestemmendeFravaersdag(
             arbeidsgiverperioder = agp.perioder,
-            sykmeldingsperioder = sykmeldingsperioder,
+            sykefravaersperioder = sykmeldingsperioder,
         )
 
         val feiletValidering = valider(

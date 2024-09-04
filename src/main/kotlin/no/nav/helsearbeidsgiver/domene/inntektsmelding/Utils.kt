@@ -340,7 +340,7 @@ object Utils {
             bestemmendeFraværsdag = inntekt?.inntektsdato
                 ?: bestemmendeFravaersdag(
                     arbeidsgiverperioder = arbeidsgiverperioder,
-                    sykmeldingsperioder = sykmeldingsperioder,
+                    sykefravaersperioder = sykmeldingsperioder,
                 ),
             naturalytelser = inntekt?.naturalytelser?.map { it.convert() }.orEmpty(),
             refusjon = refusjon?.convert()
