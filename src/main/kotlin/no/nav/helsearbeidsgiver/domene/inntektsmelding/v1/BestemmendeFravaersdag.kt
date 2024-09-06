@@ -7,36 +7,36 @@ import java.time.LocalDate
 
 fun bestemmendeFravaersdag(
     arbeidsgiverperioder: List<Periode>,
-    sykmeldingsperioder: List<Periode>,
+    sykefravaersperioder: List<Periode>, // sykmeldingsperioder (+ evt. egenmeldingsperioder)
 ): LocalDate {
     val agpSlutt = arbeidsgiverperioder.lastOrNull()?.tom
-    val sykmeldingsperioderStart = sykmeldingsperioder.first().fom
+    val sykefravaersperioderStart = sykefravaersperioder.first().fom
 
-    val sammenhengendeSykmeldingsperioder = sykmeldingsperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
+    val sammenhengendeFravaer = sykefravaersperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
 
     val sammenhengendeFravaersperioder = if (
         agpSlutt == null ||
-        agpPaavirkerIkkeInntektsmelding(agpSlutt, sykmeldingsperioderStart)
+        agpPaavirkerIkkeInntektsmelding(agpSlutt, sykefravaersperioderStart)
     ) {
-        sammenhengendeSykmeldingsperioder
+        sammenhengendeFravaer
     } else {
         val sammenhengendeArbeidsgiverperioder =
             arbeidsgiverperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
 
-        val sammenhengendeSykmeldingsperioderUtenAgp = sammenhengendeSykmeldingsperioder.fjernDatoerTilOgMed(agpSlutt)
+        val sammenhengendeFravaersperioderUtenAgp = sammenhengendeFravaer.fjernDatoerTilOgMed(agpSlutt)
 
         // Antar sykdom i helg i overgang fra AGP
         // Fremtidig versjon: Spør AG om sykdom i helg i overgang
         val overgangFraAgp = listOfNotNull(
             sammenhengendeArbeidsgiverperioder.last(),
-            sammenhengendeSykmeldingsperioderUtenAgp.firstOrNull(),
+            sammenhengendeFravaersperioderUtenAgp.firstOrNull(),
         )
             .slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
 
         listOf(
             sammenhengendeArbeidsgiverperioder.dropLast(1),
             overgangFraAgp,
-            sammenhengendeSykmeldingsperioderUtenAgp.drop(1),
+            sammenhengendeFravaersperioderUtenAgp.drop(1),
         )
             .flatten()
             .fjernPerioderEtterFoersteUtoverAgp()

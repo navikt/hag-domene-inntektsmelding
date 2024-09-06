@@ -28,7 +28,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     11.mars til 20.mars,
                     22.mars til 29.mars,
                 ),
-                sykmeldingsperioder = listOf(
+                sykefravaersperioder = listOf(
                     8.juni til 29.juni,
                 ),
             )
@@ -41,7 +41,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
 
             val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
-                sykmeldingsperioder = listOf(
+                sykefravaersperioder = listOf(
                     17.september til 31.oktober,
                 ),
             )
@@ -54,7 +54,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
 
             val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
-                sykmeldingsperioder = listOf(
+                sykefravaersperioder = listOf(
                     21.juni til 1.juli,
                     2.juli til 13.juli,
                     14.juli til 25.juli,
@@ -69,7 +69,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
 
             val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
-                sykmeldingsperioder = listOf(
+                sykefravaersperioder = listOf(
                     // 3. august 2018 er en fredag
                     2.august til 3.august,
                     6.august til 29.august,
@@ -84,7 +84,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
 
             val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
-                sykmeldingsperioder = listOf(
+                sykefravaersperioder = listOf(
                     // 11. november 2018 er en søndag
                     5.november til 11.november,
                     14.november til 28.november,
@@ -99,7 +99,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
 
             val actual = bestemmendeFravaersdag(
                 arbeidsgiverperioder = emptyList(),
-                sykmeldingsperioder = listOf(
+                sykefravaersperioder = listOf(
                     9.juli til 19.juli,
                     15.juli til 23.juli,
                 ),
@@ -121,7 +121,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         2.juli til 2.juli,
                         3.juli til 4.juli,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         5.juli til 25.juli,
                         26.juli til 29.juli,
                         30.juli til 12.august,
@@ -140,7 +140,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         7.august til 10.august,
                         12.august til 13.august,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         // 17 august 2018 er en fredag
                         14.august til 17.august,
                         20.august til 19.september,
@@ -159,7 +159,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         3.desember til 6.desember,
                         10.desember til 16.desember,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         17.desember til 29.desember,
                     ),
                 )
@@ -177,7 +177,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         10.januar til 26.januar,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         7.februar til 28.februar,
                     ),
                 )
@@ -192,7 +192,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         2.mai til 2.mai,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         3.mai til 25.mai,
                     ),
                 )
@@ -208,7 +208,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         // 3. mars 2018 er en lørdag
                         2.mars til 3.mars,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         5.mars til 30.mars,
                     ),
                 )
@@ -224,7 +224,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         // 7. januar 2018 er en mandag
                         7.januar til 7.januar,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         9.januar til 29.januar,
                     ),
                 )
@@ -239,7 +239,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         23.juli til 29.juli,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         1.august til 5.august,
                         6.august til 8.august,
                         11.august til 12.august,
@@ -265,7 +265,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         1.januar til 16.januar,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         1.januar til 31.januar,
                     ),
                 )
@@ -280,7 +280,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         2.oktober til 17.oktober,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         4.oktober til 27.oktober,
                     ),
                 )
@@ -295,7 +295,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         3.juli til 18.juli,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         1.juli til 27.juli,
                     ),
                 )
@@ -310,7 +310,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         8.april til 23.april,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         2.april til 22.april,
                     ),
                 )
@@ -328,7 +328,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         // 31. august 2018 er en fredag
                         16.august til 31.august,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         16.august til 24.august,
                         3.september til 21.september,
                     ),
@@ -345,7 +345,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         7.september til 12.september,
                         16.september til 20.september,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         2.september til 30.september,
                     ),
                 )
@@ -360,7 +360,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         11.desember til 27.desember,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         9.desember til 20.desember,
                         24.desember til 31.desember,
                     ),
@@ -376,7 +376,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         4.mai til 10.mai,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         4.mai til 19.mai,
                         22.mai til 29.mai,
                     ),
@@ -392,7 +392,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                     arbeidsgiverperioder = listOf(
                         9.mars til 28.mars,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         10.mars til 20.mars,
                         25.mars til 29.mars,
                         // Skal bli ekskludert da foregående perioder er over 16 dager
@@ -412,7 +412,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                         18.mars til 20.mars,
                         25.mars til 29.mars,
                     ),
-                    sykmeldingsperioder = listOf(
+                    sykefravaersperioder = listOf(
                         10.mars til 20.mars,
                         25.mars til 29.mars,
                         2.april til 5.april,
@@ -432,7 +432,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 4.februar til 4.februar,
                 2.februar til 3.februar,
             ),
-            sykmeldingsperioder = listOf(
+            sykefravaersperioder = listOf(
                 13.februar til 19.februar,
                 20.februar til 27.februar,
                 4.februar til 13.februar,
@@ -449,7 +449,7 @@ class BestemmendeFravaersdagKtTest : FunSpec({
                 arbeidsgiverperioder = listOf(
                     1.juli til 16.juli,
                 ),
-                sykmeldingsperioder = emptyList(),
+                sykefravaersperioder = emptyList(),
             )
         }
     }
