@@ -22,24 +22,22 @@ data class Inntektsmelding(
     val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
+    val vedtaksperiodeId: UUID?, // TODO: skal ikke være nullable - men må vente til frontend er deployet
 ) {
     @Serializable
     sealed class Type {
         abstract val id: UUID
-        abstract val vedtaksperiodeId: UUID?
 
         @Serializable
         @SerialName("Forespurt")
         data class Forespurt(
             override val id: UUID,
-            override val vedtaksperiodeId: UUID,
         ) : Type()
 
         @Serializable
         @SerialName("Selvbestemt")
         data class Selvbestemt(
             override val id: UUID,
-            override val vedtaksperiodeId: UUID?,
         ) : Type()
     }
 }

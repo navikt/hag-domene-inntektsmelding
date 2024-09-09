@@ -78,7 +78,6 @@ class UtilsTest : FunSpec({
     val inntektsmeldingId = UUID.randomUUID()
     val forespurtType = InntektsmeldingV1.Type.Forespurt(
         id = UUID.randomUUID(),
-        vedtaksperiodeId = UUID.randomUUID(),
     )
 
     test("convertInntekt") {
@@ -185,7 +184,7 @@ class UtilsTest : FunSpec({
         gammelIM.inntektsdato shouldBe LocalDate.EPOCH
         gammelIM.naturalytelser shouldBe emptyList()
         gammelIM.fullLønnIArbeidsgiverPerioden shouldBe FullLoennIArbeidsgiverPerioden(true, null, null)
-        gammelIM.vedtaksperiodeId shouldBe (nyIM.type as? InntektsmeldingV1.Type.Forespurt)?.vedtaksperiodeId
+        gammelIM.vedtaksperiodeId shouldBe nyIM.vedtaksperiodeId
     }
 
     test("konverter inntekt fra nytt til gammelt IM-format") {

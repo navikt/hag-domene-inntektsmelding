@@ -101,6 +101,7 @@ object Utils {
             refusjon = refusjon,
             aarsakInnsending = convertAarsakInnsending(inntektsmelding.årsakInnsending),
             mottatt = inntektsmelding.tidspunkt,
+            vedtaksperiodeId = inntektsmelding.vedtaksperiodeId,
         )
     }
 
@@ -230,7 +231,7 @@ object Utils {
             innsenderNavn = avsender.navn,
             telefonnummer = avsender.tlf,
             forespurtData = getForespurtData(),
-            vedtaksperiodeId = type.vedtaksperiodeId,
+            vedtaksperiodeId = vedtaksperiodeId,
         )
     }
 
