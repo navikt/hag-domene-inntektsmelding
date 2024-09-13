@@ -101,6 +101,7 @@ object Utils {
             refusjon = refusjon,
             aarsakInnsending = convertAarsakInnsending(inntektsmelding.årsakInnsending),
             mottatt = inntektsmelding.tidspunkt,
+            vedtaksperiodeId = inntektsmelding.vedtaksperiodeId,
         )
     }
 
@@ -203,11 +204,6 @@ object Utils {
     }
 
     fun InntektsmeldingV1.convert(): Inntektsmelding {
-        val vedtaksperiodeId = when (type) {
-            is InntektsmeldingV1.Type.Forespurt -> type.vedtaksperiodeId
-            is InntektsmeldingV1.Type.Selvbestemt -> null
-        }
-
         return Inntektsmelding(
             orgnrUnderenhet = avsender.orgnr.verdi,
             identitetsnummer = sykmeldt.fnr.verdi,
