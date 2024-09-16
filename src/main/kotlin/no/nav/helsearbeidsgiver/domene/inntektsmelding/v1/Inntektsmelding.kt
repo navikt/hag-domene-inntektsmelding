@@ -22,7 +22,7 @@ data class Inntektsmelding(
     val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
-    val vedtaksperiodeId: UUID?, // TODO: skal ikke være nullable - men må vente til frontend er deployet
+    val vedtaksperiodeId: UUID? = null, // TODO: skal ikke være nullable - men må vente til frontend er deployet
 ) {
     @Serializable
     sealed class Type {
