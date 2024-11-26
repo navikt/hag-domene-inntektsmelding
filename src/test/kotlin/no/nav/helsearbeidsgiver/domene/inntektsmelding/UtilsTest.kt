@@ -180,8 +180,10 @@ class UtilsTest : FunSpec({
             Inntektsmelding::fullLønnIArbeidsgiverPerioden,
             Inntektsmelding::vedtaksperiodeId,
         )
-        // konvertering setter inntektsdato til epoch-tid og naturalytelse til tom liste, fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
-        gammelIM.inntektsdato shouldBe LocalDate.EPOCH
+        // konvertering setter inntektsdato til orginal.bestemmendeFraværsdag hvis orginal.inntektsdato er null.
+        // naturalytelse settes til tom liste
+        // fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
+        gammelIM.inntektsdato shouldBe orginal.bestemmendeFraværsdag
         gammelIM.naturalytelser shouldBe emptyList()
         gammelIM.fullLønnIArbeidsgiverPerioden shouldBe FullLoennIArbeidsgiverPerioden(true, null, null)
         gammelIM.vedtaksperiodeId shouldBe nyIM.vedtaksperiodeId
