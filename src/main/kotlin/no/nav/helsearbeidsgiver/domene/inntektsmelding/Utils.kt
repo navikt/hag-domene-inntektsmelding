@@ -31,7 +31,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsm
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
-import java.time.LocalDate
 import java.util.UUID
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending as AarsakInnsendingV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode as ArbeidsgiverperiodeV1
@@ -144,7 +143,7 @@ object Utils {
         return if (im.forespurtData?.contains("inntekt") == true) {
             InntektV1(
                 im.inntekt.beregnetInntekt,
-                LocalDate.EPOCH,
+                im.inntektsdato.orDefault(im.bestemmendeFraværsdag),
                 convertNaturalYtelser(im.naturalytelser),
                 im.inntekt.endringÅrsak?.convert(),
             )
