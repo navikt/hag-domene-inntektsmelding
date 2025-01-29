@@ -37,6 +37,12 @@ data class Inntektsmelding(
         ) : Type()
 
         @Serializable
+        @SerialName("IkkeForespurt")
+        data class IkkeForespurt(
+            override val id: UUID,
+        ) : Type()
+
+        @Serializable
         @SerialName("Selvbestemt")
         data class Selvbestemt(
             override val id: UUID,
