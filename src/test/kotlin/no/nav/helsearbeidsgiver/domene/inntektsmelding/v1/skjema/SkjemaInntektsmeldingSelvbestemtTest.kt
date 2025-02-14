@@ -501,6 +501,12 @@ private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
                 gjelderFra = 30.juni,
                 bleKjent = 5.juli,
             ),
+            endringAarsaker = listOf(
+                Tariffendring(
+                    gjelderFra = 30.juni,
+                    bleKjent = 5.juli,
+                ),
+            ),
         ),
         refusjon = Refusjon(
             beloepPerMaaned = 10000.0,

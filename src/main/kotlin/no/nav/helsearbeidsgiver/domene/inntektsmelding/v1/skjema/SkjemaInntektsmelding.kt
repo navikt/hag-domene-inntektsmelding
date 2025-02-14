@@ -36,14 +36,11 @@ data class SkjemaInntektsmelding(
                     feilmelding = Feilmelding.TLF,
                 ),
             ),
-
             agp?.valider(),
             inntekt?.valider(),
             refusjon?.valider(),
-
             validerRefusjonMotInntekt(refusjon, inntekt),
-        )
-            .tilFeilmeldinger()
+        ).tilFeilmeldinger()
 }
 
 @Serializable
@@ -65,16 +62,13 @@ data class SkjemaInntektsmeldingSelvbestemt(
                     feilmelding = Feilmelding.SYKEMELDINGER_IKKE_TOM,
                 ),
             ),
-
             avsender.valider(),
             agp?.valider(),
             inntekt.valider(),
             refusjon?.valider(),
-
             validerBestemmendeFravaersdagMotInntektsdato(agp, inntekt, sykmeldingsperioder),
             validerRefusjonMotInntekt(refusjon, inntekt),
-        )
-            .tilFeilmeldinger()
+        ).tilFeilmeldinger()
 }
 
 private fun validerBestemmendeFravaersdagMotInntektsdato(
@@ -84,15 +78,17 @@ private fun validerBestemmendeFravaersdagMotInntektsdato(
 ): List<FeiletValidering> =
     // Må sjekke sykmeldingsperioder fordi beregning av bestemmende fraværsdag krever ikke-tom liste
     if (agp != null && inntekt != null && sykmeldingsperioder.isNotEmpty()) {
-        val bestemmendeFravaersdag = bestemmendeFravaersdag(
-            arbeidsgiverperioder = agp.perioder,
-            sykefravaersperioder = sykmeldingsperioder,
-        )
+        val bestemmendeFravaersdag =
+            bestemmendeFravaersdag(
+                arbeidsgiverperioder = agp.perioder,
+                sykefravaersperioder = sykmeldingsperioder,
+            )
 
-        val feiletValidering = valider(
-            vilkaar = !bestemmendeFravaersdag.isBefore(inntekt.inntektsdato),
-            feilmelding = Feilmelding.TEKNISK_FEIL,
-        )
+        val feiletValidering =
+            valider(
+                vilkaar = !bestemmendeFravaersdag.isBefore(inntekt.inntektsdato),
+                feilmelding = Feilmelding.TEKNISK_FEIL,
+            )
 
         if (feiletValidering != null) {
             sikkerLogger.error("Bestemmende fraværsdag er før inntektsdato. Dette er ikke mulig. Bruker hindret fra å sende inn.")
@@ -103,14 +99,16 @@ private fun validerBestemmendeFravaersdagMotInntektsdato(
         emptyList()
     }
 
-private fun validerRefusjonMotInntekt(refusjon: Refusjon?, inntekt: Inntekt?): List<FeiletValidering> =
+private fun validerRefusjonMotInntekt(
+    refusjon: Refusjon?,
+    inntekt: Inntekt?,
+): List<FeiletValidering> =
     if (refusjon != null && inntekt != null) {
         listOfNotNull(
             valider(
                 vilkaar = refusjon.beloepPerMaaned <= inntekt.beloep,
                 feilmelding = Feilmelding.REFUSJON_OVER_INNTEKT,
             ),
-
             valider(
                 vilkaar = refusjon.endringer.all { it.beloep <= inntekt.beloep },
                 feilmelding = Feilmelding.REFUSJON_OVER_INNTEKT,

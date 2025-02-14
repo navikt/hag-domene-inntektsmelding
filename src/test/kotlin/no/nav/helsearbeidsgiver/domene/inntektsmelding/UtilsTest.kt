@@ -65,215 +65,230 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykefravaer as Sykefra
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring as TariffendringV1
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring as VarigLoennsendringV1
 
-class UtilsTest : FunSpec({
+class UtilsTest :
+    FunSpec({
 
-    val foersteJanuar2023 = LocalDate.of(2023, 1, 1)
-    val inntektsmeldingId = UUID.randomUUID()
-    val forespurtType = InntektsmeldingV1.Type.Forespurt(
-        id = UUID.randomUUID(),
-    )
+        val foersteJanuar2023 = LocalDate.of(2023, 1, 1)
+        val inntektsmeldingId = UUID.randomUUID()
+        val forespurtType =
+            InntektsmeldingV1.Type.Forespurt(
+                id = UUID.randomUUID(),
+            )
 
-    test("convertInntekt") {
-        val im = lagGammelInntektsmelding()
-        val nyInntekt = im.convertInntekt()
-        nyInntekt shouldNotBe null
-        val gammelInntekt = im.inntekt
-        nyInntekt.beloep shouldBe gammelInntekt?.beregnetInntekt
-    }
-
-    test("convertInntekt kaster exception hvis null") {
-        val im = lagGammelInntektsmelding().copy(inntekt = null)
-        shouldThrowExactly<IllegalArgumentException> {
-            im.convertInntekt()
+        test("convertInntekt") {
+            val im = lagGammelInntektsmelding()
+            val nyInntekt = im.convertInntekt()
+            nyInntekt shouldNotBe null
+            val gammelInntekt = im.inntekt
+            nyInntekt.beloep shouldBe gammelInntekt?.beregnetInntekt
         }
-    }
 
-    test("convertEndringAarsak") {
-        Bonus(1.0, LocalDate.EPOCH).convert() shouldBe BonusV1
-        Bonus(null, null).convert() shouldBe BonusV1
-        Feilregistrert.convert() shouldBe FeilregistrertV1
-        Ferie(lagPeriode()).convert() shouldBe FerieV1(lagPeriode())
-        Ferietrekk.convert() shouldBe FerietrekkV1
-        Nyansatt.convert() shouldBe NyansattV1
-        NyStilling(foersteJanuar2023).convert() shouldBe NyStillingV1(foersteJanuar2023)
-        NyStillingsprosent(foersteJanuar2023).convert() shouldBe NyStillingsprosentV1(foersteJanuar2023)
-        Permisjon(lagPeriode()).convert() shouldBe PermisjonV1(lagPeriode())
-        Permittering(lagPeriode()).convert() shouldBe PermitteringV1(lagPeriode())
-        Sykefravaer(lagPeriode()).convert() shouldBe SykefravaerV1(lagPeriode())
-        Tariffendring(foersteJanuar2023, foersteJanuar2023).convert() shouldBe TariffendringV1(
-            foersteJanuar2023,
-            foersteJanuar2023,
-        )
-        VarigLonnsendring(foersteJanuar2023).convert() shouldBe VarigLoennsendringV1(foersteJanuar2023)
-    }
+        test("convertInntekt kaster exception hvis null") {
+            val im = lagGammelInntektsmelding().copy(inntekt = null)
+            shouldThrowExactly<IllegalArgumentException> {
+                im.convertInntekt()
+            }
+        }
 
-    test("Naturalytelse-convert") {
-        val belop = 10.0
-        val gamleYtelser = NaturalytelseKode.entries.map {
-            Naturalytelse(it, foersteJanuar2023, belop)
-        }.toList()
-        val nyeYtelser = NaturalytelseV1.Kode.entries.map {
-            NaturalytelseV1(it, belop, foersteJanuar2023)
-        }.toList()
-        gamleYtelser.map { it.convert() } shouldBeEqual nyeYtelser
-    }
+        test("convertEndringAarsak") {
+            Bonus(1.0, LocalDate.EPOCH).convert() shouldBe BonusV1
+            Bonus(null, null).convert() shouldBe BonusV1
+            Feilregistrert.convert() shouldBe FeilregistrertV1
+            Ferie(lagPeriode()).convert() shouldBe FerieV1(lagPeriode())
+            Ferietrekk.convert() shouldBe FerietrekkV1
+            Nyansatt.convert() shouldBe NyansattV1
+            NyStilling(foersteJanuar2023).convert() shouldBe NyStillingV1(foersteJanuar2023)
+            NyStillingsprosent(foersteJanuar2023).convert() shouldBe NyStillingsprosentV1(foersteJanuar2023)
+            Permisjon(lagPeriode()).convert() shouldBe PermisjonV1(lagPeriode())
+            Permittering(lagPeriode()).convert() shouldBe PermitteringV1(lagPeriode())
+            Sykefravaer(lagPeriode()).convert() shouldBe SykefravaerV1(lagPeriode())
+            Tariffendring(foersteJanuar2023, foersteJanuar2023).convert() shouldBe
+                TariffendringV1(
+                    foersteJanuar2023,
+                    foersteJanuar2023,
+                )
+            VarigLonnsendring(foersteJanuar2023).convert() shouldBe VarigLoennsendringV1(foersteJanuar2023)
+        }
 
-    test("FullLoennIArbeidsgiverPerioden-convert") {
-        val utbetalt = 10000.0
-        val imMedReduksjon = lagGammelInntektsmelding().copy(
-            fullLønnIArbeidsgiverPerioden =
-            FullLoennIArbeidsgiverPerioden(
-                false,
-                BegrunnelseIngenEllerRedusertUtbetalingKode.BetvilerArbeidsufoerhet,
-                utbetalt,
-            ),
-        )
-        val agp = imMedReduksjon.convertToV1(inntektsmeldingId, forespurtType).agp
-        agp?.redusertLoennIAgp?.beloep shouldBe utbetalt
-        agp?.redusertLoennIAgp?.begrunnelse shouldBe RedusertLoennIAgpV1.Begrunnelse.BetvilerArbeidsufoerhet
-    }
+        test("Naturalytelse-convert") {
+            val belop = 10.0
+            val gamleYtelser =
+                NaturalytelseKode.entries
+                    .map {
+                        Naturalytelse(it, foersteJanuar2023, belop)
+                    }.toList()
+            val nyeYtelser =
+                NaturalytelseV1.Kode.entries
+                    .map {
+                        NaturalytelseV1(it, belop, foersteJanuar2023)
+                    }.toList()
+            gamleYtelser.map { it.convert() } shouldBeEqual nyeYtelser
+        }
 
-    test("convertBegrunnelse") {
-        val gamleBegrunnelser = BegrunnelseIngenEllerRedusertUtbetalingKode.entries.toList()
-        val nyeBegrunnelser = RedusertLoennIAgpV1.Begrunnelse.entries.toList()
-        gamleBegrunnelser.forEachIndexed { index, begrunnelse -> begrunnelse.convert() shouldBe nyeBegrunnelser[index] }
-    }
+        test("FullLoennIArbeidsgiverPerioden-convert") {
+            val utbetalt = 10000.0
+            val imMedReduksjon =
+                lagGammelInntektsmelding().copy(
+                    fullLønnIArbeidsgiverPerioden =
+                    FullLoennIArbeidsgiverPerioden(
+                        false,
+                        BegrunnelseIngenEllerRedusertUtbetalingKode.BetvilerArbeidsufoerhet,
+                        utbetalt,
+                    ),
+                )
+            val agp = imMedReduksjon.convertToV1(inntektsmeldingId, forespurtType).agp
+            agp?.redusertLoennIAgp?.beloep shouldBe utbetalt
+            agp?.redusertLoennIAgp?.begrunnelse shouldBe RedusertLoennIAgpV1.Begrunnelse.BetvilerArbeidsufoerhet
+        }
 
-    test("håndterer tomme lister og null-verdier") {
-        val im = lagGammelInntektsmeldingMedTommeOgNullVerdier().convertToV1(inntektsmeldingId, forespurtType)
-        im.aarsakInnsending shouldBe AarsakInnsendingV1.Endring
-    }
+        test("convertBegrunnelse") {
+            val gamleBegrunnelser = BegrunnelseIngenEllerRedusertUtbetalingKode.entries.toList()
+            val nyeBegrunnelser = RedusertLoennIAgpV1.Begrunnelse.entries.toList()
+            gamleBegrunnelser.forEachIndexed { index, begrunnelse -> begrunnelse.convert() shouldBe nyeBegrunnelser[index] }
+        }
 
-    test("konverter im til V1") {
-        val gammelIM = lagGammelInntektsmelding()
-        val nyIM = gammelIM.convertToV1(inntektsmeldingId, forespurtType)
+        test("håndterer tomme lister og null-verdier") {
+            val im = lagGammelInntektsmeldingMedTommeOgNullVerdier().convertToV1(inntektsmeldingId, forespurtType)
+            im.aarsakInnsending shouldBe AarsakInnsendingV1.Endring
+        }
 
-        nyIM.type shouldBe forespurtType
+        test("konverter im til V1") {
+            val gammelIM = lagGammelInntektsmelding()
+            val nyIM = gammelIM.convertToV1(inntektsmeldingId, forespurtType)
 
-        nyIM.sykmeldt.fnr.verdi shouldBe gammelIM.identitetsnummer
-        nyIM.sykmeldt.navn shouldBe gammelIM.fulltNavn
+            nyIM.type shouldBe forespurtType
 
-        nyIM.avsender.navn shouldBe gammelIM.innsenderNavn
-        nyIM.avsender.orgNavn shouldBe gammelIM.virksomhetNavn
-        nyIM.avsender.orgnr.verdi shouldBe gammelIM.orgnrUnderenhet
-        nyIM.avsender.tlf shouldBe gammelIM.telefonnummer
+            nyIM.sykmeldt.fnr.verdi shouldBe gammelIM.identitetsnummer
+            nyIM.sykmeldt.navn shouldBe gammelIM.fulltNavn
 
-        nyIM.aarsakInnsending shouldBe AarsakInnsendingV1.Ny
-    }
+            nyIM.avsender.navn shouldBe gammelIM.innsenderNavn
+            nyIM.avsender.orgNavn shouldBe gammelIM.virksomhetNavn
+            nyIM.avsender.orgnr.verdi shouldBe gammelIM.orgnrUnderenhet
+            nyIM.avsender.tlf shouldBe gammelIM.telefonnummer
 
-    test("konverter fra nytt til gammelt IM-format") {
-        val orginal = lagGammelInntektsmelding()
-        val nyIM = orginal.convertToV1(inntektsmeldingId, forespurtType)
-        val gammelIM = nyIM.convert()
-        gammelIM.shouldBeEqualToIgnoringFields(
-            orginal,
-            Inntektsmelding::inntektsdato,
-            Inntektsmelding::naturalytelser,
-            Inntektsmelding::fullLønnIArbeidsgiverPerioden,
-            Inntektsmelding::vedtaksperiodeId,
-        )
-        // konvertering setter inntektsdato til orginal.bestemmendeFraværsdag hvis orginal.inntektsdato er null.
-        // naturalytelse settes til tom liste
-        // fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
-        gammelIM.inntektsdato shouldBe orginal.bestemmendeFraværsdag
-        gammelIM.naturalytelser shouldBe emptyList()
-        gammelIM.fullLønnIArbeidsgiverPerioden shouldBe FullLoennIArbeidsgiverPerioden(true, null, null)
-        gammelIM.vedtaksperiodeId shouldBe nyIM.vedtaksperiodeId
-    }
+            nyIM.aarsakInnsending shouldBe AarsakInnsendingV1.Ny
+        }
 
-    test("konverter inntekt fra nytt til gammelt IM-format") {
-        val belop = 1000.0
-        val dato = LocalDate.of(2024, 1, 1)
-        val nyInntekt = InntektV1(
-            belop,
-            dato,
-            listOf(NaturalytelseV1(NaturalytelseV1.Kode.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
-            FeilregistrertV1,
-        )
-        val gammelInntekt = nyInntekt.convert()
-        gammelInntekt.beregnetInntekt shouldBe belop
-        gammelInntekt.endringÅrsak shouldBe Feilregistrert
-        gammelInntekt.bekreftet shouldBe true
-        gammelInntekt.manueltKorrigert shouldBe true
-        val nyIM = lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType).copy(inntekt = nyInntekt)
-        val konvertert = nyIM.convert()
-        konvertert.naturalytelser shouldBe listOf(Naturalytelse(NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, dato, belop))
-        konvertert.inntektsdato shouldBe dato
-        konvertert.beregnetInntekt shouldBe belop
-    }
+        test("konverter fra nytt til gammelt IM-format") {
+            val orginal = lagGammelInntektsmelding()
+            val nyIM = orginal.convertToV1(inntektsmeldingId, forespurtType)
+            val gammelIM = nyIM.convert()
+            gammelIM.shouldBeEqualToIgnoringFields(
+                orginal,
+                Inntektsmelding::inntektsdato,
+                Inntektsmelding::naturalytelser,
+                Inntektsmelding::fullLønnIArbeidsgiverPerioden,
+                Inntektsmelding::vedtaksperiodeId,
+            )
+            // konvertering setter inntektsdato til orginal.bestemmendeFraværsdag hvis orginal.inntektsdato er null.
+            // naturalytelse settes til tom liste
+            // fullLønnIAgp som null-verdi i orginal blir oversatt til FullLoennIAGP(true, null, null)
+            gammelIM.inntektsdato shouldBe orginal.bestemmendeFraværsdag
+            gammelIM.naturalytelser shouldBe emptyList()
+            gammelIM.fullLønnIArbeidsgiverPerioden shouldBe FullLoennIArbeidsgiverPerioden(true, null, null)
+            gammelIM.vedtaksperiodeId shouldBe nyIM.vedtaksperiodeId
+        }
 
-    test("konverter reduksjon til V0") {
-        val belop = 333.33
-        val periode = listOf(10.september til 20.september)
-        val egenmeldinger = listOf(10.september til 12.september)
-        val nyIM = lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType).copy(
-            agp = ArbeidsgiverperiodeV1(
-                periode,
-                egenmeldinger,
-                RedusertLoennIAgpV1(belop, RedusertLoennIAgpV1.Begrunnelse.FerieEllerAvspasering),
-            ),
-        )
-        val konvertert = nyIM.convert()
-        konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe BegrunnelseIngenEllerRedusertUtbetalingKode.FerieEllerAvspasering
-        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe false
-        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe belop
-        konvertert.arbeidsgiverperioder shouldBe periode
-        konvertert.egenmeldingsperioder shouldBe egenmeldinger
-    }
+        test("konverter inntekt fra nytt til gammelt IM-format") {
+            val belop = 1000.0
+            val dato = LocalDate.of(2024, 1, 1)
+            val nyInntekt =
+                InntektV1(
+                    belop,
+                    dato,
+                    listOf(NaturalytelseV1(NaturalytelseV1.Kode.BEDRIFTSBARNEHAGEPLASS, belop, dato)),
+                    FeilregistrertV1,
+                    listOf(FeilregistrertV1),
+                )
+            val gammelInntekt = nyInntekt.convert()
+            gammelInntekt.beregnetInntekt shouldBe belop
+            gammelInntekt.endringÅrsak shouldBe Feilregistrert
+            gammelInntekt.bekreftet shouldBe true
+            gammelInntekt.manueltKorrigert shouldBe true
+            val nyIM = lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType).copy(inntekt = nyInntekt)
+            val konvertert = nyIM.convert()
+            konvertert.naturalytelser shouldBe listOf(Naturalytelse(NaturalytelseKode.BEDRIFTSBARNEHAGEPLASS, dato, belop))
+            konvertert.inntektsdato shouldBe dato
+            konvertert.beregnetInntekt shouldBe belop
+        }
 
-    test("konverter null-verdi for fullLønnIAGP") {
-        val orginal = lagGammelInntektsmeldingMedTommeOgNullVerdier().copy(
-            fullLønnIArbeidsgiverPerioden = null,
-        )
+        test("konverter reduksjon til V0") {
+            val belop = 333.33
+            val periode = listOf(10.september til 20.september)
+            val egenmeldinger = listOf(10.september til 12.september)
+            val nyIM =
+                lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType).copy(
+                    agp =
+                    ArbeidsgiverperiodeV1(
+                        periode,
+                        egenmeldinger,
+                        RedusertLoennIAgpV1(belop, RedusertLoennIAgpV1.Begrunnelse.FerieEllerAvspasering),
+                    ),
+                )
+            val konvertert = nyIM.convert()
+            konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe BegrunnelseIngenEllerRedusertUtbetalingKode.FerieEllerAvspasering
+            konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe false
+            konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe belop
+            konvertert.arbeidsgiverperioder shouldBe periode
+            konvertert.egenmeldingsperioder shouldBe egenmeldinger
+        }
 
-        val nyIM = orginal.convertToV1(inntektsmeldingId, forespurtType)
+        test("konverter null-verdi for fullLønnIAGP") {
+            val orginal =
+                lagGammelInntektsmeldingMedTommeOgNullVerdier().copy(
+                    fullLønnIArbeidsgiverPerioden = null,
+                )
 
-        val konvertert = nyIM.convert()
-        konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe null
-        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe true
-        konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe null
-    }
+            val nyIM = orginal.convertToV1(inntektsmeldingId, forespurtType)
 
-    test("felt som mangler i forespurt data blir ikke konvertert til v1") {
-        val orginal = lagGammelInntektsmelding().copy(
-            forespurtData = emptyList(),
-        )
-        val nyIM = orginal.convertToV1(inntektsmeldingId, forespurtType)
-        nyIM.agp shouldBe null
-        nyIM.inntekt shouldBe null
-        nyIM.refusjon shouldBe null
-    }
+            val konvertert = nyIM.convert()
+            konvertert.fullLønnIArbeidsgiverPerioden?.begrunnelse shouldBe null
+            konvertert.fullLønnIArbeidsgiverPerioden?.utbetalerFullLønn shouldBe true
+            konvertert.fullLønnIArbeidsgiverPerioden?.utbetalt shouldBe null
+        }
 
-    test("konverter refusjon til V0") {
-        val belop = 123.45
-        val dato1 = LocalDate.of(2023, 2, 2)
-        val dato2 = LocalDate.of(2023, 2, 2)
-        val refusjon = RefusjonV1(belop, listOf(RefusjonEndringV1(belop, dato1)), dato2)
-        val gammelRefusjon = refusjon.convert()
-        gammelRefusjon.refusjonEndringer shouldBe listOf(RefusjonEndring(belop, dato1))
-        gammelRefusjon.refusjonOpphører shouldBe dato2
-        gammelRefusjon.refusjonPrMnd shouldBe belop
-    }
+        test("felt som mangler i forespurt data blir ikke konvertert til v1") {
+            val orginal =
+                lagGammelInntektsmelding().copy(
+                    forespurtData = emptyList(),
+                )
+            val nyIM = orginal.convertToV1(inntektsmeldingId, forespurtType)
+            nyIM.agp shouldBe null
+            nyIM.inntekt shouldBe null
+            nyIM.refusjon shouldBe null
+        }
 
-    test("generer forespurt data") {
-        val nyIM = lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType)
-        nyIM.getForespurtData() shouldBe listOf("arbeidsgiverperiode", "inntekt", "refusjon")
-        val utenFelter = lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType).copy(
-            agp = null,
-            refusjon = null,
-            inntekt = null,
-        )
-        utenFelter.getForespurtData() shouldBe emptyList()
-    }
-})
+        test("konverter refusjon til V0") {
+            val belop = 123.45
+            val dato1 = LocalDate.of(2023, 2, 2)
+            val dato2 = LocalDate.of(2023, 2, 2)
+            val refusjon = RefusjonV1(belop, listOf(RefusjonEndringV1(belop, dato1)), dato2)
+            val gammelRefusjon = refusjon.convert()
+            gammelRefusjon.refusjonEndringer shouldBe listOf(RefusjonEndring(belop, dato1))
+            gammelRefusjon.refusjonOpphører shouldBe dato2
+            gammelRefusjon.refusjonPrMnd shouldBe belop
+        }
+
+        test("generer forespurt data") {
+            val nyIM = lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType)
+            nyIM.getForespurtData() shouldBe listOf("arbeidsgiverperiode", "inntekt", "refusjon")
+            val utenFelter =
+                lagGammelInntektsmelding().convertToV1(inntektsmeldingId, forespurtType).copy(
+                    agp = null,
+                    refusjon = null,
+                    inntekt = null,
+                )
+            utenFelter.getForespurtData() shouldBe emptyList()
+        }
+    })
 
 fun lagPeriode(): List<Periode> {
     val start = LocalDate.of(2023, 1, 1)
     return List(3) { Periode(start.plusDays(it.toLong()), start.plusDays(it.toLong())) }
 }
 
-fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding {
-    return lagGammelInntektsmelding().copy(
+fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding =
+    lagGammelInntektsmelding().copy(
         behandlingsdager = emptyList(),
         egenmeldingsperioder = emptyList(),
         inntektsdato = null,
@@ -286,7 +301,6 @@ fun lagGammelInntektsmeldingMedTommeOgNullVerdier(): Inntektsmelding {
         telefonnummer = null,
         forespurtData = null,
     )
-}
 
 private fun lagGammelInntektsmelding(): Inntektsmelding =
     Inntektsmelding(
@@ -295,27 +309,32 @@ private fun lagGammelInntektsmelding(): Inntektsmelding =
         fulltNavn = "testNavn",
         virksomhetNavn = "testBedrift",
         behandlingsdager = emptyList(),
-        egenmeldingsperioder = listOf(
+        egenmeldingsperioder =
+        listOf(
             12.september til 13.september,
         ),
-        fraværsperioder = listOf(
+        fraværsperioder =
+        listOf(
             14.september til 20.september,
             28.september til 21.oktober,
         ),
-        arbeidsgiverperioder = listOf(
+        arbeidsgiverperioder =
+        listOf(
             12.september til 20.september,
             28.september til 4.oktober,
         ),
         beregnetInntekt = 100.0,
         inntektsdato = null,
-        inntekt = Inntekt(
+        inntekt =
+        Inntekt(
             bekreftet = true,
             beregnetInntekt = 100.0,
             endringÅrsak = null,
             manueltKorrigert = false,
         ),
         fullLønnIArbeidsgiverPerioden = null,
-        refusjon = Refusjon(
+        refusjon =
+        Refusjon(
             utbetalerHeleEllerDeler = true,
             refusjonPrMnd = 50.0,
             refusjonOpphører = LocalDate.EPOCH,
