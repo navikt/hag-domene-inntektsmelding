@@ -2,6 +2,7 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
@@ -17,7 +18,8 @@ data class Inntekt(
     val inntektsdato: LocalDate,
     val naturalytelser: List<Naturalytelse>,
     val endringAarsak: InntektEndringAarsak?,
-    val endringAarsaker: List<InntektEndringAarsak>?,
+    @EncodeDefault
+    val endringAarsaker: List<InntektEndringAarsak>? = null,
 ) {
     internal fun valider(): List<FeiletValidering> =
         listOfNotNull(
