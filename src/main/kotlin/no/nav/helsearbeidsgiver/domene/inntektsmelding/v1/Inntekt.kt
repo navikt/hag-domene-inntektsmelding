@@ -2,7 +2,6 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
-import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
