@@ -18,7 +18,6 @@ data class Inntekt(
     val inntektsdato: LocalDate,
     val naturalytelser: List<Naturalytelse>,
     val endringAarsak: InntektEndringAarsak?,
-    @EncodeDefault
     val endringAarsaker: List<InntektEndringAarsak>? = null,
 ) {
     internal fun valider(): List<FeiletValidering> =
