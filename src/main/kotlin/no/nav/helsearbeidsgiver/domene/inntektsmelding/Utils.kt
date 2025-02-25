@@ -53,38 +53,42 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring as Tarif
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.VarigLoennsendring as VarigLoennsendringV1
 
 object Utils {
-
     fun Inntektsmelding.convertToV1(
         inntektsmeldingId: UUID,
         type: InntektsmeldingV1.Type,
     ): InntektsmeldingV1 {
         // kutt ut feltet hvis det ikke finnes i forespurt data:
-        val agpV1 = if (forespurtData?.contains("arbeidsgiverperiode") == true) {
-            convertAgp()
-        } else {
-            null
-        }
+        val agpV1 =
+            if (forespurtData?.contains("arbeidsgiverperiode") == true) {
+                convertAgp()
+            } else {
+                null
+            }
 
-        val inntektV1 = if (forespurtData?.contains("inntekt") == true) {
-            convertInntekt()
-        } else {
-            null
-        }
+        val inntektV1 =
+            if (forespurtData?.contains("inntekt") == true) {
+                convertInntekt()
+            } else {
+                null
+            }
 
-        val refusjonV1 = if (forespurtData?.contains("refusjon") == true) {
-            refusjon.convert()
-        } else {
-            null
-        }
+        val refusjonV1 =
+            if (forespurtData?.contains("refusjon") == true) {
+                refusjon.convert()
+            } else {
+                null
+            }
 
         return InntektsmeldingV1(
             id = inntektsmeldingId,
             type = type,
-            sykmeldt = SykmeldtV1(
+            sykmeldt =
+            SykmeldtV1(
                 fnr = identitetsnummer.let(::Fnr),
                 navn = fulltNavn,
             ),
-            avsender = AvsenderV1(
+            avsender =
+            AvsenderV1(
                 orgnr = orgnrUnderenhet.let(::Orgnr),
                 orgNavn = virksomhetNavn,
                 navn = innsenderNavn.orEmpty(),
@@ -126,6 +130,7 @@ object Utils {
                 inntektsdato = inntektsdato.orDefault(bestemmendeFraværsdag),
                 naturalytelser = naturalytelser?.map { it.convert() }.orEmpty(),
                 endringAarsak = inntekt.endringÅrsak?.convert(),
+                endringAarsaker = listOfNotNull(inntekt.endringÅrsak?.convert()),
             )
         }
 
@@ -145,17 +150,15 @@ object Utils {
             is VarigLonnsendring -> VarigLoennsendringV1(gjelderFra = this.gjelderFra)
         }
 
-    fun Naturalytelse.convert(): NaturalytelseV1 {
-        return NaturalytelseV1(
+    fun Naturalytelse.convert(): NaturalytelseV1 =
+        NaturalytelseV1(
             NaturalytelseV1.Kode.valueOf(this.naturalytelse.name),
             this.beløp,
             this.dato,
         )
-    }
 
-    fun BegrunnelseIngenEllerRedusertUtbetalingKode.convert(): RedusertLoennIAgpV1.Begrunnelse {
-        return RedusertLoennIAgpV1.Begrunnelse.valueOf(this.name)
-    }
+    fun BegrunnelseIngenEllerRedusertUtbetalingKode.convert(): RedusertLoennIAgpV1.Begrunnelse =
+        RedusertLoennIAgpV1.Begrunnelse.valueOf(this.name)
 
     fun Refusjon.convert(): RefusjonV1? =
         // (refusjonPrMnd == null) bør ikke skje, men deprecated nullable-kode åpner for ugyldige data.
@@ -176,11 +179,10 @@ object Utils {
             RefusjonEndringV1(beløp, dato)
         }
 
-    private fun AarsakInnsending.convert(): AarsakInnsendingV1 =
-        AarsakInnsendingV1.valueOf(value)
+    private fun AarsakInnsending.convert(): AarsakInnsendingV1 = AarsakInnsendingV1.valueOf(value)
 
-    fun InntektsmeldingV1.convert(): Inntektsmelding {
-        return Inntektsmelding(
+    fun InntektsmeldingV1.convert(): Inntektsmelding =
+        Inntektsmelding(
             orgnrUnderenhet = avsender.orgnr.verdi,
             identitetsnummer = sykmeldt.fnr.verdi,
             fulltNavn = sykmeldt.navn,
@@ -193,7 +195,8 @@ object Utils {
             beregnetInntekt = inntekt?.beloep ?: 0.0,
             inntektsdato = inntekt?.inntektsdato,
             inntekt = inntekt?.convert(),
-            fullLønnIArbeidsgiverPerioden = agp?.redusertLoennIAgp?.convert().orDefault(
+            fullLønnIArbeidsgiverPerioden =
+            agp?.redusertLoennIAgp?.convert().orDefault(
                 FullLoennIArbeidsgiverPerioden(
                     utbetalerFullLønn = true,
                     begrunnelse = null,
@@ -209,16 +212,13 @@ object Utils {
             forespurtData = getForespurtData(),
             vedtaksperiodeId = vedtaksperiodeId,
         )
-    }
 
     fun InntektsmeldingV1.getForespurtData(): List<String> {
         val fullListe = mapOf("arbeidsgiverperiode" to this.agp, "inntekt" to this.inntekt, "refusjon" to this.refusjon)
         return fullListe.filterValues { it != null }.keys.toList()
     }
 
-    fun AarsakInnsendingV1.convert(): AarsakInnsending {
-        return AarsakInnsending.valueOf(this.name.uppercase())
-    }
+    fun AarsakInnsendingV1.convert(): AarsakInnsending = AarsakInnsending.valueOf(this.name.uppercase())
 
     private fun convertNaturalYtelserToV0(naturalytelser: List<NaturalytelseV1>?): List<Naturalytelse> {
         if (naturalytelser != null) {
@@ -227,31 +227,25 @@ object Utils {
         return emptyList()
     }
 
-    fun NaturalytelseV1.convert(): Naturalytelse {
-        return Naturalytelse(
+    fun NaturalytelseV1.convert(): Naturalytelse =
+        Naturalytelse(
             naturalytelse = NaturalytelseKode.valueOf(this.naturalytelse.name),
             dato = this.sluttdato,
             beløp = this.verdiBeloep,
         )
-    }
 
-    fun RefusjonV1.convert(): Refusjon {
-        return Refusjon(true, this.beloepPerMaaned, this.sluttdato, this.endringer.convert())
-    }
+    fun RefusjonV1.convert(): Refusjon = Refusjon(true, this.beloepPerMaaned, this.sluttdato, this.endringer.convert())
 
-    fun List<RefusjonEndringV1>.convert(): List<RefusjonEndring> {
-        return this.map { v1 ->
+    fun List<RefusjonEndringV1>.convert(): List<RefusjonEndring> =
+        this.map { v1 ->
             RefusjonEndring(v1.beloep, v1.startdato)
         }
-    }
 
-    fun RedusertLoennIAgpV1.convert(): FullLoennIArbeidsgiverPerioden {
-        return FullLoennIArbeidsgiverPerioden(false, this.begrunnelse.convert(), this.beloep)
-    }
+    fun RedusertLoennIAgpV1.convert(): FullLoennIArbeidsgiverPerioden =
+        FullLoennIArbeidsgiverPerioden(false, this.begrunnelse.convert(), this.beloep)
 
-    fun RedusertLoennIAgpV1.Begrunnelse.convert(): BegrunnelseIngenEllerRedusertUtbetalingKode {
-        return BegrunnelseIngenEllerRedusertUtbetalingKode.valueOf(this.name)
-    }
+    fun RedusertLoennIAgpV1.Begrunnelse.convert(): BegrunnelseIngenEllerRedusertUtbetalingKode =
+        BegrunnelseIngenEllerRedusertUtbetalingKode.valueOf(this.name)
 
     fun InntektV1.convert(): Inntekt {
         val korrigert = this.endringAarsak != null
@@ -275,10 +269,11 @@ object Utils {
             is PermisjonV1 -> Permisjon(liste = permisjoner)
             is PermitteringV1 -> Permittering(liste = permitteringer)
             is SykefravaerV1 -> Sykefravaer(liste = sykefravaer)
-            is TariffendringV1 -> Tariffendring(
-                gjelderFra = this.gjelderFra,
-                bleKjent = this.bleKjent,
-            )
+            is TariffendringV1 ->
+                Tariffendring(
+                    gjelderFra = this.gjelderFra,
+                    bleKjent = this.bleKjent,
+                )
 
             is VarigLoennsendringV1 -> VarigLonnsendring(gjelderFra = this.gjelderFra)
         }

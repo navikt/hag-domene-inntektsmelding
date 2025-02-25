@@ -17,6 +17,7 @@ data class Inntekt(
     val inntektsdato: LocalDate,
     val naturalytelser: List<Naturalytelse>,
     val endringAarsak: InntektEndringAarsak?,
+    val endringAarsaker: List<InntektEndringAarsak>? = null,
 ) {
     internal fun valider(): List<FeiletValidering> =
         listOfNotNull(
@@ -24,7 +25,6 @@ data class Inntekt(
                 vilkaar = beloep.erStoerreEllerLikNullOgMindreEnnMaks(),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
-
             valider(
                 vilkaar = naturalytelser.all(Naturalytelse::erGyldig),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,

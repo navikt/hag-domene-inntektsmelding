@@ -39,9 +39,10 @@ data class Inntektsmelding(
     val telefonnummer: String? = null,
     val forespurtData: List<String>? = null,
     @EncodeDefault
-    val bestemmendeFraværsdag: LocalDate = bestemmendeFravaersdag(
-        arbeidsgiverperioder = arbeidsgiverperioder,
-        sykefravaersperioder = fraværsperioder,
-    ),
+    val bestemmendeFraværsdag: LocalDate =
+        bestemmendeFravaersdag(
+            arbeidsgiverperioder = arbeidsgiverperioder,
+            sykefravaersperioder = fraværsperioder,
+        ),
     val vedtaksperiodeId: UUID? = null,
 )
