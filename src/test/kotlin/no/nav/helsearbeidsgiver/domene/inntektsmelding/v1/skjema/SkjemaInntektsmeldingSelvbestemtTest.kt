@@ -164,6 +164,7 @@ class SkjemaInntektsmeldingSelvbestemtTest : FunSpec({
                                 20.august til 31.august,
                             ),
                         ),
+                        refusjon = null,
                     )
                 }
 
@@ -406,7 +407,7 @@ class SkjemaInntektsmeldingSelvbestemtTest : FunSpec({
                         endringer = listOf(
                             RefusjonEndring(
                                 beloep = 8000.1,
-                                startdato = 8.juni,
+                                startdato = 19.juni,
                             ),
                         ),
                     ),
@@ -513,14 +514,14 @@ private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
             endringer = listOf(
                 RefusjonEndring(
                     beloep = 8000.0,
-                    startdato = 10.juni,
+                    startdato = 10.juli,
                 ),
                 RefusjonEndring(
                     beloep = 6000.0,
-                    startdato = 20.juni,
+                    startdato = 20.juli,
                 ),
             ),
-            sluttdato = 30.juni,
+            sluttdato = null,
         ),
         vedtaksperiodeId = UUID.randomUUID(),
     )
