@@ -9,6 +9,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
@@ -84,6 +85,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                                 20.august til 31.august,
                             ),
                         ),
+                        refusjon = null,
                     )
                 }
 
@@ -270,6 +272,48 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 skjema.valider().shouldBeEmpty()
             }
 
+            test("dato for refusjonEndring må være etter AGP") {
+                val agpFom = 4.juni
+                val agpTom = 18.juni
+
+                val agp = Arbeidsgiverperiode(listOf(Periode(fom = agpFom, tom = agpTom)), emptyList(), null)
+                val ugyldigRefusjon = Refusjon(
+                    beloepPerMaaned = 50000.0,
+                    endringer = listOf(RefusjonEndring(beloep = 10.0, startdato = agpTom)),
+                    sluttdato = null,
+                )
+                val skjema = fulltSkjema().copy(
+                    agp = agp,
+                    refusjon = ugyldigRefusjon,
+                )
+
+                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_FOER_AGP_SLUTT)
+            }
+
+            test("dato for refusjonEndring må være etter inntektDato hvis ingen AGP") {
+                val inntektDato = 1.juni
+
+                val inntekt = Inntekt(
+                    beloep = 51000.0,
+                    inntektsdato = inntektDato,
+                    naturalytelser = emptyList(),
+                    endringAarsak = null,
+                    endringAarsaker = null,
+                )
+                val ugyldigRefusjon = Refusjon(
+                    beloepPerMaaned = 50000.0,
+                    endringer = listOf(RefusjonEndring(beloep = 10.0, startdato = inntektDato.minusDays(1))),
+                    sluttdato = null,
+                )
+                val skjema = fulltSkjema().copy(
+                    inntekt = inntekt,
+                    agp = null,
+                    refusjon = ugyldigRefusjon,
+                )
+
+                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_FOER_INNTEKTDATO)
+            }
+
             test("ugyldig dato i endring (må være før eller lik (non-null) 'sluttdato')") {
                 val skjema = fulltSkjema().let {
                     it.copy(
@@ -314,7 +358,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                         endringer = listOf(
                             RefusjonEndring(
                                 beloep = 8000.1,
-                                startdato = 8.juni,
+                                startdato = 8.juli,
                             ),
                         ),
                     ),
@@ -434,13 +478,13 @@ private fun fulltSkjema(): SkjemaInntektsmelding =
             endringer = listOf(
                 RefusjonEndring(
                     beloep = 8000.0,
-                    startdato = 10.juni,
+                    startdato = 10.juli,
                 ),
                 RefusjonEndring(
                     beloep = 6000.0,
-                    startdato = 20.juni,
+                    startdato = 20.juli,
                 ),
             ),
-            sluttdato = 30.juni,
+            sluttdato = null,
         ),
     )
