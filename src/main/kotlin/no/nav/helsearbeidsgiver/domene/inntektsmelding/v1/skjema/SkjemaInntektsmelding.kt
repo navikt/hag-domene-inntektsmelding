@@ -130,10 +130,7 @@ private fun validerRefusjonMotInntekt(
 Endring i refusjon skal alltid ha dato etter AGP (dersom det er AGP).
  */
 private fun validerRefusjonMotAgp(refusjon: Refusjon?, agp: Arbeidsgiverperiode?): List<FeiletValidering> {
-    val agpMax = agp?.let {
-            arbeidsgiverperiode ->
-        arbeidsgiverperiode.perioder.maxOfOrNull { it.tom }
-    }
+    val agpMax = agp?.perioder?.maxOfOrNull { it.tom }
     if (agpMax == null) {
         return emptyList()
     } else {
