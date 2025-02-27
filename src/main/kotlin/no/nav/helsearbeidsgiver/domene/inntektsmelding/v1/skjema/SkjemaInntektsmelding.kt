@@ -40,6 +40,7 @@ data class SkjemaInntektsmelding(
             inntekt?.valider(),
             refusjon?.valider(),
             validerRefusjonMotInntekt(refusjon, inntekt),
+            validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
 }
 
@@ -68,6 +69,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
             refusjon?.valider(),
             validerBestemmendeFravaersdagMotInntektsdato(agp, inntekt, sykmeldingsperioder),
             validerRefusjonMotInntekt(refusjon, inntekt),
+            validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
 }
 
@@ -113,10 +115,33 @@ private fun validerRefusjonMotInntekt(
                 vilkaar = refusjon.endringer.all { it.beloep <= inntekt.beloep },
                 feilmelding = Feilmelding.REFUSJON_OVER_INNTEKT,
             ),
+            // "Fallback"-sjekk dersom ingen AGP - da skal dato for refusjonEndring alltid være senere enn InntektDato
+            valider(
+                vilkaar = refusjon.endringer.all { it.startdato.isAfter(inntekt.inntektsdato) },
+                feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_INNTEKTDATO,
+            ),
+
         )
     } else {
         emptyList()
     }
+
+/*
+Endring i refusjon skal alltid ha dato etter AGP (dersom det er AGP).
+ */
+private fun validerRefusjonMotAgp(refusjon: Refusjon?, agp: Arbeidsgiverperiode?): List<FeiletValidering> {
+    val agpMax = agp?.perioder?.maxOfOrNull { it.tom }
+    if (agpMax == null) {
+        return emptyList()
+    } else {
+        return refusjon?.endringer?.mapNotNull { endring ->
+            valider(
+                vilkaar = endring.startdato.isAfter(agpMax),
+                feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_AGP_SLUTT,
+            )
+        }.orEmpty()
+    }
+}
 
 private fun List<List<FeiletValidering>>.tilFeilmeldinger(): Set<String> =
     flatten()
