@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
@@ -366,6 +367,18 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+        }
+
+        test("for mange inntekt endringsaarsaker") {
+            val skjema = fulltSkjema().let {
+                it.copy(
+                    inntekt = it.inntekt?.copy(
+                        endringAarsaker = List(50) { Bonus },
+                    ),
+                )
+            }
+
+            skjema.valider() shouldBe setOf(Feilmelding.FOR_MANGE_INNTEKT_ENDRINGSAARSAKER)
         }
 
         test("duplikate feilmeldinger fjernes") {
