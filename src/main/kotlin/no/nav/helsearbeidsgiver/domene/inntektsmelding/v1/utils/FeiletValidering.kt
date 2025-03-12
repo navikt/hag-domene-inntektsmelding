@@ -22,7 +22,7 @@ internal object Feilmelding {
     const val REFUSJON_ENDRING_DATO = "Refusjonsendringer må være før eller lik siste dato for refusjon"
     const val REFUSJON_ENDRING_FOER_AGP_SLUTT = "Startdato for refusjonsendringer må være etter arbeidsgiverperiode"
     const val REFUSJON_ENDRING_FOER_INNTEKTDATO = "Startdato for refusjonsendringer må være etter inntektdato"
-    const val FOR_MANGE_INNTEKT_ENDRINGSAARSAKER = "Kan ikke ha mer enn 15 endringsaarsaker"
+    const val FOR_MANGE_INNTEKT_ENDRINGSAARSAKER = "Kan ikke ha mer enn 15 inntekt endringsårsaker"
 
     // Feil i koden, ingenting bruker kan gjøre
     const val TEKNISK_FEIL = "Det oppsto en feil i systemet. Prøv igjen senere."
