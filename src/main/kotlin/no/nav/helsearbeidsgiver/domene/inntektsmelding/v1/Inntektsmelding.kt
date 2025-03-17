@@ -25,6 +25,7 @@ data class Inntektsmelding(
     val vedtaksperiodeId: UUID? = null,
     // TODO: vedtaksperiodeID skal ikke være nullable
     // - men må vente til alle gamle saker / selvbestemtIMer har blitt slettet - ETA November 2025
+    val kanal: Kanal = Kanal.NAV_NO,
 ) {
     @Serializable
     sealed class Type {
@@ -42,4 +43,11 @@ data class Inntektsmelding(
             override val id: UUID,
         ) : Type()
     }
+}
+
+@Serializable
+enum class Kanal {
+    NAV_NO,
+    NAV_API,
+    ALTINN,
 }
