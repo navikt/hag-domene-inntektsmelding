@@ -38,6 +38,8 @@ class PeriodeTest : FunSpec({
                 val fom = datoer.first()
                 val tom = datoer.last()
 
+                if (fom == tom) { return@checkAll } // Skipper like datoer
+
                 shouldThrowExactly<IllegalArgumentException> {
                     lagPeriodeFn(tom, fom)
                 }
