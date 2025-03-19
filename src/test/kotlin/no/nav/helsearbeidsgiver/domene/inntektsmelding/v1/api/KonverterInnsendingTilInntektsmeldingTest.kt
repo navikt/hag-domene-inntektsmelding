@@ -5,7 +5,6 @@ import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Avsender
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Kanal
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykmeldt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestFactory
 import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
@@ -16,16 +15,20 @@ import java.util.UUID
 
 class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
 
-    test("En innsending skal inneholde (nesten) nok informasjon til at man kan generere en ferdig inntektsmelding") {
+    test("En innsending skal inneholde (nesten) nok informasjon til at man kan bygge en ferdig inntektsmelding") {
         // Denne testen er nå mest for å sjekke at formatene er kompatible,
         // at vi får sendt nok informasjon inn, og kan få tilbake nok info etter berikelse
         val innsending = Innsending(
-            UUID.randomUUID(),
-            TestFactory.fulltSkjema(),
-            AarsakInnsending.Ny,
-            Inntektsmelding.Type.Forespurt(UUID.randomUUID()),
-            ApiAvsender(Orgnr.genererGyldig(), "TestSystem", "1", "Arve Arbeidsgiver"),
-            OffsetDateTime.now(),
+            innsendingId = UUID.randomUUID(),
+            skjema = TestFactory.fulltSkjema(),
+            aarsakInnsending = AarsakInnsending.Ny,
+            type = Inntektsmelding.Type.Forespurt(UUID.randomUUID()),
+            avsenderSystem = AvsenderSystem(
+                orgnr = Orgnr.genererGyldig(),
+                avsenderSystemNavn = "TestSystem",
+                avsenderSystemVersjon = "1",
+            ),
+            innsendtTid = OffsetDateTime.now(),
         )
         val inntektsmelding = Inntektsmelding(
             id = innsending.innsendingId,
@@ -39,11 +42,12 @@ class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
             aarsakInnsending = innsending.aarsakInnsending,
             mottatt = innsending.innsendtTid,
             vedtaksperiodeId = UUID.randomUUID(), // hente fra fsp...
-            kanal = Kanal.NAV_API,
+            avsenderSystem = innsending.avsenderSystem,
         )
         inntektsmelding.inntekt shouldBe innsending.skjema.inntekt
         inntektsmelding.refusjon shouldBe innsending.skjema.refusjon
         inntektsmelding.agp shouldBe innsending.skjema.agp
         inntektsmelding.id shouldBe innsending.innsendingId
+        inntektsmelding.avsenderSystem shouldBe innsending.avsenderSystem
     }
 })

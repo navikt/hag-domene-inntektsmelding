@@ -5,6 +5,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.api.AvsenderSystem
 import no.nav.helsearbeidsgiver.utils.json.serializer.OffsetDateTimeSerializer
 import no.nav.helsearbeidsgiver.utils.json.serializer.UuidSerializer
 import java.time.OffsetDateTime
@@ -26,6 +27,7 @@ data class Inntektsmelding(
     // TODO: vedtaksperiodeID skal ikke være nullable
     // - men må vente til alle gamle saker / selvbestemtIMer har blitt slettet - ETA November 2025
     val kanal: Kanal = Kanal.NAV_NO,
+    val avsenderSystem: AvsenderSystem,
 ) {
     @Serializable
     sealed class Type {
@@ -48,6 +50,5 @@ data class Inntektsmelding(
 @Serializable
 enum class Kanal {
     NAV_NO,
-    NAV_API,
     ALTINN,
 }
