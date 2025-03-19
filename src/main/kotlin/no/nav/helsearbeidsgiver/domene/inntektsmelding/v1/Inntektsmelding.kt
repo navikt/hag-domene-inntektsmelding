@@ -27,7 +27,7 @@ data class Inntektsmelding(
     // TODO: vedtaksperiodeID skal ikke være nullable
     // - men må vente til alle gamle saker / selvbestemtIMer har blitt slettet - ETA November 2025
     val kanal: Kanal = Kanal.NAV_NO,
-    val avsenderSystem: AvsenderSystem,
+    val avsenderSystem: AvsenderSystem = AvsenderSystem(),
 ) {
     @Serializable
     sealed class Type {
