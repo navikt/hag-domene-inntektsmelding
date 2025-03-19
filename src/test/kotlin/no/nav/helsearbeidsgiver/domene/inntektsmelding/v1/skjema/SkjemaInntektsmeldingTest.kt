@@ -368,7 +368,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         }
 
         test("for mange inntekt endringsaarsaker") {
-            val skjema = fulltSkjema().let {
+            val skjema = TestFactory.fulltSkjema().let {
                 it.copy(
                     inntekt = it.inntekt?.copy(
                         endringAarsaker = List(50) { Bonus },
