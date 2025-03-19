@@ -9,9 +9,9 @@ import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.utils.json.serializer.UuidSerializer
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 
-private val NAV_ORGNR = Orgnr("889640782")
-private val NAV_SYSTEMNAVN = "NAV_PORTAL"
-private val NAV_SYSTEMVERSJON = "1.0"
+val NAV_ORGNR = Orgnr("889640782")
+val NAV_SYSTEMNAVN = "NAV_PORTAL"
+val NAV_SYSTEMVERSJON = "1.0"
 
 @Serializable
 data class AvsenderSystem(
