@@ -15,7 +15,6 @@ val NAV_SYSTEMVERSJON = "1.0"
 
 @Serializable
 data class AvsenderSystem(
-    // val systemBrukerId: UUID = UUID.randomUUID(), // TODO: Kan egentlig termineres i LPS-API..?
     val orgnr: Orgnr = NAV_ORGNR, // Teknisk avsender: LPS sitt Orgnr, Nav hvis innsendt fra nav.no
     val avsenderSystemNavn: String = NAV_SYSTEMNAVN,
     val avsenderSystemVersjon: String = NAV_SYSTEMVERSJON,
