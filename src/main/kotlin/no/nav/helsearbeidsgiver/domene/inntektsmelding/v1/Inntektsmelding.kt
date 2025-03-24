@@ -2,6 +2,8 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -11,6 +13,7 @@ import no.nav.helsearbeidsgiver.utils.json.serializer.UuidSerializer
 import java.time.OffsetDateTime
 import java.util.UUID
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class Inntektsmelding(
     val id: UUID,
@@ -26,7 +29,9 @@ data class Inntektsmelding(
     val vedtaksperiodeId: UUID? = null,
     // TODO: vedtaksperiodeID skal ikke være nullable
     // - men må vente til alle gamle saker / selvbestemtIMer har blitt slettet - ETA November 2025
+    @EncodeDefault
     val kanal: Kanal = Kanal.NAV_NO,
+    @EncodeDefault
     val avsenderSystem: AvsenderSystem = AvsenderSystem(),
 ) {
     @Serializable
