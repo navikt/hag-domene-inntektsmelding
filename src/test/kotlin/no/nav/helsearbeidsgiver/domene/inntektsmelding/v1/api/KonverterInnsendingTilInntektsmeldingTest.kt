@@ -6,7 +6,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Avsender
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykmeldt
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestFactory
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
@@ -20,7 +20,7 @@ class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
         // at vi får sendt nok informasjon inn, og kan få tilbake nok info etter berikelse
         val innsending = Innsending(
             innsendingId = UUID.randomUUID(),
-            skjema = TestFactory.fulltSkjema(),
+            skjema = TestData.fulltSkjema(),
             aarsakInnsending = AarsakInnsending.Ny,
             type = Inntektsmelding.Type.Forespurt(UUID.randomUUID()),
             avsenderSystem = AvsenderSystem(

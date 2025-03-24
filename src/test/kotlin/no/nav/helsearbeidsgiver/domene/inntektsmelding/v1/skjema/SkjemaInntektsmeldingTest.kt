@@ -14,7 +14,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestFactory
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.test.date.august
@@ -26,12 +26,12 @@ class SkjemaInntektsmeldingTest : FunSpec({
     context(SkjemaInntektsmelding::valider.name) {
 
         test("skjema uten feil valideres uten feilmeldinger") {
-            TestFactory.fulltSkjema().valider().shouldBeEmpty()
+            TestData.fulltSkjema().valider().shouldBeEmpty()
         }
 
         context(SkjemaInntektsmelding::avsenderTlf.name) {
             test("ugyldig tlf") {
-                val skjema = TestFactory.fulltSkjema().copy(
+                val skjema = TestData.fulltSkjema().copy(
                     avsenderTlf = "hæ?",
                 )
 
@@ -41,13 +41,13 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
         context(SkjemaInntektsmelding::agp.name) {
             test("AGP kan være 'null'") {
-                val skjema = TestFactory.fulltSkjema().copy(agp = null)
+                val skjema = TestData.fulltSkjema().copy(agp = null)
 
                 skjema.valider().shouldBeEmpty()
             }
 
             test("AGP kan _ikke_ være tom når AG betaler full lønn i AGP") {
-                val skjema = TestFactory.fulltSkjema().let {
+                val skjema = TestData.fulltSkjema().let {
                     it.copy(
                         agp = it.agp?.copy(
                             perioder = emptyList(),
@@ -60,7 +60,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
-                val skjema = TestFactory.fulltSkjema().let {
+                val skjema = TestData.fulltSkjema().let {
                     it.copy(
                         agp = it.agp?.copy(
                             perioder = emptyList(),
@@ -76,7 +76,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             test("AGP kan være maks 16 dager") {
-                val skjema = TestFactory.fulltSkjema().let {
+                val skjema = TestData.fulltSkjema().let {
                     it.copy(
                         agp = it.agp?.copy(
                             perioder = listOf(
@@ -92,7 +92,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             test("egenmeldinger kan være tom") {
-                val skjema = TestFactory.fulltSkjema().let {
+                val skjema = TestData.fulltSkjema().let {
                     it.copy(
                         agp = it.agp?.copy(
                             egenmeldinger = emptyList(),
@@ -105,7 +105,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             context(Arbeidsgiverperiode::redusertLoennIAgp.name) {
                 test("'redusertLoennIAgp' kan være 'null'") {
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             agp = it.agp?.copy(
                                 redusertLoennIAgp = null,
@@ -117,7 +117,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 }
 
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             agp = it.agp?.copy(
                                 redusertLoennIAgp = RedusertLoennIAgp(
@@ -135,14 +135,14 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
         context(SkjemaInntektsmelding::inntekt.name) {
             test("inntekt kan være 'null'") {
-                val skjema = TestFactory.fulltSkjema().copy(inntekt = null)
+                val skjema = TestData.fulltSkjema().copy(inntekt = null)
 
                 skjema.valider().shouldBeEmpty()
             }
 
             context(Inntekt::beloep.name) {
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             inntekt = it.inntekt?.copy(
                                 beloep = beloep,
@@ -156,7 +156,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             context(Inntekt::naturalytelser.name) {
                 test("'naturalytelser' kan være tom") {
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             inntekt = it.inntekt?.copy(
                                 naturalytelser = emptyList(),
@@ -176,7 +176,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                     -1.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
                     1_000_000.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
                 ) { (beloep, forventetFeil) ->
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             inntekt = it.inntekt?.copy(
                                 naturalytelser = listOf(
@@ -195,7 +195,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             test("'endringAarsak' kan være 'null'") {
-                val skjema = TestFactory.fulltSkjema().let {
+                val skjema = TestData.fulltSkjema().let {
                     it.copy(
                         inntekt = it.inntekt?.copy(
                             endringAarsak = null,
@@ -209,14 +209,14 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
         context(SkjemaInntektsmelding::refusjon.name) {
             test("refusjon kan være 'null'") {
-                val skjema = TestFactory.fulltSkjema().copy(refusjon = null)
+                val skjema = TestData.fulltSkjema().copy(refusjon = null)
 
                 skjema.valider().shouldBeEmpty()
             }
 
             context(Refusjon::beloepPerMaaned.name) {
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             refusjon = it.refusjon?.copy(
                                 beloepPerMaaned = beloep,
@@ -230,7 +230,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
 
             context(Refusjon::endringer.name) {
                 test("'endringer' kan være tom") {
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             refusjon = it.refusjon?.copy(
                                 endringer = emptyList(),
@@ -242,7 +242,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                 }
 
                 testBeloep { beloep, forventetFeil ->
-                    val skjema = TestFactory.fulltSkjema().let {
+                    val skjema = TestData.fulltSkjema().let {
                         it.copy(
                             refusjon = it.refusjon?.copy(
                                 endringer = listOf(
@@ -260,7 +260,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             test("'sluttdato' kan være 'null'") {
-                val skjema = TestFactory.fulltSkjema().let {
+                val skjema = TestData.fulltSkjema().let {
                     it.copy(
                         refusjon = it.refusjon?.copy(
                             sluttdato = null,
@@ -281,7 +281,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                     endringer = listOf(RefusjonEndring(beloep = 10.0, startdato = agpTom)),
                     sluttdato = null,
                 )
-                val skjema = TestFactory.fulltSkjema().copy(
+                val skjema = TestData.fulltSkjema().copy(
                     agp = agp,
                     refusjon = ugyldigRefusjon,
                 )
@@ -304,7 +304,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
                     endringer = listOf(RefusjonEndring(beloep = 10.0, startdato = inntektDato.minusDays(1))),
                     sluttdato = null,
                 )
-                val skjema = TestFactory.fulltSkjema().copy(
+                val skjema = TestData.fulltSkjema().copy(
                     inntekt = inntekt,
                     agp = null,
                     refusjon = ugyldigRefusjon,
@@ -314,7 +314,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
             }
 
             test("ugyldig dato i endring (må være før eller lik (non-null) 'sluttdato')") {
-                val skjema = TestFactory.fulltSkjema().let {
+                val skjema = TestData.fulltSkjema().let {
                     it.copy(
                         refusjon = it.refusjon?.copy(
                             endringer = listOf(
@@ -333,7 +333,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         }
 
         test("refusjonsbeløp over inntekt") {
-            val skjema = TestFactory.fulltSkjema().let {
+            val skjema = TestData.fulltSkjema().let {
                 it.copy(
                     inntekt = it.inntekt?.copy(
                         beloep = 15000.0,
@@ -348,7 +348,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         }
 
         test("refusjonsbeløp i endring over inntekt") {
-            val skjema = TestFactory.fulltSkjema().let {
+            val skjema = TestData.fulltSkjema().let {
                 it.copy(
                     inntekt = it.inntekt?.copy(
                         beloep = 8000.0,
@@ -368,7 +368,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         }
 
         test("for mange inntekt endringsaarsaker") {
-            val skjema = TestFactory.fulltSkjema().let {
+            val skjema = TestData.fulltSkjema().let {
                 it.copy(
                     inntekt = it.inntekt?.copy(
                         endringAarsaker = List(50) { Bonus },
@@ -380,7 +380,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         }
 
         test("duplikate feilmeldinger fjernes") {
-            val skjema = TestFactory.fulltSkjema().let {
+            val skjema = TestData.fulltSkjema().let {
                 it.copy(
                     agp = it.agp?.copy(
                         redusertLoennIAgp = it.agp?.redusertLoennIAgp?.copy(
@@ -397,7 +397,7 @@ class SkjemaInntektsmeldingTest : FunSpec({
         }
 
         test("ulike feilmeldinger bevares") {
-            val skjema = TestFactory.fulltSkjema().let {
+            val skjema = TestData.fulltSkjema().let {
                 it.copy(
                     avsenderTlf = "112",
                     inntekt = it.inntekt?.copy(

@@ -6,7 +6,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.juni
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import java.util.UUID
 
-class TestFactory {
+class TestData {
 
     companion object {
         fun fulltSkjema(): SkjemaInntektsmelding =
