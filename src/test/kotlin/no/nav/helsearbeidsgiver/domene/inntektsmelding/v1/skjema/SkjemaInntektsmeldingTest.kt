@@ -369,16 +369,16 @@ class SkjemaInntektsmeldingTest : FunSpec({
             skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
         }
 
-        test("for mange inntekt endringsaarsaker") {
+        test("duplikat inntekt endringsaarsaker") {
             val skjema = fulltSkjema().let {
                 it.copy(
                     inntekt = it.inntekt?.copy(
-                        endringAarsaker = List(50) { Bonus },
+                        endringAarsaker = List(2) { Bonus },
                     ),
                 )
             }
 
-            skjema.valider() shouldBe setOf(Feilmelding.FOR_MANGE_INNTEKT_ENDRINGSAARSAKER)
+            skjema.valider() shouldBe setOf(Feilmelding.DUPLIKAT_INNTEKT_ENDRINGSAARSAK)
         }
 
         test("duplikate feilmeldinger fjernes") {

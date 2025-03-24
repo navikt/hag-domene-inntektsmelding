@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.FOR_MANGE_INNTEKT_ENDRINGSAARSAKER
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.harIngenDuplikater
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import java.time.LocalDate
@@ -31,8 +31,8 @@ data class Inntekt(
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
             ),
             valider(
-                vilkaar = endringAarsaker == null || endringAarsaker.size < 16,
-                feilmelding = FOR_MANGE_INNTEKT_ENDRINGSAARSAKER,
-            ),
+                vilkaar = endringAarsaker.harIngenDuplikater(),
+                feilmelding = Feilmelding.DUPLIKAT_INNTEKT_ENDRINGSAARSAK,
+            )
         )
 }
