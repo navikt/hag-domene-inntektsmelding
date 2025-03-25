@@ -33,6 +33,6 @@ data class Inntekt(
             valider(
                 vilkaar = endringAarsaker.harIngenDuplikater(),
                 feilmelding = Feilmelding.DUPLIKAT_INNTEKT_ENDRINGSAARSAK,
-            )
+            ),
         )
 }
