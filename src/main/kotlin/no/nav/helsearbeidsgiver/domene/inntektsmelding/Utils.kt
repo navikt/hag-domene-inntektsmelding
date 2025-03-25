@@ -24,7 +24,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.RefusjonEndrin
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Sykefravaer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.Tariffendring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.deprecated.VarigLonnsendring
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.api.AvsenderSystem
 import no.nav.helsearbeidsgiver.utils.pipe.orDefault
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
@@ -102,7 +101,6 @@ object Utils {
             aarsakInnsending = årsakInnsending.convert(),
             mottatt = tidspunkt,
             vedtaksperiodeId = vedtaksperiodeId,
-            avsenderSystem = AvsenderSystem(),
         )
     }
 

@@ -22,8 +22,6 @@ data class Innsending(
     val skjema: SkjemaInntektsmelding,
     val aarsakInnsending: AarsakInnsending,
     val type: Inntektsmelding.Type,
-    @EncodeDefault
-    val avsenderSystem: AvsenderSystem,
     val innsendtTid: OffsetDateTime,
     @EncodeDefault
     val kanal: Kanal = Kanal.NAV_NO,

@@ -29,25 +29,40 @@ data class Inntektsmelding(
     val vedtaksperiodeId: UUID? = null,
     // TODO: vedtaksperiodeID skal ikke være nullable
     // - men må vente til alle gamle saker / selvbestemtIMer har blitt slettet - ETA November 2025
-    @EncodeDefault
-    val kanal: Kanal = Kanal.NAV_NO,
-    @EncodeDefault
-    val avsenderSystem: AvsenderSystem = AvsenderSystem(),
 ) {
     @Serializable
     sealed class Type {
         abstract val id: UUID
 
+        abstract val avsenderSystem: AvsenderSystem
+        fun kanal(): Kanal = when (this) {
+            is Ekstern -> Kanal.HR_SYSTEM_API
+            is Forespurt, is Selvbestemt -> Kanal.NAV_NO
+        }
+
         @Serializable
         @SerialName("Forespurt")
         data class Forespurt(
             override val id: UUID,
-        ) : Type()
+        ) : Type() {
+            @EncodeDefault
+            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
+        }
 
         @Serializable
         @SerialName("Selvbestemt")
         data class Selvbestemt(
             override val id: UUID,
+        ) : Type() {
+            @EncodeDefault
+            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
+        }
+
+        @Serializable
+        @SerialName("Ekstern")
+        data class Ekstern(
+            override val id: UUID,
+            override val avsenderSystem: AvsenderSystem,
         ) : Type()
     }
 }
@@ -55,5 +70,6 @@ data class Inntektsmelding(
 @Serializable
 enum class Kanal {
     NAV_NO,
+    HR_SYSTEM_API,
     ALTINN,
 }

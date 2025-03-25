@@ -18,15 +18,18 @@ class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
     test("En innsending skal inneholde (nesten) nok informasjon til at man kan bygge en ferdig inntektsmelding") {
         // Denne testen er nå mest for å sjekke at formatene er kompatible,
         // at vi får sendt nok informasjon inn, og kan få tilbake nok info etter berikelse
+        val eksternAvsender = AvsenderSystem(
+            orgnr = Orgnr.genererGyldig(),
+            avsenderSystemNavn = "TestSystem",
+            avsenderSystemVersjon = "1",
+        )
         val innsending = Innsending(
             innsendingId = UUID.randomUUID(),
             skjema = TestData.fulltSkjema(),
             aarsakInnsending = AarsakInnsending.Ny,
-            type = Inntektsmelding.Type.Forespurt(UUID.randomUUID()),
-            avsenderSystem = AvsenderSystem(
-                orgnr = Orgnr.genererGyldig(),
-                avsenderSystemNavn = "TestSystem",
-                avsenderSystemVersjon = "1",
+            type = Inntektsmelding.Type.Ekstern(
+                id = UUID.randomUUID(),
+                avsenderSystem = eksternAvsender,
             ),
             innsendtTid = OffsetDateTime.now(),
         )
@@ -42,12 +45,11 @@ class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
             aarsakInnsending = innsending.aarsakInnsending,
             mottatt = innsending.innsendtTid,
             vedtaksperiodeId = UUID.randomUUID(), // hente fra fsp...
-            avsenderSystem = innsending.avsenderSystem,
         )
         inntektsmelding.inntekt shouldBe innsending.skjema.inntekt
         inntektsmelding.refusjon shouldBe innsending.skjema.refusjon
         inntektsmelding.agp shouldBe innsending.skjema.agp
         inntektsmelding.id shouldBe innsending.innsendingId
-        inntektsmelding.avsenderSystem shouldBe innsending.avsenderSystem
+        inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
     }
 })
