@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Kanal
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
 import no.nav.helsearbeidsgiver.utils.json.serializer.OffsetDateTimeSerializer
 import no.nav.helsearbeidsgiver.utils.json.serializer.UuidSerializer
@@ -23,8 +22,6 @@ data class Innsending(
     val aarsakInnsending: AarsakInnsending,
     val type: Inntektsmelding.Type,
     val innsendtTid: OffsetDateTime,
-    @EncodeDefault
-    val kanal: Kanal = Kanal.NAV_NO,
     @EncodeDefault
     val versjon: Int = 1,
 )

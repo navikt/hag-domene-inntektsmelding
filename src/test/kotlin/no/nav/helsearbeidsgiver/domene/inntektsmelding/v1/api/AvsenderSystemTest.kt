@@ -10,9 +10,9 @@ import java.util.UUID
 class AvsenderSystemTest : FunSpec({
 
     test("serialiser custom Avsender") {
-        val customAvsenderSystem = AvsenderSystem(avsenderSystemNavn = "Kontor")
+        val customAvsenderSystem = AvsenderSystem(navn = "Kontor")
         val customSerial = customAvsenderSystem.toJson(AvsenderSystem.serializer())
-        customSerial.toString() shouldContain (Regex(customAvsenderSystem.avsenderSystemNavn))
+        customSerial.toString() shouldContain (Regex(customAvsenderSystem.navn))
     }
 
     test("serialiser avsender defaultverdi ") {

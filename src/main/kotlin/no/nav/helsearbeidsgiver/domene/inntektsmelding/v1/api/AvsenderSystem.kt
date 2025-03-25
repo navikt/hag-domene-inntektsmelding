@@ -21,7 +21,7 @@ data class AvsenderSystem(
     @EncodeDefault
     val orgnr: Orgnr = NAV_ORGNR, // Teknisk avsender: LPS sitt Orgnr, Nav hvis innsendt fra nav.no
     @EncodeDefault
-    val avsenderSystemNavn: String = NAV_SYSTEMNAVN,
+    val navn: String = NAV_SYSTEMNAVN,
     @EncodeDefault
-    val avsenderSystemVersjon: String = NAV_SYSTEMVERSJON,
+    val versjon: String = NAV_SYSTEMVERSJON,
 )

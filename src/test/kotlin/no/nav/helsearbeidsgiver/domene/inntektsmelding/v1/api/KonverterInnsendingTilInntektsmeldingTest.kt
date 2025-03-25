@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Avsender
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Kanal
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykmeldt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
@@ -20,8 +21,8 @@ class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
         // at vi får sendt nok informasjon inn, og kan få tilbake nok info etter berikelse
         val eksternAvsender = AvsenderSystem(
             orgnr = Orgnr.genererGyldig(),
-            avsenderSystemNavn = "TestSystem",
-            avsenderSystemVersjon = "1",
+            navn = "TestSystem",
+            versjon = "1",
         )
         val innsending = Innsending(
             innsendingId = UUID.randomUUID(),
@@ -51,5 +52,6 @@ class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
         inntektsmelding.agp shouldBe innsending.skjema.agp
         inntektsmelding.id shouldBe innsending.innsendingId
         inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
+        inntektsmelding.type.kanal() shouldBe Kanal.HR_SYSTEM_API
     }
 })
