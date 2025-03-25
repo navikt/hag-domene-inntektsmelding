@@ -9,34 +9,22 @@ import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.api.AvsenderSystem
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
-import no.nav.helsearbeidsgiver.utils.json.toJson
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
-import java.util.UUID
 
 class SkjemaInntektsmeldingTest : FunSpec({
 
     context(SkjemaInntektsmelding::valider.name) {
 
-        test("avsender override") {
-            val type = Inntektsmelding.Type.Forespurt(id = UUID.randomUUID())
-            type.avsenderSystem shouldBe AvsenderSystem()
-            (type as Inntektsmelding.Type).avsenderSystem
-            // val typ1 = Inntektsmelding.Type.Ekstern(id = UUID.randomUUID(), avsenderSystem = AvsenderSystem(sdfds))
-            val streng = type.toJson(Inntektsmelding.Type.serializer())
-            println("STRENGE $streng")
-        }
         test("skjema uten feil valideres uten feilmeldinger") {
             TestData.fulltSkjema().valider().shouldBeEmpty()
         }

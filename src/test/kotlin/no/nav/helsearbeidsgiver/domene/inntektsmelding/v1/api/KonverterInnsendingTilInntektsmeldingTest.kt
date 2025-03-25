@@ -27,7 +27,7 @@ class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
             innsendingId = UUID.randomUUID(),
             skjema = TestData.fulltSkjema(),
             aarsakInnsending = AarsakInnsending.Ny,
-            type = Inntektsmelding.Type.Ekstern(
+            type = Inntektsmelding.Type.ForespurtEkstern(
                 id = UUID.randomUUID(),
                 avsenderSystem = eksternAvsender,
             ),

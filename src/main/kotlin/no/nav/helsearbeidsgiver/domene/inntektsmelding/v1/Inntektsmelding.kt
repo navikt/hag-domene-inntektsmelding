@@ -36,7 +36,7 @@ data class Inntektsmelding(
 
         abstract val avsenderSystem: AvsenderSystem
         fun kanal(): Kanal = when (this) {
-            is Ekstern -> Kanal.HR_SYSTEM_API
+            is ForespurtEkstern -> Kanal.HR_SYSTEM_API
             is Forespurt, is Selvbestemt -> Kanal.NAV_NO
         }
 
@@ -59,8 +59,8 @@ data class Inntektsmelding(
         }
 
         @Serializable
-        @SerialName("Ekstern")
-        data class Ekstern(
+        @SerialName("ForespurtEkstern")
+        data class ForespurtEkstern(
             override val id: UUID,
             override val avsenderSystem: AvsenderSystem,
         ) : Type()
