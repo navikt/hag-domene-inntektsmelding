@@ -13,7 +13,7 @@ import java.time.LocalDate
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("aarsak")
-sealed class InntektEndringAarsak
+open class InntektEndringAarsak
 
 @Serializable
 @SerialName("Bonus")

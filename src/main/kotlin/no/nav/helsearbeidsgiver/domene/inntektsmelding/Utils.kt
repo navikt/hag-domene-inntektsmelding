@@ -276,5 +276,8 @@ object Utils {
                 )
 
             is VarigLoennsendringV1 -> VarigLonnsendring(gjelderFra = this.gjelderFra)
+            else -> {
+                throw IllegalArgumentException("Ukjent type InntektEndringAarsakV1")
+            }
         }
 }
