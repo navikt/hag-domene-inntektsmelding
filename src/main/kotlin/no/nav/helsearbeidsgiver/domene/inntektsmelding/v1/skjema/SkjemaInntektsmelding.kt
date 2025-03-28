@@ -131,10 +131,10 @@ Endring i refusjon skal alltid ha dato etter AGP (dersom det er AGP).
  */
 private fun validerRefusjonMotAgp(refusjon: Refusjon?, agp: Arbeidsgiverperiode?): List<FeiletValidering> {
     val agpMax = agp?.perioder?.maxOfOrNull { it.tom }
-    if (agpMax == null) {
-        return emptyList()
+    return if (agpMax == null) {
+        emptyList()
     } else {
-        return refusjon?.endringer?.mapNotNull { endring ->
+        refusjon?.endringer?.mapNotNull { endring ->
             valider(
                 vilkaar = endring.startdato.isAfter(agpMax),
                 feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_AGP_SLUTT,
