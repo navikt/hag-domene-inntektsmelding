@@ -9,7 +9,8 @@ import java.time.LocalDate
 
 class PeriodeTest : FunSpec({
 
-    val testFns = mapOf(
+    // kompilatoren tryner uten typeargumenter, selv om den påstår at de er unødvendige her
+    val testFns = mapOf<String, (LocalDate, LocalDate) -> Periode>(
         "constructor" to ::Periode,
         "til" to { fom, tom -> fom til tom },
     )
