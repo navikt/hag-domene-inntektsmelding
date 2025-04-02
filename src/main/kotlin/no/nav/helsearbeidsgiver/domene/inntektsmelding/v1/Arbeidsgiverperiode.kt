@@ -23,12 +23,10 @@ data class Arbeidsgiverperiode(
                 vilkaar = perioder.isNotEmpty() || redusertLoennIAgp != null,
                 feilmelding = Feilmelding.AGP_IKKE_TOM,
             ),
-
             valider(
                 vilkaar = perioder.sumOf { it.fom.daysUntil(it.tom) + 1 } <= AGP_MAKS_DAGER,
                 feilmelding = Feilmelding.AGP_MAKS_16,
             ),
-
             redusertLoennIAgp?.valider(),
         )
 }

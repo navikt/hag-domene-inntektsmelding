@@ -14,44 +14,56 @@ import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 import java.time.OffsetDateTime
 import java.util.UUID
 
-class KonverterInnsendingTilInntektsmeldingTest : FunSpec({
+class KonverterInnsendingTilInntektsmeldingTest :
+    FunSpec({
 
-    test("En innsending skal inneholde (nesten) nok informasjon til at man kan bygge en ferdig inntektsmelding") {
-        // Denne testen er nå mest for å sjekke at formatene er kompatible,
-        // at vi får sendt nok informasjon inn, og kan få tilbake nok info etter berikelse
-        val eksternAvsender = AvsenderSystem(
-            orgnr = Orgnr.genererGyldig(),
-            navn = "TestSystem",
-            versjon = "1",
-        )
-        val innsending = Innsending(
-            innsendingId = UUID.randomUUID(),
-            skjema = TestData.fulltSkjema(),
-            aarsakInnsending = AarsakInnsending.Ny,
-            type = Inntektsmelding.Type.ForespurtEkstern(
-                id = UUID.randomUUID(),
-                avsenderSystem = eksternAvsender,
-            ),
-            innsendtTid = OffsetDateTime.now(),
-        )
-        val inntektsmelding = Inntektsmelding(
-            id = innsending.innsendingId,
-            type = innsending.type,
-            sykmeldt = Sykmeldt(Fnr.genererGyldig(), "Navn Navnesen"), // Fnr hentes fra fsp, navn slås opp i berik-steg
-            avsender = Avsender(Orgnr.genererGyldig(), "TestBedrift", "En Ansatt", innsending.skjema.avsenderTlf), // orgnr på bedrift kommer fra fsp,
-            sykmeldingsperioder = emptyList(), // slå opp fra fsp..
-            agp = innsending.skjema.agp,
-            inntekt = innsending.skjema.inntekt,
-            refusjon = innsending.skjema.refusjon,
-            aarsakInnsending = innsending.aarsakInnsending,
-            mottatt = innsending.innsendtTid,
-            vedtaksperiodeId = UUID.randomUUID(), // hente fra fsp...
-        )
-        inntektsmelding.inntekt shouldBe innsending.skjema.inntekt
-        inntektsmelding.refusjon shouldBe innsending.skjema.refusjon
-        inntektsmelding.agp shouldBe innsending.skjema.agp
-        inntektsmelding.id shouldBe innsending.innsendingId
-        inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
-        inntektsmelding.type.kanal() shouldBe Kanal.HR_SYSTEM_API
-    }
-})
+        test("En innsending skal inneholde (nesten) nok informasjon til at man kan bygge en ferdig inntektsmelding") {
+            // Denne testen er nå mest for å sjekke at formatene er kompatible,
+            // at vi får sendt nok informasjon inn, og kan få tilbake nok info etter berikelse
+            val eksternAvsender =
+                AvsenderSystem(
+                    orgnr = Orgnr.genererGyldig(),
+                    navn = "TestSystem",
+                    versjon = "1",
+                )
+            val innsending =
+                Innsending(
+                    innsendingId = UUID.randomUUID(),
+                    skjema = TestData.fulltSkjema(),
+                    aarsakInnsending = AarsakInnsending.Ny,
+                    type =
+                        Inntektsmelding.Type.ForespurtEkstern(
+                            id = UUID.randomUUID(),
+                            avsenderSystem = eksternAvsender,
+                        ),
+                    innsendtTid = OffsetDateTime.now(),
+                )
+            val inntektsmelding =
+                Inntektsmelding(
+                    id = innsending.innsendingId,
+                    type = innsending.type,
+                    sykmeldt = Sykmeldt(Fnr.genererGyldig(), "Navn Navnesen"), // Fnr hentes fra fsp, navn slås opp i berik-steg
+                    avsender =
+                        Avsender(
+                            // orgnr på bedrift kommer fra fsp
+                            orgnr = Orgnr.genererGyldig(),
+                            orgNavn = "TestBedrift",
+                            navn = "En Ansatt",
+                            tlf = innsending.skjema.avsenderTlf,
+                        ),
+                    sykmeldingsperioder = emptyList(), // slå opp fra fsp..
+                    agp = innsending.skjema.agp,
+                    inntekt = innsending.skjema.inntekt,
+                    refusjon = innsending.skjema.refusjon,
+                    aarsakInnsending = innsending.aarsakInnsending,
+                    mottatt = innsending.innsendtTid,
+                    vedtaksperiodeId = UUID.randomUUID(), // hente fra fsp...
+                )
+            inntektsmelding.inntekt shouldBe innsending.skjema.inntekt
+            inntektsmelding.refusjon shouldBe innsending.skjema.refusjon
+            inntektsmelding.agp shouldBe innsending.skjema.agp
+            inntektsmelding.id shouldBe innsending.innsendingId
+            inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
+            inntektsmelding.type.kanal() shouldBe Kanal.HR_SYSTEM_API
+        }
+    })

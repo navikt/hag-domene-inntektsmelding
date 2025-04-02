@@ -9,14 +9,10 @@ internal fun String.erGyldigTlf(): Boolean =
         Regex("\\d{8}"),
         Regex("00\\d{10}"),
         Regex("\\+\\d{10}"),
-    )
-        .any(::matches)
+    ).any(::matches)
 
-internal fun Double.erStoerreEllerLikNullOgMindreEnnMaks(): Boolean =
-    this >= 0 && this < MAKS_GRENSE_BELOEP
+internal fun Double.erStoerreEllerLikNullOgMindreEnnMaks(): Boolean = this >= 0 && this < MAKS_GRENSE_BELOEP
 
-internal fun Double.erStoerreEnnNullOgMindreEnnMaks(): Boolean =
-    this > 0 && this < MAKS_GRENSE_BELOEP
+internal fun Double.erStoerreEnnNullOgMindreEnnMaks(): Boolean = this > 0 && this < MAKS_GRENSE_BELOEP
 
-internal fun List<InntektEndringAarsak>?.harIngenDuplikater(): Boolean =
-    this == null || distinct().size == size
+internal fun List<InntektEndringAarsak>?.harIngenDuplikater(): Boolean = this == null || distinct().size == size

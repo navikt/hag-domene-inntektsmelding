@@ -18,8 +18,7 @@ data class Periode(
         }
     }
 
-    private fun erGyldig(): Boolean =
-        !fom.isAfter(tom)
+    private fun erGyldig(): Boolean = !fom.isAfter(tom)
 }
 
 infix fun LocalDate.til(tom: LocalDate): Periode =
