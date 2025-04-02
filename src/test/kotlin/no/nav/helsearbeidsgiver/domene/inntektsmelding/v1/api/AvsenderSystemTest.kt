@@ -7,18 +7,19 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
 import no.nav.helsearbeidsgiver.utils.json.toJson
 import java.util.UUID
 
-class AvsenderSystemTest : FunSpec({
+class AvsenderSystemTest :
+    FunSpec({
 
-    test("serialiser custom Avsender") {
-        val customAvsenderSystem = AvsenderSystem(navn = "Kontor")
-        val customSerial = customAvsenderSystem.toJson(AvsenderSystem.serializer())
-        customSerial.toString() shouldContain (Regex(customAvsenderSystem.navn))
-    }
+        test("serialiser custom Avsender") {
+            val customAvsenderSystem = AvsenderSystem(navn = "Kontor")
+            val customSerial = customAvsenderSystem.toJson(AvsenderSystem.serializer())
+            customSerial.toString() shouldContain (Regex(customAvsenderSystem.navn))
+        }
 
-    test("serialiser avsender defaultverdi ") {
-        val type = Inntektsmelding.Type.Forespurt(id = UUID.randomUUID())
-        type.avsenderSystem shouldBe AvsenderSystem()
-        val streng = type.toJson(Inntektsmelding.Type.serializer())
-        streng.toString().shouldContain(Regex(NAV_ORGNR.toString()))
-    }
-})
+        test("serialiser avsender defaultverdi ") {
+            val type = Inntektsmelding.Type.Forespurt(id = UUID.randomUUID())
+            type.avsenderSystem shouldBe AvsenderSystem()
+            val streng = type.toJson(Inntektsmelding.Type.serializer())
+            streng.toString().shouldContain(Regex(NAV_ORGNR.toString()))
+        }
+    })

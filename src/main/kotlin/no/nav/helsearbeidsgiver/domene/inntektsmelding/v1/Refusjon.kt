@@ -23,12 +23,10 @@ data class Refusjon(
                 vilkaar = beloepPerMaaned.erStoerreEllerLikNullOgMindreEnnMaks(),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
-
             valider(
                 vilkaar = endringer.all(RefusjonEndring::erGyldig),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
-
             valider(
                 vilkaar = sluttdato == null || endringer.map(RefusjonEndring::startdato).all { !it.isAfter(sluttdato) },
                 feilmelding = Feilmelding.REFUSJON_ENDRING_DATO,
@@ -41,6 +39,5 @@ data class RefusjonEndring(
     val beloep: Double,
     val startdato: LocalDate,
 ) {
-    internal fun erGyldig(): Boolean =
-        beloep.erStoerreEllerLikNullOgMindreEnnMaks()
+    internal fun erGyldig(): Boolean = beloep.erStoerreEllerLikNullOgMindreEnnMaks()
 }

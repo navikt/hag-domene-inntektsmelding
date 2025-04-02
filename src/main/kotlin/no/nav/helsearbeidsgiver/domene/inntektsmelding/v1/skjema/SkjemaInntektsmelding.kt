@@ -120,7 +120,6 @@ private fun validerRefusjonMotInntekt(
                 vilkaar = refusjon.endringer.all { it.startdato.isAfter(inntekt.inntektsdato) },
                 feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_INNTEKTDATO,
             ),
-
         )
     } else {
         emptyList()
@@ -129,17 +128,22 @@ private fun validerRefusjonMotInntekt(
 /*
 Endring i refusjon skal alltid ha dato etter AGP (dersom det er AGP).
  */
-private fun validerRefusjonMotAgp(refusjon: Refusjon?, agp: Arbeidsgiverperiode?): List<FeiletValidering> {
+private fun validerRefusjonMotAgp(
+    refusjon: Refusjon?,
+    agp: Arbeidsgiverperiode?,
+): List<FeiletValidering> {
     val agpMax = agp?.perioder?.maxOfOrNull { it.tom }
     return if (agpMax == null) {
         emptyList()
     } else {
-        refusjon?.endringer?.mapNotNull { endring ->
-            valider(
-                vilkaar = endring.startdato.isAfter(agpMax),
-                feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_AGP_SLUTT,
-            )
-        }.orEmpty()
+        refusjon
+            ?.endringer
+            ?.mapNotNull { endring ->
+                valider(
+                    vilkaar = endring.startdato.isAfter(agpMax),
+                    feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_AGP_SLUTT,
+                )
+            }.orEmpty()
     }
 }
 
