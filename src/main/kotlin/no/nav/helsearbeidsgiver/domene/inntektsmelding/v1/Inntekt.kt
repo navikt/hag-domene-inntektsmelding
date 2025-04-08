@@ -17,7 +17,6 @@ data class Inntekt(
     val beloep: Double,
     val inntektsdato: LocalDate,
     val naturalytelser: List<Naturalytelse>,
-    val endringAarsak: InntektEndringAarsak?,
     val endringAarsaker: List<InntektEndringAarsak>? = null,
 ) {
     internal fun valider(): List<FeiletValidering> =

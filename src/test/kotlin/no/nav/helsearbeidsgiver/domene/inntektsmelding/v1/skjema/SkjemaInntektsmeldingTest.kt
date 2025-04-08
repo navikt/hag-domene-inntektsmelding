@@ -218,13 +218,13 @@ class SkjemaInntektsmeldingTest :
                     }
                 }
 
-                test("'endringAarsak' kan være 'null'") {
+                test("'endringAarsaker' kan være 'null'") {
                     val skjema =
                         TestData.fulltSkjema().let {
                             it.copy(
                                 inntekt =
                                     it.inntekt?.copy(
-                                        endringAarsak = null,
+                                        endringAarsaker = null,
                                     ),
                             )
                         }
@@ -334,7 +334,6 @@ class SkjemaInntektsmeldingTest :
                             beloep = 51000.0,
                             inntektsdato = inntektDato,
                             naturalytelser = emptyList(),
-                            endringAarsak = null,
                             endringAarsaker = null,
                         )
                     val ugyldigRefusjon =
