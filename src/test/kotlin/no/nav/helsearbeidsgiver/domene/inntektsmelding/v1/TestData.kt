@@ -47,11 +47,6 @@ class TestData {
                                     sluttdato = 25.juni,
                                 ),
                             ),
-                        endringAarsak =
-                            Tariffendring(
-                                gjelderFra = 30.juni,
-                                bleKjent = 5.juli,
-                            ),
                         endringAarsaker =
                             listOf(
                                 Tariffendring(

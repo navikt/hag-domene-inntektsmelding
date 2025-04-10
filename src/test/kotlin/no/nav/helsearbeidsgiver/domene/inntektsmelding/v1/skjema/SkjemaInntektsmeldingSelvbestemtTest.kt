@@ -296,13 +296,13 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     }
                 }
 
-                test("'endringAarsak' kan være 'null'") {
+                test("'endringAarsaker' kan være tom") {
                     val skjema =
                         fulltSkjema().let {
                             it.copy(
                                 inntekt =
                                     it.inntekt.copy(
-                                        endringAarsak = null,
+                                        endringAarsaker = emptyList(),
                                     ),
                             )
                         }
@@ -565,11 +565,6 @@ private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
                             verdiBeloep = 555.0,
                             sluttdato = 25.juni,
                         ),
-                    ),
-                endringAarsak =
-                    Tariffendring(
-                        gjelderFra = 30.juni,
-                        bleKjent = 5.juli,
                     ),
                 endringAarsaker =
                     listOf(
