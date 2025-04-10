@@ -17,7 +17,7 @@ data class Inntekt(
     val beloep: Double,
     val inntektsdato: LocalDate,
     val naturalytelser: List<Naturalytelse>,
-    val endringAarsaker: List<InntektEndringAarsak>? = null,
+    val endringAarsaker: List<InntektEndringAarsak>,
 ) {
     internal fun valider(): List<FeiletValidering> =
         listOfNotNull(

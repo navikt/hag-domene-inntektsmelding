@@ -296,13 +296,13 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     }
                 }
 
-                test("'endringAarsaker' kan være 'null'") {
+                test("'endringAarsaker' kan være tom") {
                     val skjema =
                         fulltSkjema().let {
                             it.copy(
                                 inntekt =
                                     it.inntekt.copy(
-                                        endringAarsaker = null,
+                                        endringAarsaker = emptyList(),
                                     ),
                             )
                         }
