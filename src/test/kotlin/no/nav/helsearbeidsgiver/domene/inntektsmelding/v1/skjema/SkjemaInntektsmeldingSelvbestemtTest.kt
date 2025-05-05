@@ -369,41 +369,6 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         skjema.valider() shouldContainAll forventetFeil
                     }
                 }
-
-                test("'sluttdato' kan være 'null'") {
-                    val skjema =
-                        fulltSkjema().let {
-                            it.copy(
-                                refusjon =
-                                    it.refusjon?.copy(
-                                        sluttdato = null,
-                                    ),
-                            )
-                        }
-
-                    skjema.valider().shouldBeEmpty()
-                }
-
-                test("ugyldig dato i endring (må være før eller lik (non-null) 'sluttdato')") {
-                    val skjema =
-                        fulltSkjema().let {
-                            it.copy(
-                                refusjon =
-                                    it.refusjon?.copy(
-                                        endringer =
-                                            listOf(
-                                                RefusjonEndring(
-                                                    beloep = 4567.0,
-                                                    startdato = 4.august,
-                                                ),
-                                            ),
-                                        sluttdato = 1.august,
-                                    ),
-                            )
-                        }
-
-                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_DATO)
-                }
             }
 
             test("bestemmende fraværsdag før inntektsdato") {
@@ -587,8 +552,11 @@ private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
                             beloep = 6000.0,
                             startdato = 20.juli,
                         ),
+                        RefusjonEndring(
+                            beloep = 0.0,
+                            startdato = 30.juli,
+                        ),
                     ),
-                sluttdato = null,
             ),
         vedtaksperiodeId = UUID.randomUUID(),
     )
