@@ -22,7 +22,6 @@ internal object Feilmelding {
     const val AGP_IKKE_TOM = "Arbeidsgiverperioden må fylles ut, med mindre man betaler redusert lønn i perioden"
     const val AGP_MAKS_16 = "Arbeidsgiverperioden kan være maksimum 16 dager"
     const val REFUSJON_OVER_INNTEKT = "Refusjonsbeløp må være mindre eller lik inntekt"
-    const val REFUSJON_ENDRING_DATO = "Refusjonsendringer må være før eller lik siste dato for refusjon"
     const val REFUSJON_ENDRING_FOER_AGP_SLUTT = "Startdato for refusjonsendringer må være etter arbeidsgiverperiode"
     const val REFUSJON_ENDRING_FOER_INNTEKTDATO = "Startdato for refusjonsendringer må være etter inntektdato"
     const val DUPLIKAT_INNTEKT_ENDRINGSAARSAK = "Endringsårsaker kan ikke inneholde duplikater"

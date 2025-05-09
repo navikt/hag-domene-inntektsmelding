@@ -15,7 +15,6 @@ import java.time.LocalDate
 data class Refusjon(
     val beloepPerMaaned: Double,
     val endringer: List<RefusjonEndring>,
-    val sluttdato: LocalDate?,
 ) {
     internal fun valider(): List<FeiletValidering> =
         listOfNotNull(
@@ -26,10 +25,6 @@ data class Refusjon(
             valider(
                 vilkaar = endringer.all(RefusjonEndring::erGyldig),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
-            ),
-            valider(
-                vilkaar = sluttdato == null || endringer.map(RefusjonEndring::startdato).all { !it.isAfter(sluttdato) },
-                feilmelding = Feilmelding.REFUSJON_ENDRING_DATO,
             ),
         )
 }

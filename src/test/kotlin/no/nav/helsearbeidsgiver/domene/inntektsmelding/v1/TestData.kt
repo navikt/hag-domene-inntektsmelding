@@ -69,7 +69,6 @@ class TestData {
                                     startdato = 20.juli,
                                 ),
                             ),
-                        sluttdato = null,
                     ),
             )
     }

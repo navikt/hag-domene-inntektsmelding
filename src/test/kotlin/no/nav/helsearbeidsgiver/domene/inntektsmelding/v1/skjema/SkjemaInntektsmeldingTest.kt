@@ -292,20 +292,6 @@ class SkjemaInntektsmeldingTest :
                     }
                 }
 
-                test("'sluttdato' kan være 'null'") {
-                    val skjema =
-                        TestData.fulltSkjema().let {
-                            it.copy(
-                                refusjon =
-                                    it.refusjon?.copy(
-                                        sluttdato = null,
-                                    ),
-                            )
-                        }
-
-                    skjema.valider().shouldBeEmpty()
-                }
-
                 test("dato for refusjonEndring må være etter AGP") {
                     val agpFom = 4.juni
                     val agpTom = 18.juni
@@ -315,7 +301,6 @@ class SkjemaInntektsmeldingTest :
                         Refusjon(
                             beloepPerMaaned = 50000.0,
                             endringer = listOf(RefusjonEndring(beloep = 10.0, startdato = agpTom)),
-                            sluttdato = null,
                         )
                     val skjema =
                         TestData.fulltSkjema().copy(
@@ -340,7 +325,6 @@ class SkjemaInntektsmeldingTest :
                         Refusjon(
                             beloepPerMaaned = 50000.0,
                             endringer = listOf(RefusjonEndring(beloep = 10.0, startdato = inntektDato.minusDays(1))),
-                            sluttdato = null,
                         )
                     val skjema =
                         TestData.fulltSkjema().copy(
@@ -350,27 +334,6 @@ class SkjemaInntektsmeldingTest :
                         )
 
                     skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_FOER_INNTEKTDATO)
-                }
-
-                test("ugyldig dato i endring (må være før eller lik (non-null) 'sluttdato')") {
-                    val skjema =
-                        TestData.fulltSkjema().let {
-                            it.copy(
-                                refusjon =
-                                    it.refusjon?.copy(
-                                        endringer =
-                                            listOf(
-                                                RefusjonEndring(
-                                                    beloep = 4567.0,
-                                                    startdato = 4.august,
-                                                ),
-                                            ),
-                                        sluttdato = 1.august,
-                                    ),
-                            )
-                        }
-
-                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_DATO)
                 }
             }
 
