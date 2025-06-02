@@ -73,5 +73,4 @@ data class Inntektsmelding(
 enum class Kanal {
     NAV_NO,
     HR_SYSTEM_API,
-    ALTINN,
 }
