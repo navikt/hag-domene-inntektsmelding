@@ -53,7 +53,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt,
     val refusjon: Refusjon?,
-    val vedtaksperiodeId: UUID? = null, // TODO: Skal ikke være nullable - Endre når frontend har implementert og er i produksjon
+    val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
 ) {
     fun valider(): Set<String> =
         listOfNotNull(

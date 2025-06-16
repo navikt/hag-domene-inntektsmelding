@@ -26,9 +26,7 @@ data class Inntektsmelding(
     val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
-    val vedtaksperiodeId: UUID? = null,
-    // TODO: vedtaksperiodeID skal ikke være nullable
-    // - men må vente til alle gamle saker / selvbestemtIMer har blitt slettet - ETA November 2025
+    val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
 ) {
     @Serializable
     sealed class Type {
@@ -39,7 +37,7 @@ data class Inntektsmelding(
         fun kanal(): Kanal =
             when (this) {
                 is ForespurtEkstern -> Kanal.HR_SYSTEM_API
-                is Forespurt, is Selvbestemt -> Kanal.NAV_NO
+                is Forespurt, is Selvbestemt, is Fisker, is UtenArbeidsforhold -> Kanal.NAV_NO
             }
 
         @Serializable
@@ -54,6 +52,24 @@ data class Inntektsmelding(
         @Serializable
         @SerialName("Selvbestemt")
         data class Selvbestemt(
+            override val id: UUID,
+        ) : Type() {
+            @EncodeDefault
+            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
+        }
+
+        @Serializable
+        @SerialName("Fisker")
+        data class Fisker(
+            override val id: UUID,
+        ) : Type() {
+            @EncodeDefault
+            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
+        }
+
+        @Serializable
+        @SerialName("UtenArbeidsforhold")
+        data class UtenArbeidsforhold(
             override val id: UUID,
         ) : Type() {
             @EncodeDefault
