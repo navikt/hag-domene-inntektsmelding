@@ -479,9 +479,26 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     )
             }
         }
+
+        test("serialiserer og deserialiserer arbeidsforholdType") {
+
+            val vedtaksperiodeId = UUID.randomUUID()
+            val skjema = fulltSkjema(vedtaksperiodeId = vedtaksperiodeId)
+
+            skjema.arbeidsforholdType shouldBe ArbeidsforholdType.MedArbeidsforhold(vedtaksperiodeId)
+
+            val json = skjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+            val deserialisertSkjema =
+                json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+
+            deserialisertSkjema.arbeidsforholdType shouldBe
+                ArbeidsforholdType.MedArbeidsforhold(
+                    vedtaksperiodeId,
+                )
+        }
     })
 
-private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
+private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInntektsmeldingSelvbestemt =
     SkjemaInntektsmeldingSelvbestemt(
         selvbestemtId = UUID.randomUUID(),
         sykmeldtFnr = Fnr("11037400132"),
@@ -558,5 +575,6 @@ private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
                         ),
                     ),
             ),
-        vedtaksperiodeId = UUID.randomUUID(),
+        vedtaksperiodeId = vedtaksperiodeId,
+        arbeidsforholdType = ArbeidsforholdType.MedArbeidsforhold(vedtaksperiodeId),
     )
