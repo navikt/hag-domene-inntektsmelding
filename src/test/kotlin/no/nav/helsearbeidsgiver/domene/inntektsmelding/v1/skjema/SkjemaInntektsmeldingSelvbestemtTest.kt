@@ -479,22 +479,23 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     )
             }
         }
-
-        test("serialiserer og deserialiserer arbeidsforholdType") {
-
+        context("serialiser og deserialiserer ArbeidsforholdType") {
             val vedtaksperiodeId = UUID.randomUUID()
-            val skjema = fulltSkjema(vedtaksperiodeId = vedtaksperiodeId)
-
-            skjema.arbeidsforholdType shouldBe ArbeidsforholdType.MedArbeidsforhold(vedtaksperiodeId)
-
-            val json = skjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
-            val deserialisertSkjema =
-                json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
-
-            deserialisertSkjema.arbeidsforholdType shouldBe
-                ArbeidsforholdType.MedArbeidsforhold(
-                    vedtaksperiodeId,
-                )
+            withData(
+                nameFn = { (_, arbeidsforholdType) ->
+                    "ArbeidsforholdType: ${arbeidsforholdType::class.simpleName}"
+                },
+                fulltSkjema(vedtaksperiodeId) to ArbeidsforholdType.MedArbeidsforhold(vedtaksperiodeId),
+                fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.Fisker) to ArbeidsforholdType.Fisker,
+                fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.UtenArbeidsforhold) to
+                    ArbeidsforholdType.UtenArbeidsforhold,
+            ) { (skjema, arbeidsforholdType) ->
+                skjema.arbeidsforholdType shouldBe arbeidsforholdType
+                val json = skjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                val deserialisertSkjema =
+                    json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                deserialisertSkjema.arbeidsforholdType shouldBe arbeidsforholdType
+            }
         }
     })
 
