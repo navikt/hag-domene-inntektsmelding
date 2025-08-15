@@ -37,7 +37,7 @@ data class Inntektsmelding(
         fun kanal(): Kanal =
             when (this) {
                 is ForespurtEkstern -> Kanal.HR_SYSTEM_API
-                is Forespurt, is Selvbestemt, is Fisker, is UtenArbeidsforhold -> Kanal.NAV_NO
+                is Forespurt, is Selvbestemt, is Fisker, is UtenArbeidsforhold, is Behandlingsdager -> Kanal.NAV_NO
             }
 
         @Serializable
@@ -70,6 +70,15 @@ data class Inntektsmelding(
         @Serializable
         @SerialName("UtenArbeidsforhold")
         data class UtenArbeidsforhold(
+            override val id: UUID,
+        ) : Type() {
+            @EncodeDefault
+            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
+        }
+
+        @Serializable
+        @SerialName("Behandlingsdager")
+        data class Behandlingsdager(
             override val id: UUID,
         ) : Type() {
             @EncodeDefault
