@@ -24,6 +24,8 @@ import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
 import no.nav.helsearbeidsgiver.utils.test.date.mai
+import no.nav.helsearbeidsgiver.utils.test.date.oktober
+import no.nav.helsearbeidsgiver.utils.test.date.september
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 import java.util.UUID
@@ -182,6 +184,36 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         }
 
                     skjema.valider() shouldBe setOf(Feilmelding.AGP_MAKS_16)
+                }
+
+                test("AGP kan være 12 dager når arbeidsforholdType er Behandlingsdager") {
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                arbeidsforholdType = ArbeidsforholdType.Behandlingsdager,
+                                agp =
+                                    it.agp?.copy(
+                                        perioder =
+                                            listOf(
+                                                8.august til 8.august,
+                                                15.august til 15.august,
+                                                22.august til 22.august,
+                                                29.august til 29.august,
+                                                5.september til 5.september,
+                                                12.september til 12.september,
+                                                19.september til 19.september,
+                                                26.september til 26.september,
+                                                3.oktober til 3.oktober,
+                                                10.oktober til 10.oktober,
+                                                17.oktober til 17.oktober,
+                                                24.oktober til 24.oktober,
+                                            ),
+                                    ),
+                                refusjon = null,
+                            )
+                        }
+
+                    skjema.valider().shouldBeEmpty()
                 }
 
                 test("egenmeldinger kan være tom") {
@@ -489,6 +521,8 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                 fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.Fisker) to ArbeidsforholdType.Fisker,
                 fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.UtenArbeidsforhold) to
                     ArbeidsforholdType.UtenArbeidsforhold,
+                fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.Behandlingsdager) to
+                    ArbeidsforholdType.Behandlingsdager,
             ) { (skjema, arbeidsforholdType) ->
                 skjema.arbeidsforholdType shouldBe arbeidsforholdType
                 val json = skjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer())

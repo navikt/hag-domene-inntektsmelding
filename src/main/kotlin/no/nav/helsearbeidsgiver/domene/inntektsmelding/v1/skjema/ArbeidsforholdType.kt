@@ -23,4 +23,8 @@ sealed class ArbeidsforholdType {
     @Serializable
     @SerialName("UtenArbeidsforhold")
     object UtenArbeidsforhold : ArbeidsforholdType()
+
+    @Serializable
+    @SerialName("Behandlingsdager")
+    object Behandlingsdager : ArbeidsforholdType()
 }
