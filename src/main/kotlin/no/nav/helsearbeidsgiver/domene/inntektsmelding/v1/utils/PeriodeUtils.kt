@@ -28,6 +28,8 @@ fun utledEgenmeldinger(
 
 internal fun LocalDate.daysUntil(other: LocalDate): Int = until(other, ChronoUnit.DAYS).toInt()
 
+internal fun List<Periode>.sumAntallDager(): Int = sumOf { it.fom.daysUntil(it.tom) + 1 }
+
 internal fun agpPaavirkerIkkeInntektsmelding(
     agpSlutt: LocalDate,
     sykmeldingsperioderStart: LocalDate,

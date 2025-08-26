@@ -1,10 +1,12 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
+import java.time.temporal.IsoFields
 import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.sumAntallDager
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 
 internal const val AGP_MAKS_DAGER = 16
@@ -24,11 +26,22 @@ data class Arbeidsgiverperiode(
                 feilmelding = Feilmelding.AGP_IKKE_TOM,
             ),
             valider(
-                vilkaar = perioder.sumOf { it.fom.daysUntil(it.tom) + 1 } <= AGP_MAKS_DAGER,
+                vilkaar = perioder.sumAntallDager() <= AGP_MAKS_DAGER,
                 feilmelding = Feilmelding.AGP_MAKS_16,
+            ),
+            valider(
+                vilkaar = perioder.sumAntallDager() == 16 || erBehandlingsdager() || redusertLoennIAgp != null,
+                feilmelding = Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER,
             ),
             redusertLoennIAgp?.valider(),
         )
+}
+
+internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {
+    val perioderErEnkelteDager = !perioder.map { it.fom.daysUntil(it.tom) + 1 }.any { it != 1 }
+    val enPeriodePerUke = perioder.map{ it.fom.get(IsoFields.WEEK_BASED_YEAR) }.distinct().size == perioder.size
+
+    return perioderErEnkelteDager && enPeriodePerUke && perioder.size == 16
 }
 
 @Serializable

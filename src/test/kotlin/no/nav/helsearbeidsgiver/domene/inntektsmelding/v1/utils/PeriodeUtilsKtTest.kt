@@ -123,5 +123,10 @@ class PeriodeUtilsKtTest :
 
                 actual shouldBe expected
             }
+
+//          TODO: Skrive ferdig test
+            test("behandlingsdager blir godkjent"){
+                1 shouldBe 0
+            }
         }
     })
