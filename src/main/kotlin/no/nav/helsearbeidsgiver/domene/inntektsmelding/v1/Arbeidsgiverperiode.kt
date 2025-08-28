@@ -3,13 +3,12 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.sumAntallDager
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.tilDatoer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 import java.time.LocalDate
 import java.time.temporal.IsoFields
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.tilDatoer
 
 internal const val AGP_MAKS_DAGER = 16
 internal const val ANTALL_BEHANDLINGSDAGER = 12
@@ -41,7 +40,12 @@ data class Arbeidsgiverperiode(
 }
 
 internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {
-    val harUnikeUker = perioder.tilDatoer().map { it.tilUkeAarPair() }.toSet().size == ANTALL_BEHANDLINGSDAGER
+    val harUnikeUker =
+        perioder
+            .tilDatoer()
+            .map { it.tilUkeAarPair() }
+            .toSet()
+            .size == ANTALL_BEHANDLINGSDAGER
 
     return harUnikeUker && perioder.tilDatoer().size == ANTALL_BEHANDLINGSDAGER
 }
