@@ -9,8 +9,10 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.sumAntallDager
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 import java.time.LocalDate
 import java.time.temporal.IsoFields
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.tilDatoer
 
 internal const val AGP_MAKS_DAGER = 16
+internal const val ANTALL_BEHANDLINGSDAGER = 12
 
 @Serializable
 data class Arbeidsgiverperiode(
@@ -39,10 +41,9 @@ data class Arbeidsgiverperiode(
 }
 
 internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {
-    val perioderErEnkelteDager = !perioder.map { it.fom.daysUntil(it.tom) + 1 }.any { it != 1 }
-    val enPeriodePerUke = perioder.map { it.fom.tilUkeAarPair() }.toSet().size == perioder.size
+    val harUnikeUker = perioder.tilDatoer().map { it.tilUkeAarPair() }.toSet().size == ANTALL_BEHANDLINGSDAGER
 
-    return perioderErEnkelteDager && enPeriodePerUke && perioder.size == 12
+    return harUnikeUker && perioder.tilDatoer().size == ANTALL_BEHANDLINGSDAGER
 }
 
 internal fun LocalDate.tilUkeAarPair(): Pair<Int, Int> = get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) to get(IsoFields.WEEK_BASED_YEAR)

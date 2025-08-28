@@ -19,6 +19,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.test.date.august
+import no.nav.helsearbeidsgiver.utils.test.date.desember
 import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
@@ -144,12 +145,18 @@ class SkjemaInntektsmeldingTest :
                     test("kan være 12 dager med en uke mellomrom") {
                         behandlingsdager.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
-
-                    test("kan være 12 dager over årsskifte") {
+                    test("kan være 12 dager der 2 perioder har samme uke nummer") {
                         val overAarSkifte = behandlingsdager.take(11).plus(Periode(1.januar(2019), 1.januar(2019)))
                         overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
-
+                    test("kan være 12 dager over årsskifte 2017-2018") {
+                        val overAarSkifte = behandlingsdager.take(11).plus(Periode(31.desember(2017), 31.desember(2017)))
+                        overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
+                    }
+                    test("kan være 12 dager med periode på 2 dager fra søndag til mandag") {
+                        val overAarSkifte = behandlingsdager.drop(2).plus(Periode(7.januar, 8.januar))
+                        overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
+                    }
                     test("kan ikke inneholde flere ganger i uken") {
                         val flereGangerIUken = behandlingsdager.take(11).plus(Periode(2.januar, 2.januar))
                         flereGangerIUken.tilArbeidsgiverperiode().valider() shouldBe

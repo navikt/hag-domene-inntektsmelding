@@ -61,6 +61,15 @@ internal fun List<Periode>.slaaSammenSammenhengendePerioder(ignorerHelgegap: Boo
         }
 }
 
+fun List<Periode>.tilDatoer(): Set<LocalDate> =
+    flatMap {
+        val antallDager = it.fom.daysUntil(it.tom) + 1
+
+        List(antallDager) { index ->
+            it.fom.plusDays(index.toLong())
+        }
+    }.toSet()
+
 private fun erSammenhengende(
     denne: Periode,
     neste: Periode,
@@ -77,15 +86,6 @@ private fun erSammenhengendeIgnorerHelgegap(
         else -> dagerAvstand <= 1
     }
 }
-
-private fun List<Periode>.tilDatoer(): Set<LocalDate> =
-    flatMap {
-        val antallDager = it.fom.daysUntil(it.tom) + 1
-
-        List(antallDager) { index ->
-            it.fom.plusDays(index.toLong())
-        }
-    }.toSet()
 
 private fun Set<LocalDate>.tilPerioder(): List<Periode> =
     map { Periode(it, it) }
