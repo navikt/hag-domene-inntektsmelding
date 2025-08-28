@@ -16,8 +16,10 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.test.date.august
+import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
 
@@ -99,6 +101,30 @@ class SkjemaInntektsmeldingTest :
                         }
 
                     skjema.valider() shouldBe setOf(Feilmelding.AGP_MAKS_16)
+                }
+
+                test("AGP må være 16 dager med mindre redusert lønn i AGP eller behandlingsdager") {
+
+                    Arbeidsgiverperiode(
+                        perioder = listOf(Periode(1.januar,1.januar)),
+                        egenmeldinger = emptyList(),
+                        redusertLoennIAgp = null
+                    ).valider() shouldBe setOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER))
+
+
+                    Arbeidsgiverperiode(
+                        perioder = listOf(Periode(1.januar,1.januar)),
+                        egenmeldinger = emptyList(),
+                        redusertLoennIAgp = RedusertLoennIAgp(22000.0, RedusertLoennIAgp.Begrunnelse.Permittering)
+                    ).valider().shouldBeEmpty()
+
+                    val behandlingsdager = List(16) { Periode(1.januar.plusWeeks(it.toLong()), 1.januar.plusWeeks(it.toLong())) }
+                    Arbeidsgiverperiode(
+                        perioder = behandlingsdager,
+                        egenmeldinger = emptyList(),
+                        redusertLoennIAgp = null
+                    ).valider().shouldBeEmpty()
+
                 }
 
                 test("egenmeldinger kan være tom") {
