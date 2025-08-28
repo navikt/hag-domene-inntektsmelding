@@ -65,6 +65,21 @@ class SkjemaInntektsmeldingTest :
                     skjema.valider() shouldBe setOf(Feilmelding.AGP_IKKE_TOM)
                 }
 
+                test("AGP kan _ikke_ være 1 dag når AG betaler full lønn i AGP") {
+                    val skjema =
+                        TestData.fulltSkjema().let {
+                            it.copy(
+                                agp =
+                                    it.agp?.copy(
+                                        perioder = listOf(Periode(1.januar, 1.januar)),
+                                        redusertLoennIAgp = null,
+                                    ),
+                            )
+                        }
+
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER)
+                }
+
                 test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
                     val skjema =
                         TestData.fulltSkjema().let {
@@ -72,6 +87,25 @@ class SkjemaInntektsmeldingTest :
                                 agp =
                                     it.agp?.copy(
                                         perioder = emptyList(),
+                                        redusertLoennIAgp =
+                                            RedusertLoennIAgp(
+                                                beloep = 22000.0,
+                                                begrunnelse = RedusertLoennIAgp.Begrunnelse.FiskerMedHyre,
+                                            ),
+                                    ),
+                            )
+                        }
+
+                    skjema.valider().shouldBeEmpty()
+                }
+
+                test("AGP kan være 1 dag når AG _ikke_ betaler full lønn i AGP") {
+                    val skjema =
+                        TestData.fulltSkjema().let {
+                            it.copy(
+                                agp =
+                                    it.agp?.copy(
+                                        perioder = listOf(Periode(1.januar, 1.januar)),
                                         redusertLoennIAgp =
                                             RedusertLoennIAgp(
                                                 beloep = 22000.0,
@@ -102,29 +136,25 @@ class SkjemaInntektsmeldingTest :
 
                     skjema.valider() shouldBe setOf(Feilmelding.AGP_MAKS_16)
                 }
+                context("behandlingsdager") {
 
-                test("AGP må være 16 dager med mindre redusert lønn i AGP eller behandlingsdager") {
+                    fun List<Periode>.tilArbeidsgiverperiode() = Arbeidsgiverperiode(this, emptyList(), null)
+                    val behandlingsdager = List(12) { Periode(1.januar.plusWeeks(it.toLong()), 1.januar.plusWeeks(it.toLong())) }
 
-                    Arbeidsgiverperiode(
-                        perioder = listOf(Periode(1.januar,1.januar)),
-                        egenmeldinger = emptyList(),
-                        redusertLoennIAgp = null
-                    ).valider() shouldBe setOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER))
+                    test("kan være 12 dager med en uke mellomrom") {
+                        behandlingsdager.tilArbeidsgiverperiode().valider().shouldBeEmpty()
+                    }
 
+                    test("kan være 12 dager over årsskifte") {
+                        val overAarSkifte = behandlingsdager.take(11).plus(Periode(1.januar(2019), 1.januar(2019)))
+                        overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
+                    }
 
-                    Arbeidsgiverperiode(
-                        perioder = listOf(Periode(1.januar,1.januar)),
-                        egenmeldinger = emptyList(),
-                        redusertLoennIAgp = RedusertLoennIAgp(22000.0, RedusertLoennIAgp.Begrunnelse.Permittering)
-                    ).valider().shouldBeEmpty()
-
-                    val behandlingsdager = List(16) { Periode(1.januar.plusWeeks(it.toLong()), 1.januar.plusWeeks(it.toLong())) }
-                    Arbeidsgiverperiode(
-                        perioder = behandlingsdager,
-                        egenmeldinger = emptyList(),
-                        redusertLoennIAgp = null
-                    ).valider().shouldBeEmpty()
-
+                    test("kan ikke inneholde flere ganger i uken") {
+                        val flereGangerIUken = behandlingsdager.take(11).plus(Periode(2.januar, 2.januar))
+                        flereGangerIUken.tilArbeidsgiverperiode().valider() shouldBe
+                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER))
+                    }
                 }
 
                 test("egenmeldinger kan være tom") {

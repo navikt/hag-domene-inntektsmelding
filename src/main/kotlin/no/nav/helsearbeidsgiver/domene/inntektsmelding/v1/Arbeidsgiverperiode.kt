@@ -1,6 +1,5 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
-import java.time.temporal.IsoFields
 import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
@@ -8,6 +7,8 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.sumAntallDager
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
+import java.time.LocalDate
+import java.time.temporal.IsoFields
 
 internal const val AGP_MAKS_DAGER = 16
 
@@ -39,10 +40,12 @@ data class Arbeidsgiverperiode(
 
 internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {
     val perioderErEnkelteDager = !perioder.map { it.fom.daysUntil(it.tom) + 1 }.any { it != 1 }
-    val enPeriodePerUke = perioder.map{ it.fom.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) }.distinct().size == perioder.size
+    val enPeriodePerUke = perioder.map { it.fom.tilUkeAarPair() }.toSet().size == perioder.size
 
     return perioderErEnkelteDager && enPeriodePerUke && perioder.size == 12
 }
+
+internal fun LocalDate.tilUkeAarPair(): Pair<Int, Int> = get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) to get(IsoFields.WEEK_BASED_YEAR)
 
 @Serializable
 data class RedusertLoennIAgp(
