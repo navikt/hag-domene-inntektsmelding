@@ -32,7 +32,7 @@ data class Arbeidsgiverperiode(
             ),
             valider(
                 vilkaar = perioder.sumAntallDager() == 16 || erBehandlingsdager() || redusertLoennIAgp != null || perioder.isEmpty(),
-                feilmelding = Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER,
+                feilmelding = Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER,
             ),
             redusertLoennIAgp?.valider(),
         )

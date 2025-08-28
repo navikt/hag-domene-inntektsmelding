@@ -21,7 +21,7 @@ internal object Feilmelding {
     const val KREVER_BELOEP_STOERRE_ENN_NULL = "Beløp må være større enn 0"
     const val AGP_IKKE_TOM = "Arbeidsgiverperioden må fylles ut, med mindre man betaler redusert lønn i perioden"
     const val AGP_MAKS_16 = "Arbeidsgiverperioden kan være maksimum 16 dager"
-    const val AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER =
+    const val AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER =
         "Arbeidsgiverperioden må være 16 dager om det ikke er en begrunnelse eller behandlingsdager"
     const val REFUSJON_OVER_INNTEKT = "Refusjonsbeløp må være mindre eller lik inntekt"
     const val REFUSJON_ENDRING_FOER_AGP_SLUTT = "Startdato for refusjonsendringer må være etter arbeidsgiverperiode"

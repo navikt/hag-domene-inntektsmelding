@@ -77,7 +77,7 @@ class SkjemaInntektsmeldingTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
@@ -153,7 +153,7 @@ class SkjemaInntektsmeldingTest :
                     test("kan ikke inneholde flere ganger i uken") {
                         val flereGangerIUken = behandlingsdager.take(11).plus(Periode(2.januar, 2.januar))
                         flereGangerIUken.tilArbeidsgiverperiode().valider() shouldBe
-                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_BEHANDLINGSDAGER))
+                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
                     }
                 }
 
