@@ -320,7 +320,7 @@ class SkjemaInntektsmeldingTest :
 
                 test("dato for refusjonEndring må være etter AGP") {
                     val agpFom = 4.juni
-                    val agpTom = 18.juni
+                    val agpTom = 19.juni
 
                     val agp = Arbeidsgiverperiode(listOf(Periode(fom = agpFom, tom = agpTom)), emptyList(), null)
                     val ugyldigRefusjon =
