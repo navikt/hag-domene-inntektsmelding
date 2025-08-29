@@ -142,25 +142,34 @@ class SkjemaInntektsmeldingTest :
                     fun List<Periode>.tilArbeidsgiverperiode() = Arbeidsgiverperiode(this, emptyList(), null)
                     val behandlingsdager = List(12) { Periode(1.januar.plusWeeks(it.toLong()), 1.januar.plusWeeks(it.toLong())) }
 
-                    test("kan være 12 dager med en uke mellomrom") {
+                    test("er 12 dager med en uke mellomrom") {
                         behandlingsdager.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
-                    test("kan være 12 dager der 2 perioder har samme uke nummer") {
+                    test("kan ha 2 perioder med samme uke nummer men forskjellig årstall") {
                         val overAarSkifte = behandlingsdager.take(11).plus(Periode(1.januar(2019), 1.januar(2019)))
                         overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
-                    test("kan være 12 dager over årsskifte 2017-2018") {
-                        val overAarSkifte = behandlingsdager.take(11).plus(Periode(31.desember(2017), 31.desember(2017)))
-                        overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
-                    }
-                    test("kan være 12 dager med periode på 2 dager fra søndag til mandag") {
+                    test("kan ha en periode på 2 dager fra søndag til mandag") {
                         val overAarSkifte = behandlingsdager.drop(2).plus(Periode(7.januar, 8.januar))
                         overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
-                    test("kan ikke inneholde flere ganger i uken") {
+                    test("kan ha en uke mellomrom") {
+                        // håndhever ikke at ukene er kant i kant
+                        val ekstraUke = Periode(behandlingsdager[0].fom.plusWeeks(13), behandlingsdager[0].tom.plusWeeks(13))
+                        val enUkeMellomrom = behandlingsdager.take(11).plus(ekstraUke)
+                        enUkeMellomrom.tilArbeidsgiverperiode().valider().shouldBeEmpty()
+                    }
+                    test("kan ikke inneholde flere perioder i samme uke") {
                         val flereGangerIUken = behandlingsdager.take(11).plus(Periode(2.januar, 2.januar))
                         flereGangerIUken.tilArbeidsgiverperiode().valider() shouldBe
                             listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
+                    }
+                    test("kan ikke inneholde flere perioder i samme uke selv over et årsskifte") {
+                        val peiode2024 = Periode(31.desember(2024),31.desember(2024))
+                        val periode2025 = Periode(1.januar(2025),1.januar(2025))
+                        val overAarSkifte = behandlingsdager.take(10).plus(peiode2024).plus(periode2025)
+                        overAarSkifte.tilArbeidsgiverperiode().valider() shouldBe
+                                listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
                     }
                 }
 

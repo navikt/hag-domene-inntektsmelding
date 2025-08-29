@@ -47,6 +47,7 @@ internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {
             .toSet()
             .size == ANTALL_BEHANDLINGSDAGER
 
+    // håndhever ikke at ukene er kant i kant
     return harUnikeUker && perioder.tilDatoer().size == ANTALL_BEHANDLINGSDAGER
 }
 
