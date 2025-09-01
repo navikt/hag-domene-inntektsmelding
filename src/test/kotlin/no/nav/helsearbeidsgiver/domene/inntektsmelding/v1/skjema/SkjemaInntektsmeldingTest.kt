@@ -165,11 +165,11 @@ class SkjemaInntektsmeldingTest :
                             listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
                     }
                     test("kan ikke inneholde flere perioder i samme uke selv over et årsskifte") {
-                        val peiode2024 = Periode(31.desember(2024),31.desember(2024))
-                        val periode2025 = Periode(1.januar(2025),1.januar(2025))
+                        val peiode2024 = Periode(31.desember(2024), 31.desember(2024))
+                        val periode2025 = Periode(1.januar(2025), 1.januar(2025))
                         val overAarSkifte = behandlingsdager.take(10).plus(peiode2024).plus(periode2025)
                         overAarSkifte.tilArbeidsgiverperiode().valider() shouldBe
-                                listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
+                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
                     }
                 }
 
