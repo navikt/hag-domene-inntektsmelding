@@ -3,11 +3,15 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.sumAntallDager
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.tilDatoer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
+import java.time.LocalDate
+import java.time.temporal.IsoFields
 
 internal const val AGP_MAKS_DAGER = 16
+internal const val ANTALL_BEHANDLINGSDAGER = 12
 
 @Serializable
 data class Arbeidsgiverperiode(
@@ -24,12 +28,30 @@ data class Arbeidsgiverperiode(
                 feilmelding = Feilmelding.AGP_IKKE_TOM,
             ),
             valider(
-                vilkaar = perioder.sumOf { it.fom.daysUntil(it.tom) + 1 } <= AGP_MAKS_DAGER,
+                vilkaar = perioder.sumAntallDager() <= AGP_MAKS_DAGER,
                 feilmelding = Feilmelding.AGP_MAKS_16,
+            ),
+            valider(
+                vilkaar = perioder.sumAntallDager() == 16 || erBehandlingsdager() || redusertLoennIAgp != null || perioder.isEmpty(),
+                feilmelding = Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER,
             ),
             redusertLoennIAgp?.valider(),
         )
 }
+
+internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {
+    val harUnikeUker =
+        perioder
+            .tilDatoer()
+            .map { it.tilUkeAarPair() }
+            .toSet()
+            .size == ANTALL_BEHANDLINGSDAGER
+
+    // håndhever ikke at ukene er kant i kant
+    return harUnikeUker && perioder.tilDatoer().size == ANTALL_BEHANDLINGSDAGER
+}
+
+internal fun LocalDate.tilUkeAarPair(): Pair<Int, Int> = get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) to get(IsoFields.WEEK_BASED_YEAR)
 
 @Serializable
 data class RedusertLoennIAgp(
