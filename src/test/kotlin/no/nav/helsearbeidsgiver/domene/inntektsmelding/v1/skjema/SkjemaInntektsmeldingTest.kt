@@ -63,7 +63,7 @@ class SkjemaInntektsmeldingTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_IKKE_TOM)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan _ikke_ være 1 dag når AG betaler full lønn i AGP") {
@@ -78,7 +78,7 @@ class SkjemaInntektsmeldingTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
@@ -130,7 +130,9 @@ class SkjemaInntektsmeldingTest :
                                                 8.august til 17.august,
                                                 20.august til 31.august,
                                             ),
+                                        redusertLoennIAgp = null,
                                     ),
+                                // Hindrer kryssvalidering mot refusjon, som vi ikke tester her
                                 refusjon = null,
                             )
                         }
@@ -162,14 +164,14 @@ class SkjemaInntektsmeldingTest :
                     test("kan ikke inneholde flere perioder i samme uke") {
                         val flereGangerIUken = behandlingsdager.take(11).plus(Periode(2.januar, 2.januar))
                         flereGangerIUken.tilArbeidsgiverperiode().valider() shouldBe
-                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
+                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
                     }
                     test("kan ikke inneholde flere perioder i samme uke selv over et årsskifte") {
                         val peiode2024 = Periode(31.desember(2024), 31.desember(2024))
                         val periode2025 = Periode(1.januar(2025), 1.januar(2025))
                         val overAarSkifte = behandlingsdager.take(10).plus(peiode2024).plus(periode2025)
                         overAarSkifte.tilArbeidsgiverperiode().valider() shouldBe
-                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER))
+                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
                     }
                 }
 
@@ -472,7 +474,7 @@ class SkjemaInntektsmeldingTest :
                             agp =
                                 it.agp?.copy(
                                     redusertLoennIAgp =
-                                        it.agp?.redusertLoennIAgp?.copy(
+                                        it.agp.redusertLoennIAgp?.copy(
                                             beloep = -11.0,
                                         ),
                                 ),

@@ -1,7 +1,7 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.agpPaavirkerIkkeInntektsmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.daysUntil
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.antallDager
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.slaaSammenSammenhengendePerioder
 import java.time.LocalDate
 
@@ -65,7 +65,7 @@ private fun List<Periode>.fjernPerioderEtterFoersteUtoverAgp(): List<Periode> =
         val antallForegaaendeDager =
             slice(0..<index)
                 .sumOf {
-                    it.fom.daysUntil(it.tom) + 1
+                    it.antallDager()
                 }
 
         antallForegaaendeDager <= AGP_MAKS_DAGER
