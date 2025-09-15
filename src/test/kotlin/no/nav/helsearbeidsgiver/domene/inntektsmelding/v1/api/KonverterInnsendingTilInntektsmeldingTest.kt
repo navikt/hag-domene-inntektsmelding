@@ -34,7 +34,7 @@ class KonverterInnsendingTilInntektsmeldingTest :
                     type =
                         Inntektsmelding.Type.ForespurtEkstern(
                             id = UUID.randomUUID(),
-                            avsenderSystem = eksternAvsender,
+                            _avsenderSystem = eksternAvsender,
                         ),
                     innsendtTid = OffsetDateTime.now(),
                 )
@@ -64,6 +64,6 @@ class KonverterInnsendingTilInntektsmeldingTest :
             inntektsmelding.agp shouldBe innsending.skjema.agp
             inntektsmelding.id shouldBe innsending.innsendingId
             inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
-            inntektsmelding.type.kanal() shouldBe Kanal.HR_SYSTEM_API
+            inntektsmelding.type.kanal shouldBe Kanal.HR_SYSTEM_API
         }
     })
