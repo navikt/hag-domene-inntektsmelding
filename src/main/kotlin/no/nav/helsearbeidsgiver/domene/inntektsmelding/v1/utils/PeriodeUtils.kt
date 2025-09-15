@@ -28,7 +28,7 @@ fun utledEgenmeldinger(
 
 internal fun LocalDate.daysUntil(other: LocalDate): Int = until(other, ChronoUnit.DAYS).toInt()
 
-internal fun List<Periode>.sumAntallDager(): Int = sumOf { it.fom.daysUntil(it.tom) + 1 }
+internal fun Periode.antallDager(): Int = fom.daysUntil(tom) + 1
 
 internal fun agpPaavirkerIkkeInntektsmelding(
     agpSlutt: LocalDate,
@@ -61,11 +61,9 @@ internal fun List<Periode>.slaaSammenSammenhengendePerioder(ignorerHelgegap: Boo
         }
 }
 
-fun List<Periode>.tilDatoer(): Set<LocalDate> =
+internal fun List<Periode>.tilDatoer(): Set<LocalDate> =
     flatMap {
-        val antallDager = it.fom.daysUntil(it.tom) + 1
-
-        List(antallDager) { index ->
+        List(it.antallDager()) { index ->
             it.fom.plusDays(index.toLong())
         }
     }.toSet()

@@ -3,8 +3,8 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.antallDager
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.sumAntallDager
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.tilDatoer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 import java.time.LocalDate
@@ -20,23 +20,31 @@ data class Arbeidsgiverperiode(
     val egenmeldinger: List<Periode>,
     val redusertLoennIAgp: RedusertLoennIAgp?,
 ) {
-    internal fun valider(): List<FeiletValidering> =
-        listOfNotNull(
-            // AGP kan ikke være tom, unntatt når arbeidsgiver betaler redusert lønn i AGP
-            valider(
-                vilkaar = perioder.isNotEmpty() || redusertLoennIAgp != null,
-                feilmelding = Feilmelding.AGP_IKKE_TOM,
-            ),
-            valider(
-                vilkaar = perioder.sumAntallDager() <= AGP_MAKS_DAGER,
-                feilmelding = Feilmelding.AGP_MAKS_16,
-            ),
-            valider(
-                vilkaar = perioder.sumAntallDager() == 16 || erBehandlingsdager() || redusertLoennIAgp != null || perioder.isEmpty(),
-                feilmelding = Feilmelding.AGP_UNDER_16_OG_IKKE_GYLDIGE_BEHANDLINGSDAGER,
-            ),
+    internal fun valider(): List<FeiletValidering> {
+        val perioderAntallDager = perioder.sumOf { it.antallDager() }
+
+        val perioderValidering =
+            when {
+                perioderAntallDager == AGP_MAKS_DAGER -> null
+
+                perioderAntallDager > AGP_MAKS_DAGER ->
+                    valider(
+                        vilkaar = false,
+                        feilmelding = Feilmelding.AGP_MAKS_16,
+                    )
+
+                else ->
+                    valider(
+                        vilkaar = redusertLoennIAgp != null || erBehandlingsdager(),
+                        feilmelding = Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER,
+                    )
+            }
+
+        return listOfNotNull(
+            perioderValidering,
             redusertLoennIAgp?.valider(),
         )
+    }
 }
 
 internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {

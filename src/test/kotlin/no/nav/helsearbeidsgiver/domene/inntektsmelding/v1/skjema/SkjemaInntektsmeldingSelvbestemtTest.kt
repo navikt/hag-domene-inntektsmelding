@@ -145,7 +145,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_IKKE_TOM)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
