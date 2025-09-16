@@ -1,7 +1,7 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.core.spec.style.scopes.ContainerScope
+import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
@@ -521,7 +521,7 @@ class SkjemaInntektsmeldingTest :
         }
     })
 
-internal suspend fun ContainerScope.testBeloep(testFn: (Double, Set<String>) -> Unit) {
+internal suspend fun FunSpecContainerScope.testBeloep(testFn: (Double, Set<String>) -> Unit) {
     withData(
         nameFn = { (beloep, forventetFeil) ->
             "beløp $beloep gir ${forventetFeil.size} feil"
