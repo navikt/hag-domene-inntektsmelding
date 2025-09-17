@@ -2,8 +2,6 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
-import kotlinx.serialization.EncodeDefault
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -13,7 +11,6 @@ import no.nav.helsearbeidsgiver.utils.json.serializer.UuidSerializer
 import java.time.OffsetDateTime
 import java.util.UUID
 
-@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class Inntektsmelding(
     val id: UUID,
@@ -32,64 +29,54 @@ data class Inntektsmelding(
     sealed class Type {
         abstract val id: UUID
 
-        abstract val avsenderSystem: AvsenderSystem
+        open val avsenderSystem: AvsenderSystem
+            get() = AvsenderSystem.nav
 
-        fun kanal(): Kanal =
-            when (this) {
-                is ForespurtEkstern -> Kanal.HR_SYSTEM_API
-                is Forespurt, is Selvbestemt, is Fisker, is UtenArbeidsforhold, is Behandlingsdager -> Kanal.NAV_NO
-            }
+        val kanal: Kanal
+            get() =
+                when (this) {
+                    is ForespurtEkstern -> Kanal.HR_SYSTEM_API
+                    is Forespurt, is Selvbestemt, is Fisker, is UtenArbeidsforhold, is Behandlingsdager -> Kanal.NAV_NO
+                }
 
         @Serializable
         @SerialName("Forespurt")
         data class Forespurt(
             override val id: UUID,
+        ) : Type()
+
+        @Serializable
+        @SerialName("ForespurtEkstern")
+        data class ForespurtEkstern(
+            override val id: UUID,
+            private val _avsenderSystem: AvsenderSystem,
         ) : Type() {
-            @EncodeDefault
-            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
+            override val avsenderSystem: AvsenderSystem
+                get() = _avsenderSystem
         }
 
         @Serializable
         @SerialName("Selvbestemt")
         data class Selvbestemt(
             override val id: UUID,
-        ) : Type() {
-            @EncodeDefault
-            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
-        }
+        ) : Type()
 
         @Serializable
         @SerialName("Fisker")
         data class Fisker(
             override val id: UUID,
-        ) : Type() {
-            @EncodeDefault
-            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
-        }
+        ) : Type()
 
         @Serializable
         @SerialName("UtenArbeidsforhold")
         data class UtenArbeidsforhold(
             override val id: UUID,
-        ) : Type() {
-            @EncodeDefault
-            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
-        }
+        ) : Type()
 
         @Serializable
         @SerialName("Behandlingsdager")
         data class Behandlingsdager(
             override val id: UUID,
-        ) : Type() {
-            @EncodeDefault
-            override val avsenderSystem: AvsenderSystem = AvsenderSystem()
-        }
-
-        @Serializable
-        @SerialName("ForespurtEkstern")
-        data class ForespurtEkstern(
-            override val id: UUID,
-            override val avsenderSystem: AvsenderSystem,
         ) : Type()
     }
 }
