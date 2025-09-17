@@ -32,7 +32,11 @@ class InntektsmeldingTypeTest :
                         versjon = "AAA",
                     )
 
-                val forespurtEkstern = Inntektsmelding.Type.ForespurtEkstern(UUID.randomUUID(), eksterntAvsenderSystem)
+                val forespurtEkstern =
+                    Inntektsmelding.Type.ForespurtEkstern(
+                        id = UUID.randomUUID(),
+                        _avsenderSystem = eksterntAvsenderSystem,
+                    )
 
                 forespurtEkstern.avsenderSystem shouldBe eksterntAvsenderSystem
             }
