@@ -5,6 +5,7 @@ group = "no.nav.helsearbeidsgiver"
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
+    id("io.kotest")
     id("org.jmailen.kotlinter")
     id("maven-publish")
 }
@@ -19,10 +20,10 @@ tasks {
     test {
         useJUnitPlatform()
     }
-}
 
-tasks.register("printVersion") {
-    printVersion()
+    register("printVersion") {
+        printVersion()
+    }
 }
 
 java {
@@ -55,7 +56,7 @@ dependencies {
 
     testImplementation(testFixtures("no.nav.helsearbeidsgiver:utils:$utilsVersion"))
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.kotest:kotest-framework-datatest:$kotestVersion")
+    testImplementation("io.kotest:kotest-framework-engine:$kotestVersion")
     testImplementation("io.kotest:kotest-property:$kotestVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
 }
