@@ -1,7 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-group = "no.nav.helsearbeidsgiver"
-
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
@@ -19,10 +17,6 @@ kotlin {
 tasks {
     test {
         useJUnitPlatform()
-    }
-
-    register("printVersion") {
-        printVersion()
     }
 }
 
@@ -72,5 +66,3 @@ fun RepositoryHandler.mavenNav(repo: String): MavenArtifactRepository {
         }
     }
 }
-
-fun printVersion() = println(version)
