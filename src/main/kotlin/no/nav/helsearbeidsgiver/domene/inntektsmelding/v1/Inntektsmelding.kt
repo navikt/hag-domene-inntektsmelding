@@ -2,6 +2,8 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -26,6 +28,7 @@ data class Inntektsmelding(
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
 ) {
     @Serializable
+    @OptIn(ExperimentalSerializationApi::class)
     sealed class Type {
         abstract val id: UUID
 
@@ -43,12 +46,16 @@ data class Inntektsmelding(
         @SerialName("Forespurt")
         data class Forespurt(
             override val id: UUID,
+            @EncodeDefault
+            val erAgpForespurt: Boolean = true,
         ) : Type()
 
         @Serializable
         @SerialName("ForespurtEkstern")
         data class ForespurtEkstern(
             override val id: UUID,
+            @EncodeDefault
+            val erAgpForespurt: Boolean = true,
             private val _avsenderSystem: AvsenderSystem,
         ) : Type() {
             override val avsenderSystem: AvsenderSystem
