@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.bestemmendeFravaersdag
@@ -26,6 +27,7 @@ data class SkjemaInntektsmelding(
     val avsenderTlf: String,
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt?,
+    val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
 ) {
     fun valider(): Set<String> =
@@ -38,6 +40,7 @@ data class SkjemaInntektsmelding(
             ),
             agp?.valider(),
             inntekt?.valider(),
+            naturalytelser.valider(),
             refusjon?.valider(),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
@@ -52,6 +55,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
     val sykmeldingsperioder: List<Periode>,
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt,
+    val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
     val arbeidsforholdType: ArbeidsforholdType,
@@ -67,12 +71,21 @@ data class SkjemaInntektsmeldingSelvbestemt(
             avsender.valider(),
             agp?.valider(),
             inntekt.valider(),
+            naturalytelser.valider(),
             refusjon?.valider(),
             validerBestemmendeFravaersdagMotInntektsdato(agp, inntekt, sykmeldingsperioder),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
 }
+
+private fun List<Naturalytelse>.valider(): List<FeiletValidering> =
+    listOfNotNull(
+        valider(
+            vilkaar = all(Naturalytelse::erGyldig),
+            feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
+        ),
+    )
 
 private fun validerBestemmendeFravaersdagMotInntektsdato(
     agp: Arbeidsgiverperiode?,

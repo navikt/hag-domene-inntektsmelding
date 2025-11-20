@@ -283,51 +283,6 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     }
                 }
 
-                context(Inntekt::naturalytelser.name) {
-                    test("'naturalytelser' kan være tom") {
-                        val skjema =
-                            fulltSkjema().let {
-                                it.copy(
-                                    inntekt =
-                                        it.inntekt.copy(
-                                            naturalytelser = emptyList(),
-                                        ),
-                                )
-                            }
-
-                        skjema.valider().shouldBeEmpty()
-                    }
-
-                    withData(
-                        nameFn = { (beloep, forventetFeil) ->
-                            "beløp $beloep gir ${forventetFeil.size} feil"
-                        },
-                        1.0 to emptySet(),
-                        0.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
-                        -1.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
-                        1_000_000.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
-                    ) { (beloep, forventetFeil) ->
-                        val skjema =
-                            fulltSkjema().let {
-                                it.copy(
-                                    inntekt =
-                                        it.inntekt.copy(
-                                            naturalytelser =
-                                                listOf(
-                                                    Naturalytelse(
-                                                        naturalytelse = Naturalytelse.Kode.BIL,
-                                                        verdiBeloep = beloep,
-                                                        sluttdato = 20.juni,
-                                                    ),
-                                                ),
-                                        ),
-                                )
-                            }
-
-                        skjema.valider() shouldContainAll forventetFeil
-                    }
-                }
-
                 test("'endringAarsaker' kan være tom") {
                     val skjema =
                         fulltSkjema().let {
@@ -340,6 +295,41 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         }
 
                     skjema.valider().shouldBeEmpty()
+                }
+            }
+
+            context(SkjemaInntektsmeldingSelvbestemt::naturalytelser.name) {
+                test("'naturalytelser' kan være tom") {
+                    val skjema =
+                        fulltSkjema().copy(
+                            naturalytelser = emptyList(),
+                        )
+
+                    skjema.valider().shouldBeEmpty()
+                }
+
+                withData(
+                    nameFn = { (beloep, forventetFeil) ->
+                        "beløp $beloep gir ${forventetFeil.size} feil"
+                    },
+                    1.0 to emptySet(),
+                    0.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
+                    -1.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
+                    1_000_000.0 to setOf(Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL),
+                ) { (beloep, forventetFeil) ->
+                    val skjema =
+                        fulltSkjema().copy(
+                            naturalytelser =
+                                listOf(
+                                    Naturalytelse(
+                                        naturalytelse = Naturalytelse.Kode.BIL,
+                                        verdiBeloep = beloep,
+                                        sluttdato = 20.juni,
+                                    ),
+                                ),
+                        )
+
+                    skjema.valider() shouldContainAll forventetFeil
                 }
             }
 
@@ -570,19 +560,6 @@ private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInnte
             Inntekt(
                 beloep = 50000.0,
                 inntektsdato = 31.mai,
-                naturalytelser =
-                    listOf(
-                        Naturalytelse(
-                            naturalytelse = Naturalytelse.Kode.OPSJONER,
-                            verdiBeloep = 4000.0,
-                            sluttdato = 15.juni,
-                        ),
-                        Naturalytelse(
-                            naturalytelse = Naturalytelse.Kode.ELEKTRONISKKOMMUNIKASJON,
-                            verdiBeloep = 555.0,
-                            sluttdato = 25.juni,
-                        ),
-                    ),
                 endringAarsaker =
                     listOf(
                         Tariffendring(
@@ -590,6 +567,19 @@ private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInnte
                             bleKjent = 5.juli,
                         ),
                     ),
+            ),
+        naturalytelser =
+            listOf(
+                Naturalytelse(
+                    naturalytelse = Naturalytelse.Kode.OPSJONER,
+                    verdiBeloep = 4000.0,
+                    sluttdato = 15.juni,
+                ),
+                Naturalytelse(
+                    naturalytelse = Naturalytelse.Kode.ELEKTRONISKKOMMUNIKASJON,
+                    verdiBeloep = 555.0,
+                    sluttdato = 25.juni,
+                ),
             ),
         refusjon =
             Refusjon(
