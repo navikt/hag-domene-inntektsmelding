@@ -54,6 +54,7 @@ class KonverterInnsendingTilInntektsmeldingTest :
                     sykmeldingsperioder = emptyList(), // slå opp fra fsp..
                     agp = innsending.skjema.agp,
                     inntekt = innsending.skjema.inntekt,
+                    naturalytelser = innsending.skjema.naturalytelser,
                     refusjon = innsending.skjema.refusjon,
                     aarsakInnsending = innsending.aarsakInnsending,
                     mottatt = innsending.innsendtTid,

@@ -16,7 +16,6 @@ import java.time.LocalDate
 data class Inntekt(
     val beloep: Double,
     val inntektsdato: LocalDate,
-    val naturalytelser: List<Naturalytelse>,
     val endringAarsaker: List<InntektEndringAarsak>,
 ) {
     internal fun valider(): List<FeiletValidering> =
@@ -24,10 +23,6 @@ data class Inntekt(
             valider(
                 vilkaar = beloep.erStoerreEllerLikNullOgMindreEnnMaks(),
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
-            ),
-            valider(
-                vilkaar = naturalytelser.all(Naturalytelse::erGyldig),
-                feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
             ),
             valider(
                 vilkaar = endringAarsaker.harIngenDuplikater(),

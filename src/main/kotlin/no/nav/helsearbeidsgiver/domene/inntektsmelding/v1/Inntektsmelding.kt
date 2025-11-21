@@ -22,6 +22,7 @@ data class Inntektsmelding(
     val sykmeldingsperioder: List<Periode>,
     val agp: Arbeidsgiverperiode?,
     val inntekt: Inntekt?,
+    val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
