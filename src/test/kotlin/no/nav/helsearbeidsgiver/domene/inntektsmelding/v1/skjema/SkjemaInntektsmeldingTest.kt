@@ -139,6 +139,7 @@ class SkjemaInntektsmeldingTest :
 
                     skjema.valider() shouldBe setOf(Feilmelding.AGP_MAKS_16)
                 }
+
                 context("behandlingsdager") {
 
                     fun List<Periode>.tilArbeidsgiverperiode() = Arbeidsgiverperiode(this, emptyList(), null)
@@ -147,25 +148,30 @@ class SkjemaInntektsmeldingTest :
                     test("er 12 dager med en uke mellomrom") {
                         behandlingsdager.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
+
                     test("kan ha 2 perioder med samme uke nummer men forskjellig årstall") {
                         val overAarSkifte = behandlingsdager.take(11).plus(Periode(1.januar(2019), 1.januar(2019)))
                         overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
+
                     test("kan ha en periode på 2 dager fra søndag til mandag") {
                         val overAarSkifte = behandlingsdager.drop(2).plus(Periode(7.januar, 8.januar))
                         overAarSkifte.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
+
                     test("kan ha en uke mellomrom") {
                         // håndhever ikke at ukene er kant i kant
                         val ekstraUke = Periode(behandlingsdager[0].fom.plusWeeks(13), behandlingsdager[0].tom.plusWeeks(13))
                         val enUkeMellomrom = behandlingsdager.take(11).plus(ekstraUke)
                         enUkeMellomrom.tilArbeidsgiverperiode().valider().shouldBeEmpty()
                     }
+
                     test("kan ikke inneholde flere perioder i samme uke") {
                         val flereGangerIUken = behandlingsdager.take(11).plus(Periode(2.januar, 2.januar))
                         flereGangerIUken.tilArbeidsgiverperiode().valider() shouldBe
                             listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
                     }
+
                     test("kan ikke inneholde flere perioder i samme uke selv over et årsskifte") {
                         val peiode2024 = Periode(31.desember(2024), 31.desember(2024))
                         val periode2025 = Periode(1.januar(2025), 1.januar(2025))
@@ -400,46 +406,90 @@ class SkjemaInntektsmeldingTest :
                 }
             }
 
-            test("refusjonsbeløp over inntekt") {
-                val skjema =
-                    TestData.fulltSkjema().let {
-                        it.copy(
-                            inntekt =
-                                it.inntekt?.copy(
-                                    beloep = 15000.0,
-                                ),
-                            refusjon =
-                                it.refusjon?.copy(
-                                    beloepPerMaaned = 15001.0,
-                                ),
-                        )
-                    }
+            context("kryssvalidering av refusjon og inntekt") {
+                test("refusjonsbeløp er uavhengig av inntekt hvis inntekt er 0") {
+                    val skjema =
+                        TestData.fulltSkjema().let {
+                            it.copy(
+                                inntekt =
+                                    it.inntekt?.copy(
+                                        beloep = 0.0,
+                                    ),
+                                refusjon =
+                                    it.refusjon?.copy(
+                                        beloepPerMaaned = 777_000.0,
+                                    ),
+                            )
+                        }
 
-                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
-            }
+                    skjema.valider().shouldBeEmpty()
+                }
 
-            test("refusjonsbeløp i endring over inntekt") {
-                val skjema =
-                    TestData.fulltSkjema().let {
-                        it.copy(
-                            inntekt =
-                                it.inntekt?.copy(
-                                    beloep = 8000.0,
-                                ),
-                            refusjon =
-                                it.refusjon?.copy(
-                                    endringer =
-                                        listOf(
-                                            RefusjonEndring(
-                                                beloep = 8000.1,
-                                                startdato = 8.juli,
+                test("refusjonsbeløp over inntekt") {
+                    val skjema =
+                        TestData.fulltSkjema().let {
+                            it.copy(
+                                inntekt =
+                                    it.inntekt?.copy(
+                                        beloep = 15000.0,
+                                    ),
+                                refusjon =
+                                    it.refusjon?.copy(
+                                        beloepPerMaaned = 15001.0,
+                                    ),
+                            )
+                        }
+
+                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                }
+
+                test("refusjonsbeløp i endring er uavhengig av inntekt hvis inntekt er 0") {
+                    val skjema =
+                        TestData.fulltSkjema().let {
+                            it.copy(
+                                inntekt =
+                                    it.inntekt?.copy(
+                                        beloep = 0.0,
+                                    ),
+                                refusjon =
+                                    it.refusjon?.copy(
+                                        endringer =
+                                            listOf(
+                                                RefusjonEndring(
+                                                    beloep = 5252.52,
+                                                    startdato = 4.august,
+                                                ),
                                             ),
-                                        ),
-                                ),
-                        )
-                    }
+                                    ),
+                            )
+                        }
 
-                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                    skjema.valider().shouldBeEmpty()
+                }
+
+                test("refusjonsbeløp i endring over inntekt") {
+                    val skjema =
+                        TestData.fulltSkjema().let {
+                            it.copy(
+                                inntekt =
+                                    it.inntekt?.copy(
+                                        beloep = 8000.0,
+                                    ),
+                                refusjon =
+                                    it.refusjon?.copy(
+                                        endringer =
+                                            listOf(
+                                                RefusjonEndring(
+                                                    beloep = 8000.1,
+                                                    startdato = 8.juli,
+                                                ),
+                                            ),
+                                    ),
+                            )
+                        }
+
+                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                }
             }
 
             test("duplikat inntekt endringsaarsaker") {

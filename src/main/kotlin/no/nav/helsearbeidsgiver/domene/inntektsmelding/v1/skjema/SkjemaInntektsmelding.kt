@@ -122,11 +122,11 @@ private fun validerRefusjonMotInntekt(
     if (refusjon != null && inntekt != null) {
         listOfNotNull(
             valider(
-                vilkaar = refusjon.beloepPerMaaned <= inntekt.beloep,
+                vilkaar = inntekt.beloep == 0.0 || refusjon.beloepPerMaaned <= inntekt.beloep,
                 feilmelding = Feilmelding.REFUSJON_OVER_INNTEKT,
             ),
             valider(
-                vilkaar = refusjon.endringer.all { it.beloep <= inntekt.beloep },
+                vilkaar = inntekt.beloep == 0.0 || refusjon.endringer.all { it.beloep <= inntekt.beloep },
                 feilmelding = Feilmelding.REFUSJON_OVER_INNTEKT,
             ),
             // "Fallback"-sjekk dersom ingen AGP - da skal dato for refusjonEndring alltid være senere enn InntektDato
