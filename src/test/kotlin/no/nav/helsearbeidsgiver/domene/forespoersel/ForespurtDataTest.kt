@@ -3,9 +3,9 @@ package no.nav.helsearbeidsgiver.domene.forespoersel
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import no.nav.helsearbeidsgiver.domene.forespoersel.mock.mockForespurtData
-import no.nav.helsearbeidsgiver.domene.forespoersel.mock.mockForespurtDataMedForrigeInntekt
-import no.nav.helsearbeidsgiver.domene.forespoersel.mock.mockForespurtDataMedTomtInntektForslag
+import no.nav.helsearbeidsgiver.domene.forespoersel.test.mockForespurtData
+import no.nav.helsearbeidsgiver.domene.forespoersel.test.mockForespurtDataMedForrigeInntekt
+import no.nav.helsearbeidsgiver.domene.forespoersel.test.mockForespurtDataMedTomtInntektForslag
 import no.nav.helsearbeidsgiver.utils.json.fromJson
 import no.nav.helsearbeidsgiver.utils.json.toJsonStr
 import no.nav.helsearbeidsgiver.utils.test.json.removeJsonWhitespace

@@ -3,8 +3,8 @@ package no.nav.helsearbeidsgiver.domene.forespoersel
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import no.nav.helsearbeidsgiver.domene.forespoersel.mock.mockForespoersel
-import no.nav.helsearbeidsgiver.domene.forespoersel.mock.utenPaakrevdAGP
+import no.nav.helsearbeidsgiver.domene.forespoersel.test.mockForespoersel
+import no.nav.helsearbeidsgiver.domene.forespoersel.test.utenPaakrevdAGP
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.utils.test.date.april
 import no.nav.helsearbeidsgiver.utils.test.date.august

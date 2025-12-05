@@ -1,4 +1,4 @@
-package no.nav.helsearbeidsgiver.domene.forespoersel.mock
+package no.nav.helsearbeidsgiver.domene.forespoersel.test
 
 import no.nav.helsearbeidsgiver.domene.forespoersel.Forespoersel
 import no.nav.helsearbeidsgiver.domene.forespoersel.ForespurtData
