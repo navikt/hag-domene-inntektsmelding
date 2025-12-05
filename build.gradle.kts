@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     id("io.kotest")
+    id("java-test-fixtures")
     id("org.jmailen.kotlinter")
     id("maven-publish")
 }
@@ -53,6 +54,7 @@ dependencies {
     testImplementation("io.kotest:kotest-framework-engine:$kotestVersion")
     testImplementation("io.kotest:kotest-property:$kotestVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testFixturesImplementation(testFixtures("no.nav.helsearbeidsgiver:utils:$utilsVersion"))
 }
 
 fun RepositoryHandler.mavenNav(repo: String): MavenArtifactRepository {
