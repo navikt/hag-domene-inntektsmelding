@@ -20,6 +20,22 @@ data class Arbeidsgiverperiode(
     val egenmeldinger: List<Periode>,
     val redusertLoennIAgp: RedusertLoennIAgp?,
 ) {
+    /** Ikke-forespurt AGP _må_ indikere lengre gap til forrige sykmelding (arbeid på minst én sykmeldingsdag). */
+    fun erGyldigHvisIkkeForespurt(
+        erAgpForespurt: Boolean,
+        sykmeldingsperioder: List<Periode>,
+    ): Boolean =
+        if (erAgpForespurt) {
+            true
+        } else {
+            val agpStart = perioder.minOfOrNull { it.fom }
+            val sykmeldingStart = sykmeldingsperioder.minOf { it.fom }
+            val sykmeldingSlutt = sykmeldingsperioder.maxOf { it.tom }
+
+            agpStart == null ||
+                (agpStart.isAfter(sykmeldingStart) && !agpStart.isAfter(sykmeldingSlutt))
+        }
+
     internal fun valider(): List<FeiletValidering> {
         val perioderAntallDager = perioder.sumOf { it.antallDager() }
 
@@ -45,21 +61,19 @@ data class Arbeidsgiverperiode(
             redusertLoennIAgp?.valider(),
         )
     }
+
+    private fun erBehandlingsdager(): Boolean {
+        val harUnikeUker =
+            perioder
+                .tilDatoer()
+                .map { it.tilUkeAarPair() }
+                .toSet()
+                .size == ANTALL_BEHANDLINGSDAGER
+
+        // håndhever ikke at ukene er kant i kant
+        return harUnikeUker && perioder.tilDatoer().size == ANTALL_BEHANDLINGSDAGER
+    }
 }
-
-internal fun Arbeidsgiverperiode.erBehandlingsdager(): Boolean {
-    val harUnikeUker =
-        perioder
-            .tilDatoer()
-            .map { it.tilUkeAarPair() }
-            .toSet()
-            .size == ANTALL_BEHANDLINGSDAGER
-
-    // håndhever ikke at ukene er kant i kant
-    return harUnikeUker && perioder.tilDatoer().size == ANTALL_BEHANDLINGSDAGER
-}
-
-internal fun LocalDate.tilUkeAarPair(): Pair<Int, Int> = get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) to get(IsoFields.WEEK_BASED_YEAR)
 
 @Serializable
 data class RedusertLoennIAgp(
@@ -92,3 +106,5 @@ data class RedusertLoennIAgp(
             feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
         )
 }
+
+private fun LocalDate.tilUkeAarPair(): Pair<Int, Int> = get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) to get(IsoFields.WEEK_BASED_YEAR)
