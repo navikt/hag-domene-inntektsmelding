@@ -22,6 +22,7 @@ data class Innsending(
     val aarsakInnsending: AarsakInnsending,
     val type: Inntektsmelding.Type,
     val innsendtTid: OffsetDateTime,
+    val kontaktinformasjon: String,
     @EncodeDefault
     val versjon: Int = 1,
 )

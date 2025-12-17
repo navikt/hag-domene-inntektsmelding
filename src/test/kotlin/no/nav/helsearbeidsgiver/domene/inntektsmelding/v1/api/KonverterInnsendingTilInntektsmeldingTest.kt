@@ -37,6 +37,7 @@ class KonverterInnsendingTilInntektsmeldingTest :
                             _avsenderSystem = eksternAvsender,
                         ),
                     innsendtTid = OffsetDateTime.now(),
+                    kontaktinformasjon = "kontaktinformasjon",
                 )
             val inntektsmelding =
                 Inntektsmelding(
@@ -48,7 +49,7 @@ class KonverterInnsendingTilInntektsmeldingTest :
                             // orgnr på bedrift kommer fra fsp
                             orgnr = Orgnr.genererGyldig(),
                             orgNavn = "TestBedrift",
-                            navn = "En Ansatt",
+                            navn = innsending.kontaktinformasjon,
                             tlf = innsending.skjema.avsenderTlf,
                         ),
                     sykmeldingsperioder = emptyList(), // slå opp fra fsp..
@@ -66,5 +67,6 @@ class KonverterInnsendingTilInntektsmeldingTest :
             inntektsmelding.id shouldBe innsending.innsendingId
             inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
             inntektsmelding.type.kanal shouldBe Kanal.HR_SYSTEM_API
+            inntektsmelding.avsender.navn shouldBe innsending.kontaktinformasjon // TODO: Er det OK å putte i avsender.navn?
         }
     })
