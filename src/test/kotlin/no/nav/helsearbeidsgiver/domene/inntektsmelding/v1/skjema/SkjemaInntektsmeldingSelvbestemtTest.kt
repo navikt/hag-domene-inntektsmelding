@@ -215,21 +215,6 @@ class SkjemaInntektsmeldingSelvbestemtTest :
 
                     skjema.valider().shouldBeEmpty()
                 }
-
-                test("egenmeldinger kan være tom") {
-                    val skjema =
-                        fulltSkjema().let {
-                            it.copy(
-                                agp =
-                                    it.agp?.copy(
-                                        egenmeldinger = emptyList(),
-                                    ),
-                            )
-                        }
-
-                    skjema.valider().shouldBeEmpty()
-                }
-
                 context(Arbeidsgiverperiode::redusertLoennIAgp.name) {
                     test("'redusertLoennIAgp' kan være 'null'") {
                         val skjema =
@@ -544,11 +529,6 @@ private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInnte
                     listOf(
                         2.juni til 2.juni,
                         4.juni til 18.juni,
-                    ),
-                egenmeldinger =
-                    listOf(
-                        2.juni til 2.juni,
-                        4.juni til 5.juni,
                     ),
                 redusertLoennIAgp =
                     RedusertLoennIAgp(

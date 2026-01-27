@@ -142,7 +142,7 @@ class SkjemaInntektsmeldingTest :
 
                 context("behandlingsdager") {
 
-                    fun List<Periode>.tilArbeidsgiverperiode() = Arbeidsgiverperiode(this, emptyList(), null)
+                    fun List<Periode>.tilArbeidsgiverperiode() = Arbeidsgiverperiode(this, null)
                     val behandlingsdager = List(12) { Periode(1.januar.plusWeeks(it.toLong()), 1.januar.plusWeeks(it.toLong())) }
 
                     test("er 12 dager med en uke mellomrom") {
@@ -179,20 +179,6 @@ class SkjemaInntektsmeldingTest :
                         overAarSkifte.tilArbeidsgiverperiode().valider() shouldBe
                             listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
                     }
-                }
-
-                test("egenmeldinger kan være tom") {
-                    val skjema =
-                        TestData.fulltSkjema().let {
-                            it.copy(
-                                agp =
-                                    it.agp?.copy(
-                                        egenmeldinger = emptyList(),
-                                    ),
-                            )
-                        }
-
-                    skjema.valider().shouldBeEmpty()
                 }
 
                 context(Arbeidsgiverperiode::redusertLoennIAgp.name) {
@@ -366,7 +352,7 @@ class SkjemaInntektsmeldingTest :
                     val agpFom = 4.juni
                     val agpTom = 19.juni
 
-                    val agp = Arbeidsgiverperiode(listOf(Periode(fom = agpFom, tom = agpTom)), emptyList(), null)
+                    val agp = Arbeidsgiverperiode(listOf(Periode(fom = agpFom, tom = agpTom)), null)
                     val ugyldigRefusjon =
                         Refusjon(
                             beloepPerMaaned = 50000.0,
