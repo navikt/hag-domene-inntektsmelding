@@ -55,6 +55,5 @@ class ArbeidsgiverperiodeTest :
 private fun mockAgp(periode: Periode?): Arbeidsgiverperiode =
     Arbeidsgiverperiode(
         perioder = listOfNotNull(periode),
-        egenmeldinger = emptyList(),
         redusertLoennIAgp = null,
     )

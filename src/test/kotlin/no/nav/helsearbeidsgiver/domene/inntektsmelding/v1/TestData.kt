@@ -18,11 +18,6 @@ object TestData {
                             2.juni til 2.juni,
                             4.juni til 18.juni,
                         ),
-                    egenmeldinger =
-                        listOf(
-                            2.juni til 2.juni,
-                            4.juni til 5.juni,
-                        ),
                     redusertLoennIAgp =
                         RedusertLoennIAgp(
                             beloep = 34000.0,
