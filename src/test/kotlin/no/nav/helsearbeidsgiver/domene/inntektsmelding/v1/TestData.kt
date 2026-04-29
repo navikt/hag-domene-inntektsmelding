@@ -65,4 +65,25 @@ object TestData {
                         ),
                 ),
         )
+
+    fun fulltSkjemaMedFlereArbeidsforhold(): SkjemaInntektsmelding {
+        val flereArbeidsforhold =
+            listOf<ArbeidsforholdDetaljer>(
+                ArbeidsforholdDetaljer(
+                    "1",
+                    true,
+                    40.0,
+                    100.0,
+                ),
+                ArbeidsforholdDetaljer(
+                    "2",
+                    false,
+                    40.0,
+                    100.0,
+                ),
+            )
+        return fulltSkjema().copy(
+            arbeidsforhold = flereArbeidsforhold,
+        )
+    }
 }

@@ -16,6 +16,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.json.fromJson
@@ -505,6 +506,13 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
                 deserialisertSkjema.arbeidsforholdType shouldBe arbeidsforholdType
             }
+        }
+        context("serialiser og deserialiserer flereArbeidsforhold") {
+            val vedtaksperiodeId = UUID.randomUUID()
+            val skjema = fulltSkjema(vedtaksperiodeId)
+            skjema.erFaisu() shouldBe false
+            val faisuSkjema = skjema.copy(arbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold)
+            faisuSkjema.erFaisu() shouldBe true
         }
     })
 

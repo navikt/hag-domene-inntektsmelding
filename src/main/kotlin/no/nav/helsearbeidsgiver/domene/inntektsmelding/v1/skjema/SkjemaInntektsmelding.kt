@@ -4,6 +4,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.ArbeidsforholdDetaljer
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
@@ -29,7 +30,8 @@ data class SkjemaInntektsmelding(
     val inntekt: Inntekt?,
     val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
-) {
+    override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+) : FlereArbeidsforhold {
     fun valider(): Set<String> =
         listOfNotNull(
             listOfNotNull(
@@ -59,7 +61,8 @@ data class SkjemaInntektsmeldingSelvbestemt(
     val refusjon: Refusjon?,
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
     val arbeidsforholdType: ArbeidsforholdType,
-) {
+    override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+) : FlereArbeidsforhold {
     fun valider(): Set<String> =
         listOfNotNull(
             listOfNotNull(
@@ -77,6 +80,12 @@ data class SkjemaInntektsmeldingSelvbestemt(
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
+}
+
+interface FlereArbeidsforhold {
+    val arbeidsforhold: List<ArbeidsforholdDetaljer>
+
+    fun erFaisu(): Boolean = arbeidsforhold.size > 1 // evt filtrer på "inkludertISykefravaer" også
 }
 
 private fun List<Naturalytelse>.valider(): List<FeiletValidering> =

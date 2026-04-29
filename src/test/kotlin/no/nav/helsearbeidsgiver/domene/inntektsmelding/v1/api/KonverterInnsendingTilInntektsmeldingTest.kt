@@ -68,5 +68,8 @@ class KonverterInnsendingTilInntektsmeldingTest :
             inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
             inntektsmelding.type.kanal shouldBe Kanal.HR_SYSTEM_API
             inntektsmelding.avsender.navn shouldBe innsending.kontaktinfo
+            inntektsmelding.erFaisu() shouldBe false
+            val faisuIM = inntektsmelding.copy(arbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold)
+            faisuIM.erFaisu() shouldBe true
         }
     })
