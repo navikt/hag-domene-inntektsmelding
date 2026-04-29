@@ -84,8 +84,6 @@ data class SkjemaInntektsmeldingSelvbestemt(
 
 interface FlereArbeidsforhold {
     val arbeidsforhold: List<ArbeidsforholdDetaljer>
-
-    fun erFaisu(): Boolean = arbeidsforhold.size > 1 // evt filtrer på "inkludertISykefravaer" også
 }
 
 private fun List<Naturalytelse>.valider(): List<FeiletValidering> =

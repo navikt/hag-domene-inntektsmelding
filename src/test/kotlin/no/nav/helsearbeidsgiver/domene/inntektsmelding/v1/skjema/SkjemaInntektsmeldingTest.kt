@@ -18,6 +18,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
+import no.nav.helsearbeidsgiver.utils.json.fromJson
 import no.nav.helsearbeidsgiver.utils.json.toJsonStr
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.desember
@@ -34,21 +35,12 @@ class SkjemaInntektsmeldingTest :
                 TestData.fulltSkjema().valider().shouldBeEmpty()
             }
 
-            test("Standard Skjema er ikke type FAISU") {
-                TestData.fulltSkjema().erFaisu().shouldBe(false)
-            }
-
-            test("FAISU-skjema serialiseres OK") {
+            test("Serialiser og deserialiser FAISU-skjema OK") {
 
                 val faisuSkjema = TestData.fulltSkjemaMedFlereArbeidsforhold()
-                faisuSkjema.erFaisu() shouldBe (true)
                 val skjema = faisuSkjema.toJsonStr(SkjemaInntektsmelding.serializer())
-                println(skjema)
-                val deserialisert =
-                    kotlinx.serialization.json.Json
-                        .decodeFromString(SkjemaInntektsmelding.serializer(), skjema)
-
-                deserialisert.arbeidsforhold shouldBe faisuSkjema.arbeidsforhold
+                val im = skjema.fromJson(SkjemaInntektsmelding.serializer())
+                im.arbeidsforhold shouldBe faisuSkjema.arbeidsforhold
             }
             context(SkjemaInntektsmelding::avsenderTlf.name) {
                 test("ugyldig tlf") {

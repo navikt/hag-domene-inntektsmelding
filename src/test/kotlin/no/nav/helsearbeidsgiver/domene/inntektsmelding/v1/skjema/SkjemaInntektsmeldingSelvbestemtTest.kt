@@ -6,6 +6,7 @@ import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.jsonObject
@@ -21,6 +22,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.json.fromJson
 import no.nav.helsearbeidsgiver.utils.json.toJson
+import no.nav.helsearbeidsgiver.utils.json.toJsonStr
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
@@ -507,12 +509,17 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                 deserialisertSkjema.arbeidsforholdType shouldBe arbeidsforholdType
             }
         }
-        context("serialiser og deserialiserer flereArbeidsforhold") {
+        context("serialiser og deserialiserer Selvbestemt med flereArbeidsforhold") {
             val vedtaksperiodeId = UUID.randomUUID()
             val skjema = fulltSkjema(vedtaksperiodeId)
-            skjema.erFaisu() shouldBe false
+
             val faisuSkjema = skjema.copy(arbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold)
-            faisuSkjema.erFaisu() shouldBe true
+            val json = faisuSkjema.toJsonStr(SkjemaInntektsmeldingSelvbestemt.serializer())
+            json.shouldContain(
+                """"arbeidsforhold":[{"arbeidsforholdsId":"1","inkludertISykefravaer":true,"stillingsprosent":40.0,"inntekt":100.0},{"arbeidsforholdsId":"2","inkludertISykefravaer":false,"stillingsprosent":40.0,"inntekt":100.0}]""",
+            )
+            val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+            im.arbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold
         }
     })
 

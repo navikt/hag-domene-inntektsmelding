@@ -28,8 +28,7 @@ data class Inntektsmelding(
     val aarsakInnsending: AarsakInnsending,
     val mottatt: OffsetDateTime,
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
-    override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
-) : FlereArbeidsforhold {
+) {
     @Serializable
     @OptIn(ExperimentalSerializationApi::class)
     sealed class Type {
@@ -45,13 +44,19 @@ data class Inntektsmelding(
                     is Forespurt, is Selvbestemt, is Fisker, is UtenArbeidsforhold, is Behandlingsdager -> Kanal.NAV_NO
                 }
 
+        open fun harFlereArbeidsforhold(): Boolean = false
+
         @Serializable
         @SerialName("Forespurt")
         data class Forespurt(
             override val id: UUID,
             @EncodeDefault
             val erAgpForespurt: Boolean = true,
-        ) : Type()
+            override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+        ) : Type(),
+            FlereArbeidsforhold {
+            override fun harFlereArbeidsforhold(): Boolean = arbeidsforhold.size > 1
+        }
 
         @Serializable
         @SerialName("ForespurtEkstern")
@@ -60,16 +65,24 @@ data class Inntektsmelding(
             @EncodeDefault
             val erAgpForespurt: Boolean = true,
             private val _avsenderSystem: AvsenderSystem,
-        ) : Type() {
+            override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+        ) : Type(),
+            FlereArbeidsforhold {
             override val avsenderSystem: AvsenderSystem
                 get() = _avsenderSystem
+
+            override fun harFlereArbeidsforhold(): Boolean = arbeidsforhold.size > 1
         }
 
         @Serializable
         @SerialName("Selvbestemt")
         data class Selvbestemt(
             override val id: UUID,
-        ) : Type()
+            override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+        ) : Type(),
+            FlereArbeidsforhold {
+            override fun harFlereArbeidsforhold(): Boolean = arbeidsforhold.size > 1
+        }
 
         @Serializable
         @SerialName("Fisker")

@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.AarsakInnsending
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Avsender
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntektsmelding.Type
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Kanal
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Sykmeldt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
@@ -68,8 +69,15 @@ class KonverterInnsendingTilInntektsmeldingTest :
             inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
             inntektsmelding.type.kanal shouldBe Kanal.HR_SYSTEM_API
             inntektsmelding.avsender.navn shouldBe innsending.kontaktinfo
-            inntektsmelding.erFaisu() shouldBe false
-            val faisuIM = inntektsmelding.copy(arbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold)
-            faisuIM.erFaisu() shouldBe true
+            inntektsmelding.type.harFlereArbeidsforhold() shouldBe false
+            val faisuIM =
+                inntektsmelding.copy(
+                    type =
+                        Type.Forespurt(
+                            id = UUID.randomUUID(),
+                            arbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold,
+                        ),
+                )
+            faisuIM.type.harFlereArbeidsforhold() shouldBe true
         }
     })
