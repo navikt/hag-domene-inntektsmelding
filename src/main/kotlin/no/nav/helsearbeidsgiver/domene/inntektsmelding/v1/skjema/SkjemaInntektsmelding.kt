@@ -30,7 +30,7 @@ data class SkjemaInntektsmelding(
     val inntekt: Inntekt?,
     val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
-    val flereArbeidsforhold: FlereArbeidsforhold? = null, // Liker ikke defaults i request-klasser, men enn så lenge (?) trengs det for å lese gamle databaserader.
+    val flereArbeidsforhold: FlereArbeidsforhold? = null, // Liker ikke defaults i request-klasser, men trengs for å lese gamle databaserader.
 ) {
     fun valider(): Set<String> =
         listOfNotNull(
