@@ -52,7 +52,7 @@ data class Inntektsmelding(
             override val id: UUID,
             @EncodeDefault
             val erAgpForespurt: Boolean = true,
-            override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+            override val arbeidsforhold: List<Arbeidsforhold> = emptyList(),
         ) : Type(),
             FlereArbeidsforhold {
             override fun harFlereArbeidsforhold(): Boolean = arbeidsforhold.size > 1
@@ -65,7 +65,7 @@ data class Inntektsmelding(
             @EncodeDefault
             val erAgpForespurt: Boolean = true,
             private val _avsenderSystem: AvsenderSystem,
-            override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+            override val arbeidsforhold: List<Arbeidsforhold> = emptyList(),
         ) : Type(),
             FlereArbeidsforhold {
             override val avsenderSystem: AvsenderSystem
@@ -78,7 +78,7 @@ data class Inntektsmelding(
         @SerialName("Selvbestemt")
         data class Selvbestemt(
             override val id: UUID,
-            override val arbeidsforhold: List<ArbeidsforholdDetaljer> = emptyList(),
+            override val arbeidsforhold: List<Arbeidsforhold> = emptyList(),
         ) : Type(),
             FlereArbeidsforhold {
             override fun harFlereArbeidsforhold(): Boolean = arbeidsforhold.size > 1

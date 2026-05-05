@@ -68,14 +68,14 @@ object TestData {
 
     fun fulltSkjemaMedFlereArbeidsforhold(): SkjemaInntektsmelding {
         val flereArbeidsforhold =
-            listOf<ArbeidsforholdDetaljer>(
-                ArbeidsforholdDetaljer(
+            listOf<Arbeidsforhold>(
+                Arbeidsforhold(
                     "1",
                     true,
                     40.0,
                     100.0,
                 ),
-                ArbeidsforholdDetaljer(
+                Arbeidsforhold(
                     "2",
                     false,
                     40.0,
