@@ -513,13 +513,13 @@ class SkjemaInntektsmeldingSelvbestemtTest :
             val vedtaksperiodeId = UUID.randomUUID()
             val skjema = fulltSkjema(vedtaksperiodeId)
 
-            val faisuSkjema = skjema.copy(arbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold)
+            val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
             val json = faisuSkjema.toJsonStr(SkjemaInntektsmeldingSelvbestemt.serializer())
             json.shouldContain(
                 """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":100.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":100.0}]""",
             )
             val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
-            im.arbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold
+            im.flereArbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold
         }
     })
 

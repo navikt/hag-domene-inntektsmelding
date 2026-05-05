@@ -1,5 +1,6 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
@@ -68,22 +69,26 @@ object TestData {
 
     fun fulltSkjemaMedFlereArbeidsforhold(): SkjemaInntektsmelding {
         val flereArbeidsforhold =
-            listOf<Arbeidsforhold>(
-                Arbeidsforhold(
-                    true,
-                    "Snekker",
-                    40.0,
-                    100.0,
-                ),
-                Arbeidsforhold(
-                    false,
-                    "Stuntmann",
-                    40.0,
-                    100.0,
+            FlereArbeidsforhold(
+                false,
+                false,
+                listOf<Arbeidsforhold>(
+                    Arbeidsforhold(
+                        true,
+                        "Snekker",
+                        40.0,
+                        100.0,
+                    ),
+                    Arbeidsforhold(
+                        false,
+                        "Stuntmann",
+                        40.0,
+                        100.0,
+                    ),
                 ),
             )
         return fulltSkjema().copy(
-            arbeidsforhold = flereArbeidsforhold,
+            flereArbeidsforhold = flereArbeidsforhold,
         )
     }
 }

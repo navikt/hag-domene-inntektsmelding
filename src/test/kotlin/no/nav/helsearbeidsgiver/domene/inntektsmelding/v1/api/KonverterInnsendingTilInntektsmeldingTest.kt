@@ -75,7 +75,7 @@ class KonverterInnsendingTilInntektsmeldingTest :
                     type =
                         Type.Forespurt(
                             id = UUID.randomUUID(),
-                            arbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().arbeidsforhold,
+                            flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold,
                         ),
                 )
             faisuIM.type.harFlereArbeidsforhold() shouldBe true

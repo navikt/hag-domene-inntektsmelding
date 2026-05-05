@@ -30,8 +30,8 @@ data class SkjemaInntektsmelding(
     val inntekt: Inntekt?,
     val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
-    override val arbeidsforhold: List<Arbeidsforhold> = emptyList(),
-) : FlereArbeidsforhold {
+    val flereArbeidsforhold: FlereArbeidsforhold? = null, // Liker ikke defaults i request-klasser, men enn så lenge (?) trengs det for å lese gamle databaserader.
+) {
     fun valider(): Set<String> =
         listOfNotNull(
             listOfNotNull(
@@ -61,8 +61,8 @@ data class SkjemaInntektsmeldingSelvbestemt(
     val refusjon: Refusjon?,
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
     val arbeidsforholdType: ArbeidsforholdType,
-    override val arbeidsforhold: List<Arbeidsforhold> = emptyList(),
-) : FlereArbeidsforhold {
+    val flereArbeidsforhold: FlereArbeidsforhold? = null,
+) {
     fun valider(): Set<String> =
         listOfNotNull(
             listOfNotNull(
@@ -82,9 +82,12 @@ data class SkjemaInntektsmeldingSelvbestemt(
         ).tilFeilmeldinger()
 }
 
-interface FlereArbeidsforhold {
-    val arbeidsforhold: List<Arbeidsforhold>
-}
+@Serializable
+data class FlereArbeidsforhold(
+    val harLikLoenn: Boolean,
+    val sykmeldtFraAlle: Boolean,
+    val arbeidsforhold: List<Arbeidsforhold>,
+)
 
 private fun List<Naturalytelse>.valider(): List<FeiletValidering> =
     listOfNotNull(

@@ -40,7 +40,7 @@ class SkjemaInntektsmeldingTest :
                 val faisuSkjema = TestData.fulltSkjemaMedFlereArbeidsforhold()
                 val skjema = faisuSkjema.toJsonStr(SkjemaInntektsmelding.serializer())
                 val im = skjema.fromJson(SkjemaInntektsmelding.serializer())
-                im.arbeidsforhold shouldBe faisuSkjema.arbeidsforhold
+                im.flereArbeidsforhold shouldBe faisuSkjema.flereArbeidsforhold
             }
             context(SkjemaInntektsmelding::avsenderTlf.name) {
                 test("ugyldig tlf") {
