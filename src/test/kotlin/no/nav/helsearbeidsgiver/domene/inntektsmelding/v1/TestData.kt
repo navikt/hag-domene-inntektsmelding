@@ -70,14 +70,14 @@ object TestData {
         val flereArbeidsforhold =
             listOf<Arbeidsforhold>(
                 Arbeidsforhold(
-                    "1",
                     true,
+                    "Snekker",
                     40.0,
                     100.0,
                 ),
                 Arbeidsforhold(
-                    "2",
                     false,
+                    "Stuntmann",
                     40.0,
                     100.0,
                 ),
