@@ -4,7 +4,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
@@ -295,6 +297,25 @@ class SkjemaInntektsmeldingTest :
                         )
 
                     skjema.valider() shouldContainAll forventetFeil
+                }
+            }
+
+            context("Flere Arbeidsforhold") {
+                test("Bruker må svare nei på både lik lønn og sykmeldt fra alle forhold for at IM er gyldig") {
+                    TestData.fulltSkjemaMedFlereArbeidsforhold().valider().shouldBeEmpty()
+                    val standardFlereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold!!
+                    val ugyldigMedLikLoenn = standardFlereArbeidsforhold.copy(harLikLoenn = true)
+                    val ugyldigMedSykmeldtAlle = standardFlereArbeidsforhold.copy(sykmeldtFraAlle = true)
+                    val ugyldigBegge = ugyldigMedLikLoenn.copy(sykmeldtFraAlle = true)
+                    ugyldigMedLikLoenn.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN)
+                    ugyldigMedSykmeldtAlle.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE)
+                    ugyldigBegge.valider().shouldNotBeEmpty()
+                    // Verifiser at skjema kaller arbeidsforhold.valider() også:
+                    TestData
+                        .fulltSkjema()
+                        .copy(flereArbeidsforhold = ugyldigBegge)
+                        .valider()
+                        .shouldNotBeEmpty()
                 }
             }
 

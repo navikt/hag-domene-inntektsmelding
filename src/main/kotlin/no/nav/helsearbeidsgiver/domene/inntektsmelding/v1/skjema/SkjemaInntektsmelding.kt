@@ -44,6 +44,7 @@ data class SkjemaInntektsmelding(
             inntekt?.valider(),
             naturalytelser.valider(),
             refusjon?.valider(),
+            flereArbeidsforhold?.valider(),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
@@ -87,7 +88,19 @@ data class FlereArbeidsforhold(
     val harLikLoenn: Boolean,
     val sykmeldtFraAlle: Boolean,
     val arbeidsforhold: List<Arbeidsforhold>,
-)
+) {
+    internal fun valider(): List<FeiletValidering> =
+        listOfNotNull(
+            valider(
+                vilkaar = !harLikLoenn,
+                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN,
+            ),
+            valider(
+                vilkaar = !sykmeldtFraAlle,
+                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE,
+            ),
+        )
+}
 
 private fun List<Naturalytelse>.valider(): List<FeiletValidering> =
     listOfNotNull(
