@@ -18,50 +18,50 @@ import java.util.UUID
 class KonverterInnsendingTilInntektsmeldingTest :
     FunSpec({
 
+        val eksternAvsender =
+            AvsenderSystem(
+                orgnr = Orgnr.genererGyldig(),
+                navn = "TestSystem",
+                versjon = "1",
+            )
+        val innsending =
+            Innsending(
+                innsendingId = UUID.randomUUID(),
+                skjema = TestData.fulltSkjema(),
+                aarsakInnsending = AarsakInnsending.Ny,
+                type =
+                    Type.ForespurtEkstern(
+                        id = UUID.randomUUID(),
+                        _avsenderSystem = eksternAvsender,
+                    ),
+                innsendtTid = OffsetDateTime.now(),
+                kontaktinfo = "kontaktinformasjon",
+            )
+        val inntektsmelding =
+            Inntektsmelding(
+                id = innsending.innsendingId,
+                type = innsending.type,
+                sykmeldt = Sykmeldt(Fnr.genererGyldig(), "Navn Navnesen"), // Fnr hentes fra fsp, navn slås opp i berik-steg
+                avsender =
+                    Avsender(
+                        // orgnr på bedrift kommer fra fsp
+                        orgnr = Orgnr.genererGyldig(),
+                        orgNavn = "TestBedrift",
+                        navn = innsending.kontaktinfo,
+                        tlf = innsending.skjema.avsenderTlf,
+                    ),
+                sykmeldingsperioder = emptyList(), // slå opp fra fsp..
+                agp = innsending.skjema.agp,
+                inntekt = innsending.skjema.inntekt,
+                naturalytelser = innsending.skjema.naturalytelser,
+                refusjon = innsending.skjema.refusjon,
+                aarsakInnsending = innsending.aarsakInnsending,
+                mottatt = innsending.innsendtTid,
+                vedtaksperiodeId = UUID.randomUUID(), // hente fra fsp...
+            )
         test("En innsending skal inneholde (nesten) nok informasjon til at man kan bygge en ferdig inntektsmelding") {
             // Denne testen er nå mest for å sjekke at formatene er kompatible,
             // at vi får sendt nok informasjon inn, og kan få tilbake nok info etter berikelse
-            val eksternAvsender =
-                AvsenderSystem(
-                    orgnr = Orgnr.genererGyldig(),
-                    navn = "TestSystem",
-                    versjon = "1",
-                )
-            val innsending =
-                Innsending(
-                    innsendingId = UUID.randomUUID(),
-                    skjema = TestData.fulltSkjema(),
-                    aarsakInnsending = AarsakInnsending.Ny,
-                    type =
-                        Inntektsmelding.Type.ForespurtEkstern(
-                            id = UUID.randomUUID(),
-                            _avsenderSystem = eksternAvsender,
-                        ),
-                    innsendtTid = OffsetDateTime.now(),
-                    kontaktinfo = "kontaktinformasjon",
-                )
-            val inntektsmelding =
-                Inntektsmelding(
-                    id = innsending.innsendingId,
-                    type = innsending.type,
-                    sykmeldt = Sykmeldt(Fnr.genererGyldig(), "Navn Navnesen"), // Fnr hentes fra fsp, navn slås opp i berik-steg
-                    avsender =
-                        Avsender(
-                            // orgnr på bedrift kommer fra fsp
-                            orgnr = Orgnr.genererGyldig(),
-                            orgNavn = "TestBedrift",
-                            navn = innsending.kontaktinfo,
-                            tlf = innsending.skjema.avsenderTlf,
-                        ),
-                    sykmeldingsperioder = emptyList(), // slå opp fra fsp..
-                    agp = innsending.skjema.agp,
-                    inntekt = innsending.skjema.inntekt,
-                    naturalytelser = innsending.skjema.naturalytelser,
-                    refusjon = innsending.skjema.refusjon,
-                    aarsakInnsending = innsending.aarsakInnsending,
-                    mottatt = innsending.innsendtTid,
-                    vedtaksperiodeId = UUID.randomUUID(), // hente fra fsp...
-                )
             inntektsmelding.inntekt shouldBe innsending.skjema.inntekt
             inntektsmelding.refusjon shouldBe innsending.skjema.refusjon
             inntektsmelding.agp shouldBe innsending.skjema.agp
@@ -69,12 +69,16 @@ class KonverterInnsendingTilInntektsmeldingTest :
             inntektsmelding.type.avsenderSystem shouldBe eksternAvsender
             inntektsmelding.type.kanal shouldBe Kanal.HR_SYSTEM_API
             inntektsmelding.avsender.navn shouldBe innsending.kontaktinfo
+        }
+
+        test("Flere arbeidsforhold i inntektsmelding") {
             inntektsmelding.type.harFlereArbeidsforhold() shouldBe false
             val faisuIM =
                 inntektsmelding.copy(
                     type =
                         Type.Forespurt(
                             id = UUID.randomUUID(),
+                            erAgpForespurt = true,
                             flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold,
                         ),
                 )

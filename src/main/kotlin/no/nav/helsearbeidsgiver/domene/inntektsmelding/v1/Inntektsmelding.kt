@@ -37,14 +37,19 @@ data class Inntektsmelding(
         open val avsenderSystem: AvsenderSystem
             get() = AvsenderSystem.nav
 
+        fun harFlereArbeidsforhold(): Boolean =
+            when (this) {
+                is Forespurt -> flereArbeidsforhold != null
+                is Selvbestemt -> flereArbeidsforhold != null
+                is Behandlingsdager, is Fisker, is ForespurtEkstern, is UtenArbeidsforhold -> false
+            }
+
         val kanal: Kanal
             get() =
                 when (this) {
                     is ForespurtEkstern -> Kanal.HR_SYSTEM_API
                     is Forespurt, is Selvbestemt, is Fisker, is UtenArbeidsforhold, is Behandlingsdager -> Kanal.NAV_NO
                 }
-
-        open fun harFlereArbeidsforhold(): Boolean = false
 
         @Serializable
         @SerialName("Forespurt")
@@ -53,9 +58,7 @@ data class Inntektsmelding(
             @EncodeDefault
             val erAgpForespurt: Boolean = true,
             val flereArbeidsforhold: FlereArbeidsforhold? = null,
-        ) : Type() {
-            override fun harFlereArbeidsforhold(): Boolean = flereArbeidsforhold != null && flereArbeidsforhold.arbeidsforhold.isNotEmpty()
-        }
+        ) : Type()
 
         @Serializable
         @SerialName("ForespurtEkstern")
@@ -74,9 +77,7 @@ data class Inntektsmelding(
         data class Selvbestemt(
             override val id: UUID,
             val flereArbeidsforhold: FlereArbeidsforhold? = null,
-        ) : Type() {
-            override fun harFlereArbeidsforhold(): Boolean = flereArbeidsforhold != null && flereArbeidsforhold.arbeidsforhold.isNotEmpty()
-        }
+        ) : Type()
 
         @Serializable
         @SerialName("Fisker")
