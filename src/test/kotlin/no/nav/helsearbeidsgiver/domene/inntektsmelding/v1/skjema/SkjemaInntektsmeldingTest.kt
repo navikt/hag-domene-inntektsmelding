@@ -4,7 +4,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
@@ -18,6 +20,8 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
+import no.nav.helsearbeidsgiver.utils.json.fromJson
+import no.nav.helsearbeidsgiver.utils.json.toJsonStr
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.desember
 import no.nav.helsearbeidsgiver.utils.test.date.januar
@@ -33,6 +37,13 @@ class SkjemaInntektsmeldingTest :
                 TestData.fulltSkjema().valider().shouldBeEmpty()
             }
 
+            test("Serialiser og deserialiser FAISU-skjema OK") {
+
+                val faisuSkjema = TestData.fulltSkjemaMedFlereArbeidsforhold()
+                val skjema = faisuSkjema.toJsonStr(SkjemaInntektsmelding.serializer())
+                val im = skjema.fromJson(SkjemaInntektsmelding.serializer())
+                im.flereArbeidsforhold shouldBe faisuSkjema.flereArbeidsforhold
+            }
             context(SkjemaInntektsmelding::avsenderTlf.name) {
                 test("ugyldig tlf") {
                     val skjema =
@@ -286,6 +297,29 @@ class SkjemaInntektsmeldingTest :
                         )
 
                     skjema.valider() shouldContainAll forventetFeil
+                }
+            }
+
+            context("Flere Arbeidsforhold") {
+                test("Bruker må svare nei på både lik lønn og sykmeldt fra alle forhold for at IM er gyldig") {
+                    TestData.fulltSkjemaMedFlereArbeidsforhold().valider().shouldBeEmpty()
+                    val flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold!!
+                    val ugyldigMedLikLoenn = flereArbeidsforhold.copy(harLikLoenn = true)
+                    val ugyldigMedSykmeldtAlle = flereArbeidsforhold.copy(erSykmeldtFraAlle = true)
+                    val ugyldigBegge = ugyldigMedLikLoenn.copy(erSykmeldtFraAlle = true)
+                    ugyldigMedLikLoenn.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN)
+                    ugyldigMedSykmeldtAlle.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE)
+                    ugyldigBegge.valider().shouldNotBeEmpty()
+                    // Verifiser at skjema kaller arbeidsforhold.valider() også:
+                    TestData
+                        .fulltSkjema()
+                        .copy(flereArbeidsforhold = ugyldigBegge)
+                        .valider()
+                        .shouldNotBeEmpty()
+                }
+                test("Må ha flere arbeidsforhold") {
+                    val ugyldig = FlereArbeidsforhold(false, false, emptyList())
+                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO)
                 }
             }
 

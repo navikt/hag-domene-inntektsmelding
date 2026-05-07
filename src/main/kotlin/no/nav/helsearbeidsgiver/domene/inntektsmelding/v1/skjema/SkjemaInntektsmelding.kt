@@ -2,6 +2,8 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
@@ -21,6 +23,7 @@ import java.util.UUID
 
 private val sikkerLogger = sikkerLogger()
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class SkjemaInntektsmelding(
     val forespoerselId: UUID,
@@ -29,6 +32,8 @@ data class SkjemaInntektsmelding(
     val inntekt: Inntekt?,
     val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
+    @EncodeDefault
+    val flereArbeidsforhold: FlereArbeidsforhold? = null, // default trengs for å lese gamle databaserader
 ) {
     fun valider(): Set<String> =
         listOfNotNull(
@@ -42,11 +47,13 @@ data class SkjemaInntektsmelding(
             inntekt?.valider(),
             naturalytelser.valider(),
             refusjon?.valider(),
+            flereArbeidsforhold?.valider(),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class SkjemaInntektsmeldingSelvbestemt(
     val selvbestemtId: UUID?,
@@ -59,6 +66,8 @@ data class SkjemaInntektsmeldingSelvbestemt(
     val refusjon: Refusjon?,
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
     val arbeidsforholdType: ArbeidsforholdType,
+    @EncodeDefault
+    val flereArbeidsforhold: FlereArbeidsforhold? = null,
 ) {
     fun valider(): Set<String> =
         listOfNotNull(
@@ -73,6 +82,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
             inntekt.valider(),
             naturalytelser.valider(),
             refusjon?.valider(),
+            flereArbeidsforhold?.valider(),
             validerBestemmendeFravaersdagMotInntektsdato(agp, inntekt, sykmeldingsperioder),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),

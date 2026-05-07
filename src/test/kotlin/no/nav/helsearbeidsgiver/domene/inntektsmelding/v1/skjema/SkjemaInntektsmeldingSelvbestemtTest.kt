@@ -5,7 +5,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.jsonObject
@@ -16,10 +18,12 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Refusjon
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RefusjonEndring
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Tariffendring
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.json.fromJson
 import no.nav.helsearbeidsgiver.utils.json.toJson
+import no.nav.helsearbeidsgiver.utils.json.toJsonStr
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
@@ -505,6 +509,25 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
                 deserialisertSkjema.arbeidsforholdType shouldBe arbeidsforholdType
             }
+        }
+        test("serialiser og deserialiserer Selvbestemt med flereArbeidsforhold") {
+            val skjema = fulltSkjema(vedtaksperiodeId = UUID.randomUUID())
+
+            val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
+            val json = faisuSkjema.toJsonStr(SkjemaInntektsmeldingSelvbestemt.serializer())
+            json.shouldContain(
+                """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":100.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":100.0}]""",
+            )
+            val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+            im.flereArbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold
+        }
+        test("validerer flereArbeidsforhold") {
+            val skjema = fulltSkjema(vedtaksperiodeId = UUID.randomUUID())
+
+            val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
+            faisuSkjema.valider().shouldBeEmpty()
+            val ugyldig = faisuSkjema.copy(flereArbeidsforhold = FlereArbeidsforhold(true, false, emptyList()))
+            ugyldig.valider().shouldNotBeEmpty()
         }
     })
 
