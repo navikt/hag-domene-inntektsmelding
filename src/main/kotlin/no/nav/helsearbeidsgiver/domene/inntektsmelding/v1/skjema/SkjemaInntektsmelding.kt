@@ -77,6 +77,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
             inntekt.valider(),
             naturalytelser.valider(),
             refusjon?.valider(),
+            flereArbeidsforhold?.valider(),
             validerBestemmendeFravaersdagMotInntektsdato(agp, inntekt, sykmeldingsperioder),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),

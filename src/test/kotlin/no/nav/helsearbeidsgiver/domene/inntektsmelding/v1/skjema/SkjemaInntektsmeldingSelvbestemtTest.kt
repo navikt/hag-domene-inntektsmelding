@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -520,6 +521,15 @@ class SkjemaInntektsmeldingSelvbestemtTest :
             )
             val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
             im.flereArbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold
+        }
+        context("validerer flereArbeidsforhold") {
+            val vedtaksperiodeId = UUID.randomUUID()
+            val skjema = fulltSkjema(vedtaksperiodeId)
+
+            val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
+            faisuSkjema.valider().shouldBeEmpty()
+            val ugyldig = faisuSkjema.copy(flereArbeidsforhold = FlereArbeidsforhold(true, false, emptyList()))
+            ugyldig.valider().shouldNotBeEmpty()
         }
     })
 
