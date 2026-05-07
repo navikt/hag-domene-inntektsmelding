@@ -6,7 +6,6 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
@@ -88,29 +87,6 @@ data class SkjemaInntektsmeldingSelvbestemt(
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
-}
-
-@Serializable
-data class FlereArbeidsforhold(
-    val harLikLoenn: Boolean,
-    val erSykmeldtFraAlle: Boolean,
-    val arbeidsforhold: List<Arbeidsforhold>,
-) {
-    internal fun valider(): List<FeiletValidering> =
-        listOfNotNull(
-            valider(
-                vilkaar = !harLikLoenn,
-                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN,
-            ),
-            valider(
-                vilkaar = !erSykmeldtFraAlle,
-                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE,
-            ),
-            valider(
-                vilkaar = arbeidsforhold.size > 1,
-                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO,
-            ),
-        )
 }
 
 private fun List<Naturalytelse>.valider(): List<FeiletValidering> =
