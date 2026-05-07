@@ -2,6 +2,8 @@
 
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
@@ -22,6 +24,7 @@ import java.util.UUID
 
 private val sikkerLogger = sikkerLogger()
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class SkjemaInntektsmelding(
     val forespoerselId: UUID,
@@ -30,7 +33,8 @@ data class SkjemaInntektsmelding(
     val inntekt: Inntekt?,
     val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
-    val flereArbeidsforhold: FlereArbeidsforhold? = null, // Liker ikke defaults i request-klasser, trengs for å lese gamle databaserader
+    @EncodeDefault
+    val flereArbeidsforhold: FlereArbeidsforhold? = null, // default trengs for å lese gamle databaserader
 ) {
     fun valider(): Set<String> =
         listOfNotNull(
@@ -50,6 +54,7 @@ data class SkjemaInntektsmelding(
         ).tilFeilmeldinger()
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class SkjemaInntektsmeldingSelvbestemt(
     val selvbestemtId: UUID?,
@@ -62,6 +67,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
     val refusjon: Refusjon?,
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
     val arbeidsforholdType: ArbeidsforholdType,
+    @EncodeDefault
     val flereArbeidsforhold: FlereArbeidsforhold? = null,
 ) {
     fun valider(): Set<String> =
@@ -87,7 +93,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
 @Serializable
 data class FlereArbeidsforhold(
     val harLikLoenn: Boolean,
-    val sykmeldtFraAlle: Boolean,
+    val erSykmeldtFraAlle: Boolean,
     val arbeidsforhold: List<Arbeidsforhold>,
 ) {
     internal fun valider(): List<FeiletValidering> =
@@ -97,7 +103,7 @@ data class FlereArbeidsforhold(
                 feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN,
             ),
             valider(
-                vilkaar = !sykmeldtFraAlle,
+                vilkaar = !erSykmeldtFraAlle,
                 feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE,
             ),
             valider(

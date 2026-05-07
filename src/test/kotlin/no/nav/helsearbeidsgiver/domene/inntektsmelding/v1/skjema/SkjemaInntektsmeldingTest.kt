@@ -305,8 +305,8 @@ class SkjemaInntektsmeldingTest :
                     TestData.fulltSkjemaMedFlereArbeidsforhold().valider().shouldBeEmpty()
                     val flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold!!
                     val ugyldigMedLikLoenn = flereArbeidsforhold.copy(harLikLoenn = true)
-                    val ugyldigMedSykmeldtAlle = flereArbeidsforhold.copy(sykmeldtFraAlle = true)
-                    val ugyldigBegge = ugyldigMedLikLoenn.copy(sykmeldtFraAlle = true)
+                    val ugyldigMedSykmeldtAlle = flereArbeidsforhold.copy(erSykmeldtFraAlle = true)
+                    val ugyldigBegge = ugyldigMedLikLoenn.copy(erSykmeldtFraAlle = true)
                     ugyldigMedLikLoenn.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN)
                     ugyldigMedSykmeldtAlle.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE)
                     ugyldigBegge.valider().shouldNotBeEmpty()

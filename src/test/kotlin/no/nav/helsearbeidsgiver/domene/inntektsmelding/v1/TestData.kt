@@ -70,22 +70,23 @@ object TestData {
     fun fulltSkjemaMedFlereArbeidsforhold(): SkjemaInntektsmelding {
         val flereArbeidsforhold =
             FlereArbeidsforhold(
-                false,
-                false,
-                listOf<Arbeidsforhold>(
-                    Arbeidsforhold(
-                        true,
-                        "Snekker",
-                        40.0,
-                        100.0,
+                harLikLoenn = false,
+                erSykmeldtFraAlle = false,
+                arbeidsforhold =
+                    listOf<Arbeidsforhold>(
+                        Arbeidsforhold(
+                            inkludertISykefravaer = true,
+                            yrkesbeskrivelse = "Snekker",
+                            stillingsprosent = 40.0,
+                            inntekt = 100.0,
+                        ),
+                        Arbeidsforhold(
+                            inkludertISykefravaer = false,
+                            yrkesbeskrivelse = "Stuntmann",
+                            stillingsprosent = 40.0,
+                            inntekt = 100.0,
+                        ),
                     ),
-                    Arbeidsforhold(
-                        false,
-                        "Stuntmann",
-                        40.0,
-                        100.0,
-                    ),
-                ),
             )
         return fulltSkjema().copy(
             flereArbeidsforhold = flereArbeidsforhold,

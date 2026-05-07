@@ -510,9 +510,8 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                 deserialisertSkjema.arbeidsforholdType shouldBe arbeidsforholdType
             }
         }
-        context("serialiser og deserialiserer Selvbestemt med flereArbeidsforhold") {
-            val vedtaksperiodeId = UUID.randomUUID()
-            val skjema = fulltSkjema(vedtaksperiodeId)
+        test("serialiser og deserialiserer Selvbestemt med flereArbeidsforhold") {
+            val skjema = fulltSkjema(vedtaksperiodeId = UUID.randomUUID())
 
             val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
             val json = faisuSkjema.toJsonStr(SkjemaInntektsmeldingSelvbestemt.serializer())
@@ -522,9 +521,8 @@ class SkjemaInntektsmeldingSelvbestemtTest :
             val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
             im.flereArbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold
         }
-        context("validerer flereArbeidsforhold") {
-            val vedtaksperiodeId = UUID.randomUUID()
-            val skjema = fulltSkjema(vedtaksperiodeId)
+        test("validerer flereArbeidsforhold") {
+            val skjema = fulltSkjema(vedtaksperiodeId = UUID.randomUUID())
 
             val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
             faisuSkjema.valider().shouldBeEmpty()
