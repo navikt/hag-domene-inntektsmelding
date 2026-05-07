@@ -317,6 +317,10 @@ class SkjemaInntektsmeldingTest :
                         .valider()
                         .shouldNotBeEmpty()
                 }
+                test("Må ha flere arbeidsforhold") {
+                    val ugyldig = FlereArbeidsforhold(false, false, emptyList())
+                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO)
+                }
             }
 
             context(SkjemaInntektsmelding::refusjon.name) {

@@ -27,6 +27,7 @@ internal object Feilmelding {
     const val REFUSJON_ENDRING_FOER_INNTEKTDATO = "Startdato for refusjonsendringer må være etter inntektdato"
     const val DUPLIKAT_INNTEKT_ENDRINGSAARSAK = "Endringsårsaker kan ikke inneholde duplikater"
 
+    const val UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO = "Flere arbeidsforhold må inneholde minst to"
     const val UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN = "Ved innsending av flere arbeidsforhold må de ha ulik lønn"
     const val UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE = "Ved innsending av flere arbeidsforhold kan det ikke være sykefravær fra alle"
 

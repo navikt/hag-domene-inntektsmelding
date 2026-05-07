@@ -100,6 +100,10 @@ data class FlereArbeidsforhold(
                 vilkaar = !sykmeldtFraAlle,
                 feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE,
             ),
+            valider(
+                vilkaar = arbeidsforhold.size > 1,
+                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO,
+            ),
         )
 }
 
