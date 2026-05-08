@@ -27,6 +27,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.desember
 import no.nav.helsearbeidsgiver.utils.test.date.januar
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
+import java.time.LocalDate
 
 class SkjemaInntektsmeldingTest :
     FunSpec({
@@ -320,6 +321,19 @@ class SkjemaInntektsmeldingTest :
                 test("Må ha flere arbeidsforhold") {
                     val ugyldig = FlereArbeidsforhold(false, false, emptyList())
                     ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO)
+                }
+                test("Sum av inntektene fra flere arbeidsforhold kan ikke være forskjellig fra rapportert inntekt") {
+                    // sum inntekt i flereArbeidsforhold = 50.000:
+                    val skjema =
+                        TestData.fulltSkjemaMedFlereArbeidsforhold().copy(
+                            inntekt =
+                                Inntekt(
+                                    beloep = 49000.0,
+                                    inntektsdato = LocalDate.now(),
+                                    emptyList(),
+                                ),
+                        )
+                    skjema.valider() shouldContainAll setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK)
                 }
             }
 

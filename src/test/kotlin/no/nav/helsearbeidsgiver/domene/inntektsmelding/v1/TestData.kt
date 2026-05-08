@@ -73,18 +73,18 @@ object TestData {
                 harLikLoenn = false,
                 erSykmeldtFraAlle = false,
                 arbeidsforhold =
-                    listOf<Arbeidsforhold>(
+                    listOf(
                         Arbeidsforhold(
                             inkludertISykefravaer = true,
                             yrkesbeskrivelse = "Snekker",
                             stillingsprosent = 40.0,
-                            inntekt = 100.0,
+                            inntekt = 20000.00,
                         ),
                         Arbeidsforhold(
                             inkludertISykefravaer = false,
                             yrkesbeskrivelse = "Stuntmann",
                             stillingsprosent = 40.0,
-                            inntekt = 100.0,
+                            inntekt = 30000.00,
                         ),
                     ),
             )

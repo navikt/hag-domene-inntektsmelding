@@ -5,6 +5,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
+import java.math.BigDecimal
 
 @Serializable
 data class FlereArbeidsforhold(
@@ -35,6 +36,8 @@ data class FlereArbeidsforhold(
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
         )
+
+    fun sumInntekt(): Double = arbeidsforhold.sumOf { BigDecimal.valueOf(it.inntekt) }.toDouble()
 
     private fun gyldigStillingsprosent(prosent: Double): Boolean = prosent in 0.0..100.0
 }
