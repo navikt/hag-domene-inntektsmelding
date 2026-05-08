@@ -92,4 +92,12 @@ object TestData {
             flereArbeidsforhold = flereArbeidsforhold,
         )
     }
+
+    fun lagArbeidsforhold(inkludertISykefravaer: Boolean = false): Arbeidsforhold =
+        Arbeidsforhold(
+            inkludertISykefravaer = inkludertISykefravaer,
+            yrkesbeskrivelse = "Maler",
+            stillingsprosent = 5.0,
+            inntekt = 1.0,
+        )
 }

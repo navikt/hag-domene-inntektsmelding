@@ -35,6 +35,14 @@ data class FlereArbeidsforhold(
                 vilkaar = arbeidsforhold.all { it.inntekt.erStoerreEllerLikNullOgMindreEnnMaks() },
                 feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
+            no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider(
+                vilkaar = arbeidsforhold.any { it.inkludertISykefravaer },
+                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INGEN_ARBEIDSFORHOLD,
+            ),
+            no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider(
+                vilkaar = !arbeidsforhold.all { it.inkludertISykefravaer },
+                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_ALLE_ARBEIDSFORHOLD,
+            ),
         )
 
     fun sumInntekt(): Double = arbeidsforhold.sumOf { BigDecimal.valueOf(it.inntekt) }.toDouble()
