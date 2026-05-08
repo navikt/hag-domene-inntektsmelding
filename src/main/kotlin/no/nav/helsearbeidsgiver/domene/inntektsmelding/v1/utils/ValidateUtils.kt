@@ -2,7 +2,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils
 
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.InntektEndringAarsak
 
-private const val MAKS_GRENSE_BELOEP = 1_000_000.0
+const val MAKS_GRENSE_BELOEP = 1_000_000.0
 
 internal fun String.erGyldigTlf(): Boolean =
     listOf(

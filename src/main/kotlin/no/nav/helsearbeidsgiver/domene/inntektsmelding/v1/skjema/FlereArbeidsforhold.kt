@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 
 @Serializable
 data class FlereArbeidsforhold(
@@ -28,6 +29,10 @@ data class FlereArbeidsforhold(
             no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider(
                 vilkaar = arbeidsforhold.all { gyldigStillingsprosent(it.stillingsprosent) },
                 feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT,
+            ),
+            no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider(
+                vilkaar = arbeidsforhold.all { it.inntekt.erStoerreEllerLikNullOgMindreEnnMaks() },
+                feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
             ),
         )
 

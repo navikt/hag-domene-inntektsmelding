@@ -5,7 +5,9 @@ import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.MAKS_GRENSE_BELOEP
 
 class FlereArbeidsforholdTest :
     FunSpec({
@@ -14,7 +16,7 @@ class FlereArbeidsforholdTest :
             // negativ eller større enn 100 er ikke lov når man rapporterer inn flere arbeidsforhold..
             withData(
                 nameFn = { (stillingsprosent, forventetFeil) ->
-                    "stillingsprosent $stillingsprosent gir feil $forventetFeil"
+                    "stillingsprosent $stillingsprosent gir $forventetFeil"
                 },
                 1.0 to emptySet(),
                 100.0 to emptySet(),
@@ -34,6 +36,43 @@ class FlereArbeidsforholdTest :
                                     yrkesbeskrivelse = "Jordmor",
                                     stillingsprosent = stillingsprosent,
                                     inntekt = 1.0,
+                                ),
+                                Arbeidsforhold(
+                                    inkludertISykefravaer = false,
+                                    yrkesbeskrivelse = "Maler",
+                                    stillingsprosent = 5.0,
+                                    inntekt = 1.0,
+                                ),
+                            ),
+                    )
+                ugyldig.valider() shouldBe forventetFeil
+            }
+        }
+
+        context("arbeidsforhold med korrekt inntekt") {
+            // negativ eller større enn maxbeløp er ikke lov
+            withData(
+                nameFn = { (inntekt, forventetFeil) ->
+                    "inntekt $inntekt gir feil $forventetFeil"
+                },
+                1.0 to emptySet(),
+                100.0 to emptySet(),
+                0.0 to emptySet(), // 0 i inntekt gir nok mening bare dersom arbeidsforholdet ikke skal telle
+                -1.0 to setOf(FeiletValidering(KREVER_BELOEP_STOERRE_ELLER_LIK_NULL)),
+                MAKS_GRENSE_BELOEP + 1 to setOf(FeiletValidering(KREVER_BELOEP_STOERRE_ELLER_LIK_NULL)),
+            ) { (inntekt, forventetFeil) ->
+
+                val ugyldig =
+                    FlereArbeidsforhold(
+                        harLikLoenn = false,
+                        erSykmeldtFraAlle = false,
+                        arbeidsforhold =
+                            listOf(
+                                Arbeidsforhold(
+                                    inkludertISykefravaer = true,
+                                    yrkesbeskrivelse = "Jordmor",
+                                    stillingsprosent = 10.0,
+                                    inntekt = inntekt,
                                 ),
                                 Arbeidsforhold(
                                     inkludertISykefravaer = false,
