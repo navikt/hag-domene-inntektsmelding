@@ -25,5 +25,11 @@ data class FlereArbeidsforhold(
                 vilkaar = arbeidsforhold.size > 1,
                 feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO,
             ),
+            no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider(
+                vilkaar = arbeidsforhold.all { gyldigStillingsprosent(it.stillingsprosent) },
+                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT,
+            ),
         )
+
+    private fun gyldigStillingsprosent(prosent: Double): Boolean = prosent in 0.0..100.0
 }

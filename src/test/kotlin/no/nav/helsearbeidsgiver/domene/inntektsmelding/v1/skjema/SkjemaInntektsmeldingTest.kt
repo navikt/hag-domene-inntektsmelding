@@ -301,7 +301,7 @@ class SkjemaInntektsmeldingTest :
             }
 
             context("Flere Arbeidsforhold") {
-                test("Bruker må svare nei på både lik lønn og sykmeldt fra alle forhold for at IM er gyldig") {
+                test("Bruker må svare nei på både lik lønn og sykmeldt fra alle forhold for at IM-skjema er gyldig") {
                     TestData.fulltSkjemaMedFlereArbeidsforhold().valider().shouldBeEmpty()
                     val flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold!!
                     val ugyldigMedLikLoenn = flereArbeidsforhold.copy(harLikLoenn = true)
