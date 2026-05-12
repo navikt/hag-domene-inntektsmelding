@@ -10,6 +10,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.KREV
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_ALLE_ARBEIDSFORHOLD
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INGEN_ARBEIDSFORHOLD
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_YRKESBESKRIVELSE
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.MAKS_GRENSE_BELOEP
 
 class FlereArbeidsforholdTest :
@@ -102,6 +103,21 @@ class FlereArbeidsforholdTest :
             ) { (inkluderte, forventetFeil) ->
                 val arbeidsforhold = inkluderte.map { lagArbeidsforhold(it) }.toList()
                 val flereArbeidsforhold = FlereArbeidsforhold(false, false, arbeidsforhold)
+                flereArbeidsforhold.valider() shouldBe forventetFeil
+            }
+        }
+
+        context("Validerer at yrkesbeskrivelse kun består av latinske tegn og gyldige spesialtegn") {
+            withData(
+                nameFn = { (yrkesbeskrivelse, forventetFeil) ->
+                    "$yrkesbeskrivelse gir feil $forventetFeil"
+                },
+                "Snekker (lærling)" to emptySet(),
+                "select * from inntektsmelding;" to setOf(FeiletValidering(UGYLDIG_FLERE_ARBEIDSFORHOLD_YRKESBESKRIVELSE)),
+            ) { (yrkesbeskrivelse, forventetFeil) ->
+                val arbeidsforhold1 = lagArbeidsforhold(inkludertISykefravaer = true, yrkesbeskrivelse = yrkesbeskrivelse)
+                val arbeidsforhold2 = lagArbeidsforhold(inkludertISykefravaer = false, yrkesbeskrivelse = "Jordmor")
+                val flereArbeidsforhold = FlereArbeidsforhold(false, false, listOf(arbeidsforhold1, arbeidsforhold2))
                 flereArbeidsforhold.valider() shouldBe forventetFeil
             }
         }

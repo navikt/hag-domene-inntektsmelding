@@ -93,10 +93,13 @@ object TestData {
         )
     }
 
-    fun lagArbeidsforhold(inkludertISykefravaer: Boolean = false): Arbeidsforhold =
+    fun lagArbeidsforhold(
+        inkludertISykefravaer: Boolean = false,
+        yrkesbeskrivelse: String = "Maler",
+    ): Arbeidsforhold =
         Arbeidsforhold(
             inkludertISykefravaer = inkludertISykefravaer,
-            yrkesbeskrivelse = "Maler",
+            yrkesbeskrivelse = yrkesbeskrivelse,
             stillingsprosent = 5.0,
             inntekt = 1.0,
         )

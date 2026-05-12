@@ -4,6 +4,8 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.InntektEndringAarsak
 
 const val MAKS_GRENSE_BELOEP = 1_000_000.0
 
+internal fun String.erGyldigString(): Boolean = this.isBlank() || this.matches("^[\\d\\p{IsLatin}\\s.,()-]{1,128}".toRegex())
+
 internal fun String.erGyldigTlf(): Boolean =
     listOf(
         Regex("\\d{8}"),
