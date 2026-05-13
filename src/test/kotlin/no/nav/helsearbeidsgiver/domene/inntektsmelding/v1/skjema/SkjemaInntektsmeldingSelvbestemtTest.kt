@@ -516,7 +516,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
             val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
             val json = faisuSkjema.toJsonStr(SkjemaInntektsmeldingSelvbestemt.serializer())
             json.shouldContain(
-                """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":100.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":100.0}]""",
+                """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":20000.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":30000.0}]""",
             )
             val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
             im.flereArbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold

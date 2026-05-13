@@ -73,18 +73,18 @@ object TestData {
                 harLikLoenn = false,
                 erSykmeldtFraAlle = false,
                 arbeidsforhold =
-                    listOf<Arbeidsforhold>(
+                    listOf(
                         Arbeidsforhold(
                             inkludertISykefravaer = true,
                             yrkesbeskrivelse = "Snekker",
                             stillingsprosent = 40.0,
-                            inntekt = 100.0,
+                            inntekt = 20000.00,
                         ),
                         Arbeidsforhold(
                             inkludertISykefravaer = false,
                             yrkesbeskrivelse = "Stuntmann",
                             stillingsprosent = 40.0,
-                            inntekt = 100.0,
+                            inntekt = 30000.00,
                         ),
                     ),
             )
@@ -92,4 +92,15 @@ object TestData {
             flereArbeidsforhold = flereArbeidsforhold,
         )
     }
+
+    fun lagArbeidsforhold(
+        inkludertISykefravaer: Boolean = false,
+        yrkesbeskrivelse: String = "Maler",
+    ): Arbeidsforhold =
+        Arbeidsforhold(
+            inkludertISykefravaer = inkludertISykefravaer,
+            yrkesbeskrivelse = yrkesbeskrivelse,
+            stillingsprosent = 5.0,
+            inntekt = 1.0,
+        )
 }

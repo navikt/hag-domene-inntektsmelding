@@ -48,6 +48,7 @@ data class SkjemaInntektsmelding(
             naturalytelser.valider(),
             refusjon?.valider(),
             flereArbeidsforhold?.valider(),
+            validerInntektMotFlereArbeidsforhold(inntekt, flereArbeidsforhold),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
         ).tilFeilmeldinger()
@@ -83,6 +84,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
             naturalytelser.valider(),
             refusjon?.valider(),
             flereArbeidsforhold?.valider(),
+            validerInntektMotFlereArbeidsforhold(inntekt, flereArbeidsforhold),
             validerBestemmendeFravaersdagMotInntektsdato(agp, inntekt, sykmeldingsperioder),
             validerRefusjonMotInntekt(refusjon, inntekt),
             validerRefusjonMotAgp(refusjon, agp),
@@ -143,6 +145,22 @@ private fun validerRefusjonMotInntekt(
             valider(
                 vilkaar = refusjon.endringer.all { it.startdato.isAfter(inntekt.inntektsdato) },
                 feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_INNTEKTDATO,
+            ),
+        )
+    } else {
+        emptyList()
+    }
+
+private fun validerInntektMotFlereArbeidsforhold(
+    inntekt: Inntekt?,
+    flereArbeidsforhold: FlereArbeidsforhold?,
+): List<FeiletValidering> =
+    if (flereArbeidsforhold != null) {
+        val rapportertInntekt = inntekt?.beloep ?: 0.0
+        listOfNotNull(
+            valider(
+                vilkaar = flereArbeidsforhold.sumInntekt() == rapportertInntekt,
+                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK,
             ),
         )
     } else {
