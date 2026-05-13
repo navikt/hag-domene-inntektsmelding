@@ -32,7 +32,7 @@ internal object Feilmelding {
     const val UGYLDIG_FLERE_ARBEIDSFORHOLD_ALLE_ARBEIDSFORHOLD = "Kan ikke inkludere alle arbeidsforhold, bruk vanlig inntektsmelding"
     const val UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN = "Ved innsending av flere arbeidsforhold må de ha ulik lønn"
     const val UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE = "Ved innsending av flere arbeidsforhold kan det ikke være sykefravær fra alle"
-    const val UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT = "Faktisk stillingsprosent må være mellom 0 og 100"
+    const val UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT = "Stillingsprosent må være mellom 0 og 100"
     const val UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK = "Summen av inntekter fra flere arbeidsforhold må være lik innrapportert inntekt"
     const val UGYLDIG_FLERE_ARBEIDSFORHOLD_YRKESBESKRIVELSE = "Yrkesbeskrivelse er ugyldig"
 

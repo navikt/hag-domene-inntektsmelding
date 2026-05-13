@@ -2,7 +2,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils
 
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.InntektEndringAarsak
 
-const val MAKS_GRENSE_BELOEP = 1_000_000.0
+internal const val MAKS_GRENSE_BELOEP = 1_000_000.0
 
 internal fun String.erGyldigString(): Boolean = this.isBlank() || this.matches("^[\\d\\p{IsLatin}\\s.,()-]{1,128}".toRegex())
 

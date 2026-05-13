@@ -63,7 +63,7 @@ class FlereArbeidsforholdTest :
                 100.0 to emptySet(),
                 0.0 to emptySet(), // 0 i inntekt gir nok mening bare dersom arbeidsforholdet ikke skal telle
                 -1.0 to setOf(FeiletValidering(KREVER_BELOEP_STOERRE_ELLER_LIK_NULL)),
-                MAKS_GRENSE_BELOEP + 1 to setOf(FeiletValidering(KREVER_BELOEP_STOERRE_ELLER_LIK_NULL)),
+                MAKS_GRENSE_BELOEP to setOf(FeiletValidering(KREVER_BELOEP_STOERRE_ELLER_LIK_NULL)),
             ) { (inntekt, forventetFeil) ->
 
                 val ugyldig =
