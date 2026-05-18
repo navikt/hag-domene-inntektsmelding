@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erGyldigString
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erGyldigEllerBlankString
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 import java.math.BigDecimal
@@ -46,7 +46,7 @@ data class FlereArbeidsforhold(
                 feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_ALLE_ARBEIDSFORHOLD,
             ),
             valider(
-                vilkaar = arbeidsforhold.all { it.yrkesbeskrivelse.erGyldigString() },
+                vilkaar = arbeidsforhold.all { it.yrkesbeskrivelse.erGyldigEllerBlankString() },
                 feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_YRKESBESKRIVELSE,
             ),
         )

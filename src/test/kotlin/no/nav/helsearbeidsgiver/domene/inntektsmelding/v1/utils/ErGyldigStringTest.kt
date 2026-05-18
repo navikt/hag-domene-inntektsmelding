@@ -35,7 +35,7 @@ class ErGyldigStringTest :
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaltfor" +
                     " altfor altfor altfor lang tekst, mye lengre enn grensen på 128 tegn" to false,
             ) { (yrkesbeskrivelse, gyldig) ->
-                yrkesbeskrivelse.erGyldigString() shouldBe gyldig
+                yrkesbeskrivelse.erGyldigEllerBlankString() shouldBe gyldig
             }
         }
     })
