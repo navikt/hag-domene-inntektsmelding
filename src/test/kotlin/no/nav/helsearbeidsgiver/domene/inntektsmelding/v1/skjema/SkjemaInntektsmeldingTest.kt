@@ -6,6 +6,7 @@ import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
@@ -302,6 +303,12 @@ class SkjemaInntektsmeldingTest :
             }
 
             context("Flere Arbeidsforhold") {
+                test("Inntekt kan ikke være null når flere arbeidsforhold er lagt inn") {
+                    TestData.fulltSkjemaMedFlereArbeidsforhold().copy(inntekt = null).valider() shouldContainExactly
+                        listOf(
+                            Feilmelding.TEKNISK_FEIL,
+                        )
+                }
                 test("Bruker må svare nei på både lik lønn og sykmeldt fra alle forhold for at IM-skjema er gyldig") {
                     TestData.fulltSkjemaMedFlereArbeidsforhold().valider().shouldBeEmpty()
                     val flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold!!
