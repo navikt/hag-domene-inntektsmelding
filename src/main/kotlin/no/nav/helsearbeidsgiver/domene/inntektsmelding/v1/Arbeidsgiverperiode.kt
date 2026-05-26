@@ -39,19 +39,23 @@ data class Arbeidsgiverperiode(
 
         val perioderValidering =
             when {
-                perioderAntallDager == AGP_MAKS_DAGER -> null
+                perioderAntallDager == AGP_MAKS_DAGER -> {
+                    null
+                }
 
-                perioderAntallDager > AGP_MAKS_DAGER ->
+                perioderAntallDager > AGP_MAKS_DAGER -> {
                     valider(
                         vilkaar = false,
                         feilmelding = Feilmelding.AGP_MAKS_16,
                     )
+                }
 
-                else ->
+                else -> {
                     valider(
                         vilkaar = redusertLoennIAgp != null || erBehandlingsdager(),
                         feilmelding = Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER,
                     )
+                }
             }
 
         return listOfNotNull(

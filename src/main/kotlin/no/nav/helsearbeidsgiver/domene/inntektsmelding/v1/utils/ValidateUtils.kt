@@ -23,7 +23,7 @@ internal fun String.erGyldigTlf(): Boolean =
         Regex("\\+\\d{10}"),
     ).any(::matches)
 
-internal fun Double.erStoerreEllerLikNullOgMindreEnnMaks(): Boolean = this >= 0 && this < MAKS_GRENSE_BELOEP
+internal fun Double.erStoerreEllerLikNullOgMindreEnnMaks(): Boolean = this in 0.0..<MAKS_GRENSE_BELOEP
 
 internal fun Double.erStoerreEnnNullOgMindreEnnMaks(): Boolean = this > 0 && this < MAKS_GRENSE_BELOEP
 
