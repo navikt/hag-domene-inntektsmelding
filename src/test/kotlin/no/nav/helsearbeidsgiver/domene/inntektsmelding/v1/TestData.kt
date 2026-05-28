@@ -65,33 +65,8 @@ object TestData {
                             ),
                         ),
                 ),
+            flereArbeidsforhold = null,
         )
-
-    fun fulltSkjemaMedFlereArbeidsforhold(): SkjemaInntektsmelding {
-        val flereArbeidsforhold =
-            FlereArbeidsforhold(
-                harLikLoenn = false,
-                erSykmeldtFraAlle = false,
-                arbeidsforhold =
-                    listOf(
-                        Arbeidsforhold(
-                            inkludertISykefravaer = true,
-                            yrkesbeskrivelse = "Snekker",
-                            stillingsprosent = 40.0,
-                            inntekt = 20000.00,
-                        ),
-                        Arbeidsforhold(
-                            inkludertISykefravaer = false,
-                            yrkesbeskrivelse = "Stuntmann",
-                            stillingsprosent = 40.0,
-                            inntekt = 30000.00,
-                        ),
-                    ),
-            )
-        return fulltSkjema().copy(
-            flereArbeidsforhold = flereArbeidsforhold,
-        )
-    }
 
     fun lagArbeidsforhold(
         inkludertISykefravaer: Boolean = false,
@@ -102,5 +77,26 @@ object TestData {
             yrkesbeskrivelse = yrkesbeskrivelse,
             stillingsprosent = 5.0,
             inntekt = 1.0,
+        )
+
+    val flereArbeidsforhold =
+        FlereArbeidsforhold(
+            harLikLoenn = false,
+            erSykmeldtFraAlle = false,
+            arbeidsforhold =
+                listOf(
+                    Arbeidsforhold(
+                        inkludertISykefravaer = true,
+                        yrkesbeskrivelse = "Snekker",
+                        stillingsprosent = 40.0,
+                        inntekt = 20000.00,
+                    ),
+                    Arbeidsforhold(
+                        inkludertISykefravaer = false,
+                        yrkesbeskrivelse = "Stuntmann",
+                        stillingsprosent = 40.0,
+                        inntekt = 30000.00,
+                    ),
+                ),
         )
 }

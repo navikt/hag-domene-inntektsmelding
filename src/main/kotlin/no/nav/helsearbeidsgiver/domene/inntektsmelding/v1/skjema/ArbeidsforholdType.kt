@@ -18,13 +18,13 @@ sealed class ArbeidsforholdType {
 
     @Serializable
     @SerialName("Fisker")
-    object Fisker : ArbeidsforholdType()
+    data object Fisker : ArbeidsforholdType()
 
     @Serializable
     @SerialName("UtenArbeidsforhold")
-    object UtenArbeidsforhold : ArbeidsforholdType()
+    data object UtenArbeidsforhold : ArbeidsforholdType()
 
     @Serializable
     @SerialName("Behandlingsdager")
-    object Behandlingsdager : ArbeidsforholdType()
+    data object Behandlingsdager : ArbeidsforholdType()
 }

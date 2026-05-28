@@ -55,6 +55,7 @@ data class SkjemaInntektsmelding(
 @Serializable
 data class SkjemaInntektsmeldingSelvbestemt(
     val selvbestemtId: UUID?,
+    val arbeidsforholdType: ArbeidsforholdType,
     val sykmeldtFnr: Fnr,
     val avsender: SkjemaAvsender,
     val sykmeldingsperioder: List<Periode>,
@@ -62,8 +63,6 @@ data class SkjemaInntektsmeldingSelvbestemt(
     val inntekt: Inntekt,
     val naturalytelser: List<Naturalytelse>,
     val refusjon: Refusjon?,
-    val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
-    val arbeidsforholdType: ArbeidsforholdType,
     @EncodeDefault
     val flereArbeidsforhold: FlereArbeidsforhold? = null,
 ) {
@@ -81,6 +80,7 @@ data class SkjemaInntektsmeldingSelvbestemt(
             naturalytelser.valider(),
             refusjon?.valider(),
             flereArbeidsforhold?.valider(),
+            flereArbeidsforhold?.validerMot(arbeidsforholdType),
             flereArbeidsforhold?.validerMot(inntekt),
             validerBestemmendeFravaersdagMotInntektsdato(agp, inntekt, sykmeldingsperioder),
             validerRefusjonMotInntekt(refusjon, inntekt),
