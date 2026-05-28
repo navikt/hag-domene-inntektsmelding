@@ -22,7 +22,7 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.json.fromJson
-import no.nav.helsearbeidsgiver.utils.json.toJsonStr
+import no.nav.helsearbeidsgiver.utils.json.toJson
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.desember
 import no.nav.helsearbeidsgiver.utils.test.date.januar
@@ -40,12 +40,12 @@ class SkjemaInntektsmeldingTest :
             }
 
             test("Serialiser og deserialiser FAISU-skjema OK") {
-
                 val faisuSkjema = TestData.fulltSkjemaMedFlereArbeidsforhold()
-                val skjema = faisuSkjema.toJsonStr(SkjemaInntektsmelding.serializer())
+                val skjema = faisuSkjema.toJson(SkjemaInntektsmelding.serializer()).toString()
                 val im = skjema.fromJson(SkjemaInntektsmelding.serializer())
                 im.flereArbeidsforhold shouldBe faisuSkjema.flereArbeidsforhold
             }
+
             context(SkjemaInntektsmelding::avsenderTlf.name) {
                 test("ugyldig tlf") {
                     val skjema =

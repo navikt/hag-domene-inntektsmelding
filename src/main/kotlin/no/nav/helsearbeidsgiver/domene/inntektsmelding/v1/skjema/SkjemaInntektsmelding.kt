@@ -3,7 +3,6 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema
 
 import kotlinx.serialization.EncodeDefault
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
@@ -23,7 +22,6 @@ import java.util.UUID
 
 private val sikkerLogger = sikkerLogger()
 
-@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class SkjemaInntektsmelding(
     val forespoerselId: UUID,
@@ -54,7 +52,6 @@ data class SkjemaInntektsmelding(
         ).tilFeilmeldinger()
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class SkjemaInntektsmeldingSelvbestemt(
     val selvbestemtId: UUID?,

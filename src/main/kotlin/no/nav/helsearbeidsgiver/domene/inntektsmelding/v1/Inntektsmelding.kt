@@ -3,7 +3,6 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import kotlinx.serialization.EncodeDefault
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -30,7 +29,6 @@ data class Inntektsmelding(
     val vedtaksperiodeId: UUID? = null, // nullable for å støtte fisker og utenArbeidsforhold
 ) {
     @Serializable
-    @OptIn(ExperimentalSerializationApi::class)
     sealed class Type {
         abstract val id: UUID
 

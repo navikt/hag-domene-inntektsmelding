@@ -23,7 +23,6 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.til
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.json.fromJson
 import no.nav.helsearbeidsgiver.utils.json.toJson
-import no.nav.helsearbeidsgiver.utils.json.toJsonStr
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
@@ -514,7 +513,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
             val skjema = fulltSkjema(vedtaksperiodeId = UUID.randomUUID())
 
             val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
-            val json = faisuSkjema.toJsonStr(SkjemaInntektsmeldingSelvbestemt.serializer())
+            val json = faisuSkjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer()).toString()
             json.shouldContain(
                 """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":20000.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":30000.0}]""",
             )
