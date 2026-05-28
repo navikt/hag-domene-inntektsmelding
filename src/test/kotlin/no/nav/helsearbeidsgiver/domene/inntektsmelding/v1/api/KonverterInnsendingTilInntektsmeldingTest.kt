@@ -79,7 +79,7 @@ class KonverterInnsendingTilInntektsmeldingTest :
                         Type.Forespurt(
                             id = UUID.randomUUID(),
                             erAgpForespurt = true,
-                            flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold,
+                            flereArbeidsforhold = TestData.flereArbeidsforhold,
                         ),
                 )
             faisuIM.type.harFlereArbeidsforhold() shouldBe true

@@ -27,7 +27,7 @@ class FlereArbeidsforholdTest :
                 listOf(false, false, false) to setOf(FeiletValidering(UGYLDIG_FLERE_ARBEIDSFORHOLD_INGEN_ARBEIDSFORHOLD)),
             ) { (inkluderte, forventetFeil) ->
                 val arbeidsforhold = inkluderte.map { lagArbeidsforhold(it) }.toList()
-                val flereArbeidsforhold = FlereArbeidsforhold(false, false, arbeidsforhold)
+                val flereArbeidsforhold = FlereArbeidsforhold(harLikLoenn = false, erSykmeldtFraAlle = false, arbeidsforhold = arbeidsforhold)
                 flereArbeidsforhold.valider() shouldBe forventetFeil
             }
         }

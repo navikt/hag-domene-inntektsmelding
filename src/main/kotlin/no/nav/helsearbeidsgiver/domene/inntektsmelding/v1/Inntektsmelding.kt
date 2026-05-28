@@ -55,6 +55,7 @@ data class Inntektsmelding(
             override val id: UUID,
             @EncodeDefault
             val erAgpForespurt: Boolean = true,
+            @EncodeDefault
             val flereArbeidsforhold: FlereArbeidsforhold? = null,
         ) : Type()
 
@@ -74,6 +75,7 @@ data class Inntektsmelding(
         @SerialName("Selvbestemt")
         data class Selvbestemt(
             override val id: UUID,
+            @EncodeDefault
             val flereArbeidsforhold: FlereArbeidsforhold? = null,
         ) : Type()
 

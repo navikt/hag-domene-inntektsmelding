@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -29,6 +30,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.juni
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import no.nav.helsearbeidsgiver.utils.test.date.oktober
 import no.nav.helsearbeidsgiver.utils.test.date.september
+import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
 import java.util.UUID
@@ -381,6 +383,61 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                 }
             }
 
+            context(SkjemaInntektsmeldingSelvbestemt::flereArbeidsforhold.name) {
+                test("gyldig får _ikke_ valideringsfeil") {
+                    val gyldig =
+                        fulltSkjema().copy(
+                            flereArbeidsforhold = TestData.flereArbeidsforhold,
+                        )
+
+                    gyldig.valider().shouldBeEmpty()
+                }
+
+                test("_ikke_ gyldig får valideringsfeil") {
+                    val ugyldig =
+                        fulltSkjema().copy(
+                            flereArbeidsforhold =
+                                FlereArbeidsforhold(
+                                    harLikLoenn = true,
+                                    erSykmeldtFraAlle = true,
+                                    arbeidsforhold = emptyList(),
+                                ),
+                        )
+
+                    ugyldig.valider().shouldNotBeEmpty()
+                }
+
+                test("Sum av inntektene fra flere arbeidsforhold kan ikke være forskjellig fra rapportert inntekt") {
+                    // suminntekt av alle arbeidsforhold er 50_000.0
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                inntekt = it.inntekt.copy(beloep = 49_000.0),
+                                flereArbeidsforhold = TestData.flereArbeidsforhold,
+                            )
+                        }
+
+                    skjema.valider() shouldContainExactly setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK)
+                }
+
+                context("flere arbeidsforhold uten arbeidsforholdstype 'med arbeidsforhold' er _ikke_ gyldig") {
+                    withData(
+                        nameFn = { "${it::class.simpleName}" },
+                        ArbeidsforholdType.Behandlingsdager,
+                        ArbeidsforholdType.Fisker,
+                        ArbeidsforholdType.UtenArbeidsforhold,
+                    ) {
+                        val skjema =
+                            fulltSkjema().copy(
+                                arbeidsforholdType = it,
+                                flereArbeidsforhold = TestData.flereArbeidsforhold,
+                            )
+
+                        skjema.valider() shouldContainExactly setOf(Feilmelding.TEKNISK_FEIL)
+                    }
+                }
+            }
+
             test("bestemmende fraværsdag før inntektsdato") {
                 val skjema =
                     fulltSkjema().let {
@@ -451,7 +508,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             agp =
                                 it.agp?.copy(
                                     redusertLoennIAgp =
-                                        it.agp?.redusertLoennIAgp?.copy(
+                                        it.agp.redusertLoennIAgp?.copy(
                                             beloep = -11.0,
                                         ),
                                 ),
@@ -489,54 +546,49 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     )
             }
         }
-        context("serialiser og deserialiserer ArbeidsforholdType") {
-            val vedtaksperiodeId = UUID.randomUUID()
-            withData(
-                nameFn = { (_, arbeidsforholdType) ->
-                    "ArbeidsforholdType: ${arbeidsforholdType::class.simpleName}"
-                },
-                fulltSkjema(vedtaksperiodeId) to ArbeidsforholdType.MedArbeidsforhold(vedtaksperiodeId),
-                fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.Fisker) to ArbeidsforholdType.Fisker,
-                fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.UtenArbeidsforhold) to
-                    ArbeidsforholdType.UtenArbeidsforhold,
-                fulltSkjema().copy(vedtaksperiodeId = null, arbeidsforholdType = ArbeidsforholdType.Behandlingsdager) to
+
+        context("serialisering") {
+            context(SkjemaInntektsmeldingSelvbestemt::arbeidsforholdType.name) {
+                val vedtaksperiodeId = UUID.randomUUID()
+                withData(
+                    nameFn = { "${it::class.simpleName}" },
+                    ArbeidsforholdType.MedArbeidsforhold(vedtaksperiodeId),
                     ArbeidsforholdType.Behandlingsdager,
-            ) { (skjema, arbeidsforholdType) ->
-                skjema.arbeidsforholdType shouldBe arbeidsforholdType
-                val json = skjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
-                val deserialisertSkjema =
-                    json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
-                deserialisertSkjema.arbeidsforholdType shouldBe arbeidsforholdType
+                    ArbeidsforholdType.Fisker,
+                    ArbeidsforholdType.UtenArbeidsforhold,
+                ) { arbeidsforholdType ->
+                    val skjema = fulltSkjema().copy(arbeidsforholdType = arbeidsforholdType)
+                    skjema.arbeidsforholdType shouldBe arbeidsforholdType
+
+                    val json = skjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                    val deserialisertSkjema = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+
+                    deserialisertSkjema.arbeidsforholdType shouldBe arbeidsforholdType
+                }
             }
-        }
-        test("serialiser og deserialiserer Selvbestemt med flereArbeidsforhold") {
-            val skjema = fulltSkjema(vedtaksperiodeId = UUID.randomUUID())
 
-            val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
-            val json = faisuSkjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer()).toString()
-            json.shouldContain(
-                """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":20000.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":30000.0}]""",
-            )
-            val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
-            im.flereArbeidsforhold shouldBe TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold
-        }
-        test("validerer flereArbeidsforhold") {
-            val skjema = fulltSkjema(vedtaksperiodeId = UUID.randomUUID())
+            test(SkjemaInntektsmeldingSelvbestemt::flereArbeidsforhold.name) {
+                val skjema = fulltSkjema()
 
-            val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold)
-            faisuSkjema.valider().shouldBeEmpty()
-            val ugyldig = faisuSkjema.copy(flereArbeidsforhold = FlereArbeidsforhold(true, false, emptyList()))
-            ugyldig.valider().shouldNotBeEmpty()
+                val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.flereArbeidsforhold)
+                val json = faisuSkjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer()).toString()
+                json.shouldContain(
+                    """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":20000.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":30000.0}]""",
+                )
+                val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
+                im.flereArbeidsforhold shouldBe TestData.flereArbeidsforhold
+            }
         }
     })
 
-private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInntektsmeldingSelvbestemt =
+private fun fulltSkjema(): SkjemaInntektsmeldingSelvbestemt =
     SkjemaInntektsmeldingSelvbestemt(
         selvbestemtId = UUID.randomUUID(),
-        sykmeldtFnr = Fnr("11037400132"),
+        arbeidsforholdType = ArbeidsforholdType.MedArbeidsforhold(UUID.randomUUID()),
+        sykmeldtFnr = Fnr.genererGyldig(),
         avsender =
             SkjemaAvsender(
-                orgnr = Orgnr("888414223"),
+                orgnr = Orgnr.genererGyldig(),
                 tlf = "45456060",
             ),
         sykmeldingsperioder =
@@ -554,13 +606,13 @@ private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInnte
                     ),
                 redusertLoennIAgp =
                     RedusertLoennIAgp(
-                        beloep = 34000.0,
+                        beloep = 34_000.0,
                         begrunnelse = RedusertLoennIAgp.Begrunnelse.LovligFravaer,
                     ),
             ),
         inntekt =
             Inntekt(
-                beloep = 50000.0,
+                beloep = 50_000.0,
                 inntektsdato = 31.mai,
                 endringAarsaker =
                     listOf(
@@ -585,7 +637,7 @@ private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInnte
             ),
         refusjon =
             Refusjon(
-                beloepPerMaaned = 10000.0,
+                beloepPerMaaned = 10_000.0,
                 endringer =
                     listOf(
                         RefusjonEndring(
@@ -602,6 +654,5 @@ private fun fulltSkjema(vedtaksperiodeId: UUID = UUID.randomUUID()): SkjemaInnte
                         ),
                     ),
             ),
-        vedtaksperiodeId = vedtaksperiodeId,
-        arbeidsforholdType = ArbeidsforholdType.MedArbeidsforhold(vedtaksperiodeId),
+        flereArbeidsforhold = null,
     )

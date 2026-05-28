@@ -39,13 +39,6 @@ class SkjemaInntektsmeldingTest :
                 TestData.fulltSkjema().valider().shouldBeEmpty()
             }
 
-            test("Serialiser og deserialiser FAISU-skjema OK") {
-                val faisuSkjema = TestData.fulltSkjemaMedFlereArbeidsforhold()
-                val skjema = faisuSkjema.toJson(SkjemaInntektsmelding.serializer()).toString()
-                val im = skjema.fromJson(SkjemaInntektsmelding.serializer())
-                im.flereArbeidsforhold shouldBe faisuSkjema.flereArbeidsforhold
-            }
-
             context(SkjemaInntektsmelding::avsenderTlf.name) {
                 test("ugyldig tlf") {
                     val skjema =
@@ -302,18 +295,26 @@ class SkjemaInntektsmeldingTest :
                 }
             }
 
-            context("Flere Arbeidsforhold") {
+            context(SkjemaInntektsmelding::flereArbeidsforhold.name) {
                 test("Inntekt kan ikke være null når flere arbeidsforhold er lagt inn") {
-                    TestData.fulltSkjemaMedFlereArbeidsforhold().copy(inntekt = null).valider() shouldContainExactly
+                    TestData
+                        .fulltSkjema()
+                        .copy(
+                            inntekt = null,
+                            flereArbeidsforhold = TestData.flereArbeidsforhold,
+                        ).valider() shouldContainExactly
                         listOf(
                             Feilmelding.TEKNISK_FEIL,
                         )
                 }
                 test("Bruker må svare nei på både lik lønn og sykmeldt fra alle forhold for at IM-skjema er gyldig") {
-                    TestData.fulltSkjemaMedFlereArbeidsforhold().valider().shouldBeEmpty()
-                    val flereArbeidsforhold = TestData.fulltSkjemaMedFlereArbeidsforhold().flereArbeidsforhold!!
-                    val ugyldigMedLikLoenn = flereArbeidsforhold.copy(harLikLoenn = true)
-                    val ugyldigMedSykmeldtAlle = flereArbeidsforhold.copy(erSykmeldtFraAlle = true)
+                    TestData
+                        .fulltSkjema()
+                        .copy(flereArbeidsforhold = TestData.flereArbeidsforhold)
+                        .valider()
+                        .shouldBeEmpty()
+                    val ugyldigMedLikLoenn = TestData.flereArbeidsforhold.copy(harLikLoenn = true)
+                    val ugyldigMedSykmeldtAlle = TestData.flereArbeidsforhold.copy(erSykmeldtFraAlle = true)
                     val ugyldigBegge = ugyldigMedLikLoenn.copy(erSykmeldtFraAlle = true)
                     ugyldigMedLikLoenn.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN)
                     ugyldigMedSykmeldtAlle.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE)
@@ -326,19 +327,20 @@ class SkjemaInntektsmeldingTest :
                         .shouldNotBeEmpty()
                 }
                 test("Må ha flere arbeidsforhold") {
-                    val ugyldig = FlereArbeidsforhold(false, false, emptyList())
+                    val ugyldig = FlereArbeidsforhold(harLikLoenn = false, erSykmeldtFraAlle = false, arbeidsforhold = emptyList())
                     ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO)
                 }
                 test("Sum av inntektene fra flere arbeidsforhold kan ikke være forskjellig fra rapportert inntekt") {
                     // sum inntekt i flereArbeidsforhold = 50.000:
                     val skjema =
-                        TestData.fulltSkjemaMedFlereArbeidsforhold().copy(
+                        TestData.fulltSkjema().copy(
                             inntekt =
                                 Inntekt(
                                     beloep = 49000.0,
                                     inntektsdato = LocalDate.now(),
                                     emptyList(),
                                 ),
+                            flereArbeidsforhold = TestData.flereArbeidsforhold,
                         )
                     skjema.valider() shouldContainAll setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK)
                 }
@@ -594,6 +596,15 @@ class SkjemaInntektsmeldingTest :
                         Feilmelding.KREVER_BELOEP_STOERRE_ENN_NULL,
                         Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
                     )
+            }
+        }
+
+        context("serialisering") {
+            test(SkjemaInntektsmelding::flereArbeidsforhold.name) {
+                val faisuSkjema = TestData.fulltSkjema().copy(flereArbeidsforhold = TestData.flereArbeidsforhold)
+                val skjema = faisuSkjema.toJson(SkjemaInntektsmelding.serializer()).toString()
+                val im = skjema.fromJson(SkjemaInntektsmelding.serializer())
+                im.flereArbeidsforhold shouldBe faisuSkjema.flereArbeidsforhold
             }
         }
     })

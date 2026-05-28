@@ -52,5 +52,17 @@ data class FlereArbeidsforhold(
             },
         )
 
+    internal fun validerMot(arbeidsforholdType: ArbeidsforholdType): List<FeiletValidering> =
+        listOfNotNull(
+            when (arbeidsforholdType) {
+                is ArbeidsforholdType.MedArbeidsforhold -> null
+
+                ArbeidsforholdType.Behandlingsdager,
+                ArbeidsforholdType.Fisker,
+                ArbeidsforholdType.UtenArbeidsforhold,
+                -> FeiletValidering(TEKNISK_FEIL)
+            },
+        )
+
     private fun sumInntekt(): Double = arbeidsforhold.sumOf { BigDecimal.valueOf(it.inntekt) }.toDouble()
 }
