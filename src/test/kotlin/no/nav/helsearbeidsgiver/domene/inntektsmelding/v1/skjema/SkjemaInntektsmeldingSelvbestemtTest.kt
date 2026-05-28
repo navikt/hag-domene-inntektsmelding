@@ -384,7 +384,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
             }
 
             context(SkjemaInntektsmeldingSelvbestemt::flereArbeidsforhold.name) {
-                test("flere arbeidsforhold er gyldig") {
+                test("gyldig får _ikke_ valideringsfeil") {
                     val gyldig =
                         fulltSkjema().copy(
                             flereArbeidsforhold = TestData.flereArbeidsforhold,
@@ -393,7 +393,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     gyldig.valider().shouldBeEmpty()
                 }
 
-                test("flere arbeidsforhold er _ikke_ gyldig") {
+                test("_ikke_ gyldig får valideringsfeil") {
                     val ugyldig =
                         fulltSkjema().copy(
                             flereArbeidsforhold =
