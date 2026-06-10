@@ -40,7 +40,7 @@ data class FlereArbeidsforhold(
             arbeidsforholdPerFom.values.flatMap { arbeidsforhold ->
                 listOfNotNull(
                     valider(
-                        vilkaar = arbeidsforhold.size > 1,
+                        vilkaar = arbeidsforhold.size >= 2,
                         feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_MINST_TO,
                     ),
                     valider(
