@@ -18,11 +18,11 @@ data class Arbeidsforhold(
         listOfNotNull(
             valider(
                 vilkaar = yrkesbeskrivelse.erGyldigEllerBlankString(),
-                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_YRKESBESKRIVELSE,
+                feilmelding = Feilmelding.UGYLDIG_ARBEIDSFORHOLD_YRKESBESKRIVELSE,
             ),
             valider(
                 vilkaar = stillingsprosent in 0.0..100.0,
-                feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT,
+                feilmelding = Feilmelding.UGYLDIG_ARBEIDSFORHOLD_STILLINGSPROSENT,
             ),
             valider(
                 vilkaar = inntekt.erStoerreEllerLikNullOgMindreEnnMaks(),

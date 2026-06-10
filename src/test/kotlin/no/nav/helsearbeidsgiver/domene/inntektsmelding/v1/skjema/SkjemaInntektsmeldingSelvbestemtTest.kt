@@ -13,6 +13,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.jsonObject
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.RedusertLoennIAgp
@@ -30,6 +31,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.juni
 import no.nav.helsearbeidsgiver.utils.test.date.mai
 import no.nav.helsearbeidsgiver.utils.test.date.oktober
 import no.nav.helsearbeidsgiver.utils.test.date.september
+import no.nav.helsearbeidsgiver.utils.test.json.removeJsonWhitespace
 import no.nav.helsearbeidsgiver.utils.test.wrapper.genererGyldig
 import no.nav.helsearbeidsgiver.utils.wrapper.Fnr
 import no.nav.helsearbeidsgiver.utils.wrapper.Orgnr
@@ -400,7 +402,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                                 FlereArbeidsforhold(
                                     harLikLoenn = true,
                                     erSykmeldtFraAlle = true,
-                                    arbeidsforhold = emptyList(),
+                                    arbeidsforholdPerFom = emptyMap(),
                                 ),
                         )
 
@@ -413,11 +415,11 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         fulltSkjema().let {
                             it.copy(
                                 inntekt = it.inntekt.copy(beloep = 49_000.0),
-                                flereArbeidsforhold = TestData.flereArbeidsforhold,
+                                flereArbeidsforhold = TestData.flereArbeidsforholdMedUgyldigInntekt,
                             )
                         }
 
-                    skjema.valider() shouldContainExactly setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK)
+                    skjema.valider() shouldContainExactly setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_INNTEKT_AVVIK)
                 }
 
                 context("flere arbeidsforhold uten arbeidsforholdstype 'med arbeidsforhold' er _ikke_ gyldig") {
@@ -568,13 +570,48 @@ class SkjemaInntektsmeldingSelvbestemtTest :
             }
 
             test(SkjemaInntektsmeldingSelvbestemt::flereArbeidsforhold.name) {
-                val skjema = fulltSkjema()
+                val faisuSkjema = fulltSkjema().copy(flereArbeidsforhold = TestData.flereArbeidsforhold)
+                val hardcodedJson =
+                    """
+                    {
+                        "harLikLoenn": false,
+                        "erSykmeldtFraAlle": false,
+                        "arbeidsforholdPerFom": {
+                            "2018-05-11": [
+                                {
+                                    "inkludertISykefravaer": true,
+                                    "yrkesbeskrivelse": "Snekker",
+                                    "stillingsprosent": 40.0,
+                                    "inntekt": 20000.0
+                                },
+                                {
+                                    "inkludertISykefravaer": false,
+                                    "yrkesbeskrivelse": "Stuntmann",
+                                    "stillingsprosent": 40.0,
+                                    "inntekt": 30000.0
+                                }
+                            ],
+                            "2018-06-20": [
+                                {
+                                    "inkludertISykefravaer": true,
+                                    "yrkesbeskrivelse": "Snekker",
+                                    "stillingsprosent": 70.0,
+                                    "inntekt": 40000.0
+                                },
+                                {
+                                    "inkludertISykefravaer": false,
+                                    "yrkesbeskrivelse": "Stuntmann",
+                                    "stillingsprosent": 40.0,
+                                    "inntekt": 10000.0
+                                }
+                            ]
+                        }
+                    }
+                    """.removeJsonWhitespace()
 
-                val faisuSkjema = skjema.copy(flereArbeidsforhold = TestData.flereArbeidsforhold)
                 val json = faisuSkjema.toJson(SkjemaInntektsmeldingSelvbestemt.serializer()).toString()
-                json.shouldContain(
-                    """"arbeidsforhold":[{"inkludertISykefravaer":true,"yrkesbeskrivelse":"Snekker","stillingsprosent":40.0,"inntekt":20000.0},{"inkludertISykefravaer":false,"yrkesbeskrivelse":"Stuntmann","stillingsprosent":40.0,"inntekt":30000.0}]""",
-                )
+                json shouldContain hardcodedJson
+
                 val im = json.fromJson(SkjemaInntektsmeldingSelvbestemt.serializer())
                 im.flereArbeidsforhold shouldBe TestData.flereArbeidsforhold
             }
