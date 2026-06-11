@@ -402,7 +402,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                                 FlereArbeidsforhold(
                                     harLikLoenn = true,
                                     erSykmeldtFraAlle = true,
-                                    arbeidsforholdPerFom = emptyMap(),
+                                    arbeidsforholdPerSykmeldingStartdato = emptyMap(),
                                 ),
                         )
 
@@ -419,7 +419,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             )
                         }
 
-                    skjema.valider() shouldContainExactly setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_INNTEKT_AVVIK)
+                    skjema.valider() shouldContainExactly setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_AVVIK)
                 }
 
                 context("flere arbeidsforhold uten arbeidsforholdstype 'med arbeidsforhold' er _ikke_ gyldig") {
@@ -576,7 +576,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     {
                         "harLikLoenn": false,
                         "erSykmeldtFraAlle": false,
-                        "arbeidsforholdPerFom": {
+                        "arbeidsforholdPerSykmeldingStartdato": {
                             "2018-05-11": [
                                 {
                                     "inkludertISykefravaer": true,

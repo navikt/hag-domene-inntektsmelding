@@ -38,7 +38,7 @@ class FlereArbeidsforholdTest :
         test("Må ha minst én dato med flere arbeidsforhold") {
             val flere =
                 TestData.flereArbeidsforhold.copy(
-                    arbeidsforholdPerFom = emptyMap(),
+                    arbeidsforholdPerSykmeldingStartdato = emptyMap(),
                 )
 
             flere.valider() shouldContainExactly listOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_IKKE_TOM))
@@ -47,15 +47,15 @@ class FlereArbeidsforholdTest :
         test("Må ha minst to arbeidsforhold") {
             val flere =
                 TestData.flereArbeidsforhold.copy(
-                    arbeidsforholdPerFom =
+                    arbeidsforholdPerSykmeldingStartdato =
                         mapOf(
                             11.mai to listOf(TestData.lagArbeidsforhold().copy(inkludertISykefravaer = true)),
                         ),
                 )
             flere.valider() shouldContainExactly
                 listOf(
-                    FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_MINST_TO),
-                    FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_ALLE_ARBEIDSFORHOLD),
+                    FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_MINST_TO),
+                    FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_ALLE_ARBEIDSFORHOLD),
                 )
         }
 
@@ -67,14 +67,14 @@ class FlereArbeidsforholdTest :
                 listOf(true, false, false) to emptySet(),
                 listOf(false, true, false) to emptySet(),
                 listOf(true, true, false) to emptySet(),
-                listOf(true, true, true) to setOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_ALLE_ARBEIDSFORHOLD)),
-                listOf(false, false, false) to setOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_INGEN_ARBEIDSFORHOLD)),
+                listOf(true, true, true) to setOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_ALLE_ARBEIDSFORHOLD)),
+                listOf(false, false, false) to setOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INGEN_ARBEIDSFORHOLD)),
             ) { (inkluderte, forventetFeil) ->
                 val arbeidsforhold = inkluderte.map { TestData.lagArbeidsforhold().copy(inkludertISykefravaer = it) }.toList()
 
                 val flereArbeidsforhold =
                     TestData.flereArbeidsforhold.copy(
-                        arbeidsforholdPerFom = mapOf(20.juni to arbeidsforhold),
+                        arbeidsforholdPerSykmeldingStartdato = mapOf(20.juni to arbeidsforhold),
                     )
 
                 flereArbeidsforhold.valider() shouldBe forventetFeil

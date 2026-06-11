@@ -79,7 +79,7 @@ object TestData {
         FlereArbeidsforhold(
             harLikLoenn = false,
             erSykmeldtFraAlle = false,
-            arbeidsforholdPerFom =
+            arbeidsforholdPerSykmeldingStartdato =
                 mapOf(
                     11.mai to
                         listOf(
@@ -116,9 +116,9 @@ object TestData {
 
     val flereArbeidsforholdMedUgyldigInntekt =
         flereArbeidsforhold.copy(
-            arbeidsforholdPerFom =
-                flereArbeidsforhold.arbeidsforholdPerFom.mapValues { (fom, arbeidsforhold) ->
-                    if (fom == 20.juni) {
+            arbeidsforholdPerSykmeldingStartdato =
+                flereArbeidsforhold.arbeidsforholdPerSykmeldingStartdato.mapValues { (startdato, arbeidsforhold) ->
+                    if (startdato == 20.juni) {
                         arbeidsforhold.map { it.copy(inntekt = 30_000.0) }
                     } else {
                         arbeidsforhold

@@ -17,7 +17,7 @@ import kotlin.collections.sumOf
 data class FlereArbeidsforhold(
     val harLikLoenn: Boolean,
     val erSykmeldtFraAlle: Boolean,
-    val arbeidsforholdPerFom: Map<LocalDate, List<Arbeidsforhold>>,
+    val arbeidsforholdPerSykmeldingStartdato: Map<LocalDate, List<Arbeidsforhold>>,
 ) {
     internal fun valider(): List<FeiletValidering> {
         val overordnedeFeil =
@@ -31,30 +31,30 @@ data class FlereArbeidsforhold(
                     feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE,
                 ),
                 valider(
-                    vilkaar = arbeidsforholdPerFom.isNotEmpty(),
+                    vilkaar = arbeidsforholdPerSykmeldingStartdato.isNotEmpty(),
                     feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_IKKE_TOM,
                 ),
             )
 
         val feilPaaTversAvArbeidsforhold =
-            arbeidsforholdPerFom.values.flatMap { arbeidsforhold ->
+            arbeidsforholdPerSykmeldingStartdato.values.flatMap { arbeidsforhold ->
                 listOfNotNull(
                     valider(
                         vilkaar = arbeidsforhold.size >= 2,
-                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_MINST_TO,
+                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_MINST_TO,
                     ),
                     valider(
                         vilkaar = arbeidsforhold.any { it.inkludertISykefravaer },
-                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_INGEN_ARBEIDSFORHOLD,
+                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INGEN_ARBEIDSFORHOLD,
                     ),
                     valider(
                         vilkaar = !arbeidsforhold.all { it.inkludertISykefravaer },
-                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_ALLE_ARBEIDSFORHOLD,
+                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_ALLE_ARBEIDSFORHOLD,
                     ),
                 )
             }
 
-        val feilIEnkelteArbeidsforhold = arbeidsforholdPerFom.values.flatten().flatMap { it.valider() }
+        val feilIEnkelteArbeidsforhold = arbeidsforholdPerSykmeldingStartdato.values.flatten().flatMap { it.valider() }
 
         return overordnedeFeil + feilPaaTversAvArbeidsforhold + feilIEnkelteArbeidsforhold
     }
@@ -65,8 +65,8 @@ data class FlereArbeidsforhold(
                 FeiletValidering(Feilmelding.TEKNISK_FEIL)
             } else {
                 valider(
-                    vilkaar = sumInntektPerFom().all { it == inntekt.beloep },
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_FOM_INNTEKT_AVVIK,
+                    vilkaar = sumInntektPerStartdato().all { it == inntekt.beloep },
+                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_AVVIK,
                 )
             },
         )
@@ -83,8 +83,8 @@ data class FlereArbeidsforhold(
             },
         )
 
-    private fun sumInntektPerFom(): List<Double> =
-        arbeidsforholdPerFom.values.map { arbeidsforhold ->
+    private fun sumInntektPerStartdato(): List<Double> =
+        arbeidsforholdPerSykmeldingStartdato.values.map { arbeidsforhold ->
             arbeidsforhold.sumOf { BigDecimal.valueOf(it.inntekt) }.toDouble()
         }
 }
