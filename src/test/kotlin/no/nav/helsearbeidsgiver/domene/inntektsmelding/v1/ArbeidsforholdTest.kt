@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.TestData.lagArbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_YRKESBESKRIVELSE
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_ARBEIDSFORHOLD_STILLINGSPROSENT
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding.UGYLDIG_ARBEIDSFORHOLD_YRKESBESKRIVELSE
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.MAKS_GRENSE_BELOEP
 
 class ArbeidsforholdTest :
@@ -22,8 +22,8 @@ class ArbeidsforholdTest :
                 1.0 to emptySet(),
                 100.0 to emptySet(),
                 0.0 to emptySet(), // 0 % gir nok mening bare dersom arbeidsforholdet ikke skal telle
-                -1.0 to setOf(FeiletValidering(UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT)),
-                100.1 to setOf(FeiletValidering(UGYLDIG_FLERE_ARBEIDSFORHOLD_STILLINGSPROSENT)),
+                -1.0 to setOf(FeiletValidering(UGYLDIG_ARBEIDSFORHOLD_STILLINGSPROSENT)),
+                100.1 to setOf(FeiletValidering(UGYLDIG_ARBEIDSFORHOLD_STILLINGSPROSENT)),
             ) { (stillingsprosent, forventetFeil) ->
 
                 val arbeidsforhold =
@@ -70,9 +70,9 @@ class ArbeidsforholdTest :
                     "$yrkesbeskrivelse gir feil $forventetFeil"
                 },
                 "Snekker (lærling)" to emptySet(),
-                "select * from inntektsmelding;" to setOf(FeiletValidering(UGYLDIG_FLERE_ARBEIDSFORHOLD_YRKESBESKRIVELSE)),
+                "select * from inntektsmelding;" to setOf(FeiletValidering(UGYLDIG_ARBEIDSFORHOLD_YRKESBESKRIVELSE)),
             ) { (yrkesbeskrivelse, forventetFeil) ->
-                val arbeidsforhold = lagArbeidsforhold(inkludertISykefravaer = true, yrkesbeskrivelse = yrkesbeskrivelse)
+                val arbeidsforhold = lagArbeidsforhold().copy(inkludertISykefravaer = true, yrkesbeskrivelse = yrkesbeskrivelse)
                 arbeidsforhold.valider() shouldBe forventetFeil
             }
         }

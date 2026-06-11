@@ -1,6 +1,5 @@
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.SkjemaInntektsmelding
 import no.nav.helsearbeidsgiver.utils.test.date.juli
 import no.nav.helsearbeidsgiver.utils.test.date.juni
@@ -68,13 +67,10 @@ object TestData {
             flereArbeidsforhold = null,
         )
 
-    fun lagArbeidsforhold(
-        inkludertISykefravaer: Boolean = false,
-        yrkesbeskrivelse: String = "Maler",
-    ): Arbeidsforhold =
+    fun lagArbeidsforhold(): Arbeidsforhold =
         Arbeidsforhold(
-            inkludertISykefravaer = inkludertISykefravaer,
-            yrkesbeskrivelse = yrkesbeskrivelse,
+            inkludertISykefravaer = false,
+            yrkesbeskrivelse = "Maler",
             stillingsprosent = 5.0,
             inntekt = 1.0,
         )
@@ -83,20 +79,50 @@ object TestData {
         FlereArbeidsforhold(
             harLikLoenn = false,
             erSykmeldtFraAlle = false,
-            arbeidsforhold =
-                listOf(
-                    Arbeidsforhold(
-                        inkludertISykefravaer = true,
-                        yrkesbeskrivelse = "Snekker",
-                        stillingsprosent = 40.0,
-                        inntekt = 20000.00,
-                    ),
-                    Arbeidsforhold(
-                        inkludertISykefravaer = false,
-                        yrkesbeskrivelse = "Stuntmann",
-                        stillingsprosent = 40.0,
-                        inntekt = 30000.00,
-                    ),
+            arbeidsforholdPerSykmeldingStartdato =
+                mapOf(
+                    11.mai to
+                        listOf(
+                            Arbeidsforhold(
+                                inkludertISykefravaer = true,
+                                yrkesbeskrivelse = "Snekker",
+                                stillingsprosent = 40.0,
+                                inntekt = 20_000.0,
+                            ),
+                            Arbeidsforhold(
+                                inkludertISykefravaer = false,
+                                yrkesbeskrivelse = "Stuntmann",
+                                stillingsprosent = 40.0,
+                                inntekt = 30_000.0,
+                            ),
+                        ),
+                    20.juni to
+                        listOf(
+                            Arbeidsforhold(
+                                inkludertISykefravaer = true,
+                                yrkesbeskrivelse = "Snekker",
+                                stillingsprosent = 70.0,
+                                inntekt = 40_000.0,
+                            ),
+                            Arbeidsforhold(
+                                inkludertISykefravaer = false,
+                                yrkesbeskrivelse = "Stuntmann",
+                                stillingsprosent = 40.0,
+                                inntekt = 10_000.0,
+                            ),
+                        ),
                 ),
+        )
+
+    val flereArbeidsforholdMedUgyldigInntekt =
+        flereArbeidsforhold.copy(
+            arbeidsforholdPerSykmeldingStartdato =
+                flereArbeidsforhold.arbeidsforholdPerSykmeldingStartdato.mapValues { (startdato, arbeidsforhold) ->
+                    if (startdato == 20.juni) {
+                        arbeidsforhold.map { it.copy(inntekt = 30_000.0) }
+                    } else {
+                        arbeidsforhold
+                    }
+                },
         )
 }

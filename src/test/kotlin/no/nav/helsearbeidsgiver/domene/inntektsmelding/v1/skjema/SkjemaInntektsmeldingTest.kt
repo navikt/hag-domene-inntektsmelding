@@ -11,6 +11,7 @@ import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Arbeidsgiverperiode
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Bonus
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.FlereArbeidsforhold
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Inntekt
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Naturalytelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.Periode
@@ -307,6 +308,7 @@ class SkjemaInntektsmeldingTest :
                             Feilmelding.TEKNISK_FEIL,
                         )
                 }
+
                 test("Bruker må svare nei på både lik lønn og sykmeldt fra alle forhold for at IM-skjema er gyldig") {
                     TestData
                         .fulltSkjema()
@@ -326,10 +328,17 @@ class SkjemaInntektsmeldingTest :
                         .valider()
                         .shouldNotBeEmpty()
                 }
+
                 test("Må ha flere arbeidsforhold") {
-                    val ugyldig = FlereArbeidsforhold(harLikLoenn = false, erSykmeldtFraAlle = false, arbeidsforhold = emptyList())
-                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MAA_HA_MINST_TO)
+                    val ugyldig =
+                        FlereArbeidsforhold(
+                            harLikLoenn = false,
+                            erSykmeldtFraAlle = false,
+                            arbeidsforholdPerSykmeldingStartdato = emptyMap(),
+                        )
+                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_IKKE_TOM)
                 }
+
                 test("Sum av inntektene fra flere arbeidsforhold kan ikke være forskjellig fra rapportert inntekt") {
                     // sum inntekt i flereArbeidsforhold = 50.000:
                     val skjema =
@@ -340,9 +349,10 @@ class SkjemaInntektsmeldingTest :
                                     inntektsdato = LocalDate.now(),
                                     emptyList(),
                                 ),
-                            flereArbeidsforhold = TestData.flereArbeidsforhold,
+                            flereArbeidsforhold = TestData.flereArbeidsforholdMedUgyldigInntekt,
                         )
-                    skjema.valider() shouldContainAll setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK)
+
+                    skjema.valider() shouldContainAll setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_AVVIK)
                 }
             }
 
