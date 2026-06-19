@@ -152,7 +152,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
@@ -409,6 +409,18 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     ugyldig.valider().shouldNotBeEmpty()
                 }
 
+                test("startdato for arbeidsforhold må være samme som eller etter inntektsdato") {
+                    val skjema =
+                        fulltSkjema().let {
+                            it.copy(
+                                inntekt = it.inntekt.copy(inntektsdato = 1.juni),
+                                flereArbeidsforhold = TestData.flereArbeidsforhold,
+                            )
+                        }
+
+                    skjema.valider() shouldContainExactly setOf(Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_IKKE_FOER_INNTEKTSDATO)
+                }
+
                 test("Sum av inntektene fra flere arbeidsforhold kan ikke være forskjellig fra rapportert inntekt") {
                     // suminntekt av alle arbeidsforhold er 50_000.0
                     val skjema =
@@ -419,7 +431,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             )
                         }
 
-                    skjema.valider() shouldContainExactly setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_AVVIK)
+                    skjema.valider() shouldContainExactly setOf(Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_SUM_IKKE_AVVIK)
                 }
 
                 context("flere arbeidsforhold uten arbeidsforholdstype 'med arbeidsforhold' er _ikke_ gyldig") {
@@ -476,7 +488,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         )
                     }
 
-                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_IKKE_OVER_INNTEKT)
             }
 
             test("refusjonsbeløp i endring over inntekt") {
@@ -500,7 +512,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         )
                     }
 
-                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_IKKE_OVER_INNTEKT)
             }
 
             test("duplikate feilmeldinger fjernes") {
@@ -577,7 +589,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         "harLikLoenn": false,
                         "erSykmeldtFraAlle": false,
                         "arbeidsforholdPerSykmeldingStartdato": {
-                            "2018-05-11": [
+                            "2018-05-31": [
                                 {
                                     "inkludertISykefravaer": true,
                                     "yrkesbeskrivelse": "Snekker",

@@ -24,15 +24,15 @@ data class FlereArbeidsforhold(
             listOfNotNull(
                 valider(
                     vilkaar = !harLikLoenn,
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_ULIK_LOENN,
                 ),
                 valider(
                     vilkaar = !erSykmeldtFraAlle,
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_SYK_FRA_ALLE,
                 ),
                 valider(
                     vilkaar = arbeidsforholdPerSykmeldingStartdato.isNotEmpty(),
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_IKKE_TOM,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_TOM,
                 ),
             )
 
@@ -41,15 +41,15 @@ data class FlereArbeidsforhold(
                 listOfNotNull(
                     valider(
                         vilkaar = arbeidsforhold.size >= 2,
-                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_MINST_TO,
+                        feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_MINST_TO,
                     ),
                     valider(
                         vilkaar = arbeidsforhold.any { it.inkludertISykefravaer },
-                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INGEN_ARBEIDSFORHOLD,
+                        feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_MINST_ETT_INKLUDERT,
                     ),
                     valider(
                         vilkaar = !arbeidsforhold.all { it.inkludertISykefravaer },
-                        feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_ALLE_ARBEIDSFORHOLD,
+                        feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_IKKE_ALLE_INKLUDERT,
                     ),
                 )
             }
@@ -60,16 +60,20 @@ data class FlereArbeidsforhold(
     }
 
     internal fun validerMot(inntekt: Inntekt?): List<FeiletValidering> =
-        listOfNotNull(
-            if (inntekt == null) {
-                FeiletValidering(Feilmelding.TEKNISK_FEIL)
-            } else {
+        if (inntekt == null) {
+            listOf(FeiletValidering(Feilmelding.TEKNISK_FEIL))
+        } else {
+            listOfNotNull(
+                valider(
+                    vilkaar = arbeidsforholdPerSykmeldingStartdato.keys.all { !it.isBefore(inntekt.inntektsdato) },
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_IKKE_FOER_INNTEKTSDATO,
+                ),
                 valider(
                     vilkaar = sumInntektPerStartdato().all { it == inntekt.beloep },
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_AVVIK,
-                )
-            },
-        )
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_SUM_IKKE_AVVIK,
+                ),
+            )
+        }
 
     internal fun validerMot(arbeidsforholdType: ArbeidsforholdType): List<FeiletValidering> =
         listOfNotNull(

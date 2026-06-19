@@ -81,7 +81,7 @@ object TestData {
             erSykmeldtFraAlle = false,
             arbeidsforholdPerSykmeldingStartdato =
                 mapOf(
-                    11.mai to
+                    31.mai to
                         listOf(
                             Arbeidsforhold(
                                 inkludertISykefravaer = true,
