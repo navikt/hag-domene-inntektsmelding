@@ -21,7 +21,7 @@ class FlereArbeidsforholdTest :
                     harLikLoenn = true,
                 )
 
-            flere.valider() shouldContainExactly listOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN))
+            flere.valider() shouldContainExactly listOf(FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_ULIK_LOENN))
         }
 
         test("Kan ikke være syk fra alle") {
@@ -30,7 +30,7 @@ class FlereArbeidsforholdTest :
                     erSykmeldtFraAlle = true,
                 )
 
-            flere.valider() shouldContainExactly listOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE))
+            flere.valider() shouldContainExactly listOf(FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_SYK_FRA_ALLE))
         }
 
         test("Må ha minst to arbeidsforhold") {
@@ -40,8 +40,8 @@ class FlereArbeidsforholdTest :
                 )
             flere.valider() shouldContainExactly
                 listOf(
-                    FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MINST_TO),
-                    FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_ALLE_ARBEIDSFORHOLD),
+                    FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_MINST_TO),
+                    FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_ALLE_INKLUDERT),
                 )
         }
 
@@ -53,8 +53,8 @@ class FlereArbeidsforholdTest :
                 listOf(true, false, false) to emptySet(),
                 listOf(false, true, false) to emptySet(),
                 listOf(true, true, false) to emptySet(),
-                listOf(true, true, true) to setOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_ALLE_ARBEIDSFORHOLD)),
-                listOf(false, false, false) to setOf(FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INGEN_ARBEIDSFORHOLD)),
+                listOf(true, true, true) to setOf(FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_ALLE_INKLUDERT)),
+                listOf(false, false, false) to setOf(FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_MINST_ETT_INKLUDERT)),
             ) { (inkluderte, forventetFeil) ->
                 val flereArbeidsforhold =
                     TestData.flereArbeidsforhold.copy(

@@ -152,7 +152,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
@@ -419,7 +419,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             )
                         }
 
-                    skjema.valider() shouldContainExactly setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK)
+                    skjema.valider() shouldContainExactly setOf(Feilmelding.FLERE_ARBEIDSFORHOLD_INNTEKT_SUM_IKKE_AVVIK)
                 }
 
                 context("flere arbeidsforhold uten arbeidsforholdstype 'med arbeidsforhold' er _ikke_ gyldig") {
@@ -476,7 +476,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         )
                     }
 
-                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_IKKE_OVER_INNTEKT)
             }
 
             test("refusjonsbeløp i endring over inntekt") {
@@ -500,7 +500,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                         )
                     }
 
-                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_IKKE_OVER_INNTEKT)
             }
 
             test("duplikate feilmeldinger fjernes") {

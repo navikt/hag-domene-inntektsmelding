@@ -1,14 +1,10 @@
-@file:UseSerializers(LocalDateSerializer::class)
-
 package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.skjema.ArbeidsforholdType
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
-import no.nav.helsearbeidsgiver.utils.json.serializer.LocalDateSerializer
 import java.math.BigDecimal
 import kotlin.collections.sumOf
 
@@ -23,11 +19,11 @@ data class FlereArbeidsforhold(
             listOfNotNull(
                 valider(
                     vilkaar = !harLikLoenn,
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_ULIK_LOENN,
                 ),
                 valider(
                     vilkaar = !erSykmeldtFraAlle,
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_SYK_FRA_ALLE,
                 ),
             )
 
@@ -35,15 +31,15 @@ data class FlereArbeidsforhold(
             listOfNotNull(
                 valider(
                     vilkaar = arbeidsforhold.size >= 2,
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MINST_TO,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_MINST_TO,
                 ),
                 valider(
                     vilkaar = arbeidsforhold.any { it.inkludertISykefravaer },
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INGEN_ARBEIDSFORHOLD,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_MINST_ETT_INKLUDERT,
                 ),
                 valider(
                     vilkaar = !arbeidsforhold.all { it.inkludertISykefravaer },
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_ALLE_ARBEIDSFORHOLD,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_ALLE_INKLUDERT,
                 ),
             )
 
@@ -59,7 +55,7 @@ data class FlereArbeidsforhold(
             } else {
                 valider(
                     vilkaar = sumInntekt() == inntekt.beloep,
-                    feilmelding = Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK,
+                    feilmelding = Feilmelding.FLERE_ARBEIDSFORHOLD_INNTEKT_SUM_IKKE_AVVIK,
                 )
             },
         )
