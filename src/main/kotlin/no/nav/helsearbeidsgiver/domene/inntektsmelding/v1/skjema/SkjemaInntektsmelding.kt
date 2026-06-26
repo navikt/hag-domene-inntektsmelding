@@ -133,16 +133,16 @@ private fun validerRefusjonMotInntekt(
         listOfNotNull(
             valider(
                 vilkaar = inntekt.beloep == 0.0 || refusjon.beloepPerMaaned <= inntekt.beloep,
-                feilmelding = Feilmelding.REFUSJON_OVER_INNTEKT,
+                feilmelding = Feilmelding.REFUSJON_IKKE_OVER_INNTEKT,
             ),
             valider(
                 vilkaar = inntekt.beloep == 0.0 || refusjon.endringer.all { it.beloep <= inntekt.beloep },
-                feilmelding = Feilmelding.REFUSJON_OVER_INNTEKT,
+                feilmelding = Feilmelding.REFUSJON_IKKE_OVER_INNTEKT,
             ),
             // "Fallback"-sjekk dersom ingen AGP - da skal dato for refusjonEndring alltid være senere enn InntektDato
             valider(
                 vilkaar = refusjon.endringer.all { it.startdato.isAfter(inntekt.inntektsdato) },
-                feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_INNTEKTDATO,
+                feilmelding = Feilmelding.REFUSJON_ENDRING_ETTER_INNTEKTDATO,
             ),
         )
     } else {
@@ -165,7 +165,7 @@ private fun validerRefusjonMotAgp(
             ?.mapNotNull { endring ->
                 valider(
                     vilkaar = endring.startdato.isAfter(agpMax),
-                    feilmelding = Feilmelding.REFUSJON_ENDRING_FOER_AGP_SLUTT,
+                    feilmelding = Feilmelding.REFUSJON_ENDRING_ETTER_AGP_SLUTT,
                 )
             }.orEmpty()
     }

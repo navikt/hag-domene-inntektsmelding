@@ -54,7 +54,7 @@ data class Arbeidsgiverperiode(
                 else -> {
                     valider(
                         vilkaar = redusertLoennIAgp != null || erBehandlingsdager(),
-                        feilmelding = Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER,
+                        feilmelding = Feilmelding.AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER,
                     )
                 }
             }

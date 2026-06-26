@@ -70,7 +70,7 @@ class SkjemaInntektsmeldingTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan _ikke_ være 1 dag når AG betaler full lønn i AGP") {
@@ -85,7 +85,7 @@ class SkjemaInntektsmeldingTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
+                    skjema.valider() shouldBe setOf(Feilmelding.AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER)
                 }
 
                 test("AGP kan være tom når AG _ikke_ betaler full lønn i AGP") {
@@ -176,7 +176,7 @@ class SkjemaInntektsmeldingTest :
                     test("kan ikke inneholde flere perioder i samme uke") {
                         val flereGangerIUken = behandlingsdager.take(11).plus(Periode(2.januar, 2.januar))
                         flereGangerIUken.tilArbeidsgiverperiode().valider() shouldBe
-                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
+                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
                     }
 
                     test("kan ikke inneholde flere perioder i samme uke selv over et årsskifte") {
@@ -184,7 +184,7 @@ class SkjemaInntektsmeldingTest :
                         val periode2025 = Periode(1.januar(2025), 1.januar(2025))
                         val overAarSkifte = behandlingsdager.take(10).plus(peiode2024).plus(periode2025)
                         overAarSkifte.tilArbeidsgiverperiode().valider() shouldBe
-                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_UTEN_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
+                            listOf(FeiletValidering(Feilmelding.AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER))
                     }
                 }
 
@@ -318,8 +318,8 @@ class SkjemaInntektsmeldingTest :
                     val ugyldigMedLikLoenn = TestData.flereArbeidsforhold.copy(harLikLoenn = true)
                     val ugyldigMedSykmeldtAlle = TestData.flereArbeidsforhold.copy(erSykmeldtFraAlle = true)
                     val ugyldigBegge = ugyldigMedLikLoenn.copy(erSykmeldtFraAlle = true)
-                    ugyldigMedLikLoenn.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MED_LIK_LOENN)
-                    ugyldigMedSykmeldtAlle.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_SYK_FRA_ALLE)
+                    ugyldigMedLikLoenn.valider() shouldContain FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_ULIK_LOENN)
+                    ugyldigMedSykmeldtAlle.valider() shouldContain FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_IKKE_SYK_FRA_ALLE)
                     ugyldigBegge.valider().shouldNotBeEmpty()
                     // Verifiser at skjema kaller arbeidsforhold.valider() også:
                     TestData
@@ -334,9 +334,9 @@ class SkjemaInntektsmeldingTest :
                         FlereArbeidsforhold(
                             harLikLoenn = false,
                             erSykmeldtFraAlle = false,
-                            arbeidsforholdPerSykmeldingStartdato = emptyMap(),
+                            arbeidsforhold = emptyList(),
                         )
-                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_IKKE_TOM)
+                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.FLERE_ARBEIDSFORHOLD_MINST_TO)
                 }
 
                 test("Sum av inntektene fra flere arbeidsforhold kan ikke være forskjellig fra rapportert inntekt") {
@@ -352,7 +352,7 @@ class SkjemaInntektsmeldingTest :
                             flereArbeidsforhold = TestData.flereArbeidsforholdMedUgyldigInntekt,
                         )
 
-                    skjema.valider() shouldContainAll setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_AVVIK)
+                    skjema.valider() shouldContainAll setOf(Feilmelding.FLERE_ARBEIDSFORHOLD_INNTEKT_SUM_IKKE_AVVIK)
                 }
             }
 
@@ -431,7 +431,7 @@ class SkjemaInntektsmeldingTest :
                             refusjon = ugyldigRefusjon,
                         )
 
-                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_FOER_AGP_SLUTT)
+                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_ETTER_AGP_SLUTT)
                 }
 
                 test("dato for refusjonEndring må være etter inntektDato hvis ingen AGP") {
@@ -455,7 +455,7 @@ class SkjemaInntektsmeldingTest :
                             refusjon = ugyldigRefusjon,
                         )
 
-                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_FOER_INNTEKTDATO)
+                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_ENDRING_ETTER_INNTEKTDATO)
                 }
             }
 
@@ -493,7 +493,7 @@ class SkjemaInntektsmeldingTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_IKKE_OVER_INNTEKT)
                 }
 
                 test("refusjonsbeløp i endring er uavhengig av inntekt hvis inntekt er 0") {
@@ -541,7 +541,7 @@ class SkjemaInntektsmeldingTest :
                             )
                         }
 
-                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_OVER_INNTEKT)
+                    skjema.valider() shouldBe setOf(Feilmelding.REFUSJON_IKKE_OVER_INNTEKT)
                 }
             }
 
@@ -556,7 +556,7 @@ class SkjemaInntektsmeldingTest :
                         )
                     }
 
-                skjema.valider() shouldBe setOf(Feilmelding.DUPLIKAT_INNTEKT_ENDRINGSAARSAK)
+                skjema.valider() shouldBe setOf(Feilmelding.INNTEKT_ENDRINGSAARSAK_IKKE_DUPLIKAT)
             }
 
             test("duplikate feilmeldinger fjernes") {
