@@ -334,9 +334,9 @@ class SkjemaInntektsmeldingTest :
                         FlereArbeidsforhold(
                             harLikLoenn = false,
                             erSykmeldtFraAlle = false,
-                            arbeidsforholdPerSykmeldingStartdato = emptyMap(),
+                            arbeidsforhold = emptyList(),
                         )
-                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_IKKE_TOM)
+                    ugyldig.valider() shouldContain FeiletValidering(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_MINST_TO)
                 }
 
                 test("Sum av inntektene fra flere arbeidsforhold kan ikke være forskjellig fra rapportert inntekt") {
@@ -352,7 +352,7 @@ class SkjemaInntektsmeldingTest :
                             flereArbeidsforhold = TestData.flereArbeidsforholdMedUgyldigInntekt,
                         )
 
-                    skjema.valider() shouldContainAll setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_AVVIK)
+                    skjema.valider() shouldContainAll setOf(Feilmelding.UGYLDIG_FLERE_ARBEIDSFORHOLD_INNTEKT_AVVIK)
                 }
             }
 
