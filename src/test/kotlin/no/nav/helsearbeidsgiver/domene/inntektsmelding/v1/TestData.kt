@@ -79,47 +79,29 @@ object TestData {
         FlereArbeidsforhold(
             harLikLoenn = false,
             erSykmeldtFraAlle = false,
-            arbeidsforholdPerSykmeldingStartdato =
-                mapOf(
-                    11.mai to
-                        listOf(
-                            Arbeidsforhold(
-                                inkludertISykefravaer = true,
-                                yrkesbeskrivelse = "Snekker",
-                                stillingsprosent = 40.0,
-                                inntekt = 20_000.0,
-                            ),
-                            Arbeidsforhold(
-                                inkludertISykefravaer = false,
-                                yrkesbeskrivelse = "Stuntmann",
-                                stillingsprosent = 40.0,
-                                inntekt = 30_000.0,
-                            ),
-                        ),
-                    20.juni to
-                        listOf(
-                            Arbeidsforhold(
-                                inkludertISykefravaer = true,
-                                yrkesbeskrivelse = "Snekker",
-                                stillingsprosent = 70.0,
-                                inntekt = 40_000.0,
-                            ),
-                            Arbeidsforhold(
-                                inkludertISykefravaer = false,
-                                yrkesbeskrivelse = "Stuntmann",
-                                stillingsprosent = 40.0,
-                                inntekt = 10_000.0,
-                            ),
-                        ),
+            arbeidsforhold =
+                listOf(
+                    Arbeidsforhold(
+                        inkludertISykefravaer = true,
+                        yrkesbeskrivelse = "Snekker",
+                        stillingsprosent = 40.0,
+                        inntekt = 20_000.0,
+                    ),
+                    Arbeidsforhold(
+                        inkludertISykefravaer = false,
+                        yrkesbeskrivelse = "Stuntmann",
+                        stillingsprosent = 40.0,
+                        inntekt = 30_000.0,
+                    ),
                 ),
         )
 
     val flereArbeidsforholdMedUgyldigInntekt =
         flereArbeidsforhold.copy(
-            arbeidsforholdPerSykmeldingStartdato =
-                flereArbeidsforhold.arbeidsforholdPerSykmeldingStartdato.mapValues { (startdato, arbeidsforhold) ->
-                    if (startdato == 20.juni) {
-                        arbeidsforhold.map { it.copy(inntekt = 30_000.0) }
+            arbeidsforhold =
+                flereArbeidsforhold.arbeidsforhold.mapIndexed { index, arbeidsforhold ->
+                    if (index == 0) {
+                        arbeidsforhold.copy(inntekt = 40_000.0)
                     } else {
                         arbeidsforhold
                     }
