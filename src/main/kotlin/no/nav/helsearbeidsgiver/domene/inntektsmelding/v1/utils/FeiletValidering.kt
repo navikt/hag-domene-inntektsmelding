@@ -29,11 +29,10 @@ internal object Feilmelding {
 
     const val FLERE_ARBEIDSFORHOLD_ULIK_LOENN = "Ved innsending av flere arbeidsforhold må de ha ulik lønn"
     const val FLERE_ARBEIDSFORHOLD_IKKE_SYK_FRA_ALLE = "Ved innsending av flere arbeidsforhold kan det ikke være sykefravær fra alle"
-    const val FLERE_ARBEIDSFORHOLD_IKKE_TOM = "Må inneholde minst én startdato med flere arbeidsforhold"
-    const val FLERE_ARBEIDSFORHOLD_PER_STARTDATO_MINST_TO = "Flere arbeidsforhold må inneholde minst to arbeidsforhold per dato"
-    const val FLERE_ARBEIDSFORHOLD_PER_STARTDATO_MINST_ETT_INKLUDERT = "Minst ett arbeidsforhold må være inkludert i sykepengegrunnlaget per startdato"
-    const val FLERE_ARBEIDSFORHOLD_PER_STARTDATO_IKKE_ALLE_INKLUDERT = "Kan ikke inkludere alle arbeidsforhold per startdato, bruk vanlig inntektsmelding"
-    const val FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_SUM_IKKE_AVVIK = "Summen av inntekter fra flere arbeidsforhold må være lik innrapportert inntekt"
+    const val FLERE_ARBEIDSFORHOLD_MINST_TO = "Flere arbeidsforhold må inneholde minst to arbeidsforhold"
+    const val FLERE_ARBEIDSFORHOLD_MINST_ETT_INKLUDERT = "Minst ett arbeidsforhold må være inkludert i sykepengegrunnlaget"
+    const val FLERE_ARBEIDSFORHOLD_IKKE_ALLE_INKLUDERT = "Kan ikke inkludere alle arbeidsforhold, bruk vanlig inntektsmelding"
+    const val FLERE_ARBEIDSFORHOLD_INNTEKT_SUM_IKKE_AVVIK = "Summen av inntekter fra flere arbeidsforhold må være lik innrapportert inntekt"
     const val ARBEIDSFORHOLD_YRKESBESKRIVELSE = "Yrkesbeskrivelse er ugyldig"
     const val ARBEIDSFORHOLD_STILLINGSPROSENT = "Stillingsprosent må være mellom 0 og 100"
 

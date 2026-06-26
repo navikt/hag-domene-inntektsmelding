@@ -402,7 +402,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                                 FlereArbeidsforhold(
                                     harLikLoenn = true,
                                     erSykmeldtFraAlle = true,
-                                    arbeidsforholdPerSykmeldingStartdato = emptyMap(),
+                                    arbeidsforhold = emptyList(),
                                 ),
                         )
 
@@ -419,7 +419,7 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                             )
                         }
 
-                    skjema.valider() shouldContainExactly setOf(Feilmelding.FLERE_ARBEIDSFORHOLD_PER_STARTDATO_INNTEKT_SUM_IKKE_AVVIK)
+                    skjema.valider() shouldContainExactly setOf(Feilmelding.FLERE_ARBEIDSFORHOLD_INNTEKT_SUM_IKKE_AVVIK)
                 }
 
                 context("flere arbeidsforhold uten arbeidsforholdstype 'med arbeidsforhold' er _ikke_ gyldig") {
@@ -576,36 +576,20 @@ class SkjemaInntektsmeldingSelvbestemtTest :
                     {
                         "harLikLoenn": false,
                         "erSykmeldtFraAlle": false,
-                        "arbeidsforholdPerSykmeldingStartdato": {
-                            "2018-05-11": [
-                                {
-                                    "inkludertISykefravaer": true,
-                                    "yrkesbeskrivelse": "Snekker",
-                                    "stillingsprosent": 40.0,
-                                    "inntekt": 20000.0
-                                },
-                                {
-                                    "inkludertISykefravaer": false,
-                                    "yrkesbeskrivelse": "Stuntmann",
-                                    "stillingsprosent": 40.0,
-                                    "inntekt": 30000.0
-                                }
-                            ],
-                            "2018-06-20": [
-                                {
-                                    "inkludertISykefravaer": true,
-                                    "yrkesbeskrivelse": "Snekker",
-                                    "stillingsprosent": 70.0,
-                                    "inntekt": 40000.0
-                                },
-                                {
-                                    "inkludertISykefravaer": false,
-                                    "yrkesbeskrivelse": "Stuntmann",
-                                    "stillingsprosent": 40.0,
-                                    "inntekt": 10000.0
-                                }
-                            ]
-                        }
+                        "arbeidsforhold": [
+                            {
+                                "inkludertISykefravaer": true,
+                                "yrkesbeskrivelse": "Snekker",
+                                "stillingsprosent": 40.0,
+                                "inntekt": 20000.0
+                            },
+                            {
+                                "inkludertISykefravaer": false,
+                                "yrkesbeskrivelse": "Stuntmann",
+                                "stillingsprosent": 40.0,
+                                "inntekt": 30000.0
+                            }
+                        ]
                     }
                     """.removeJsonWhitespace()
 
