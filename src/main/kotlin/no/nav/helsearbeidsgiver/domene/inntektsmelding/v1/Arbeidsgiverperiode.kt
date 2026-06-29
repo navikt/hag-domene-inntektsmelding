@@ -18,20 +18,21 @@ data class Arbeidsgiverperiode(
     val perioder: List<Periode>,
     val redusertLoennIAgp: RedusertLoennIAgp?,
 ) {
-    /** Ikke-forespurt AGP _må_ indikere lengre gap til forrige sykmelding (arbeid på minst én sykmeldingsdag). */
+    /** Ikke-forespurt AGP _må_ indikere lengre gap til forrige sykmelding (arbeid på minst én sykefraværsdag). */
     fun erGyldigHvisIkkeForespurt(
         erAgpForespurt: Boolean,
+        egenmeldingsperioder: List<Periode>,
         sykmeldingsperioder: List<Periode>,
     ): Boolean =
         if (erAgpForespurt) {
             true
         } else {
             val agpStart = perioder.minOfOrNull { it.fom }
-            val sykmeldingStart = sykmeldingsperioder.minOf { it.fom }
+            val sykefravaerStart = (egenmeldingsperioder + sykmeldingsperioder).minOf { it.fom }
             val sykmeldingSlutt = sykmeldingsperioder.maxOf { it.tom }
 
             agpStart == null ||
-                (agpStart.isAfter(sykmeldingStart) && !agpStart.isAfter(sykmeldingSlutt))
+                (agpStart.isAfter(sykefravaerStart) && !agpStart.isAfter(sykmeldingSlutt))
         }
 
     internal fun valider(): List<FeiletValidering> {
