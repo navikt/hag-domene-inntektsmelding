@@ -20,16 +20,17 @@ data class Arbeidsgiverperiode(
     val perioder: List<Periode>,
     val redusertLoennIAgp: RedusertLoennIAgp?,
 ) {
-    fun erGyldig(
+    fun validerMotSykmeldingsperioder(
         erAgpForespurt: Boolean,
         egenmeldingerFraForespoersel: List<Periode>,
         sykmeldingsperioder: List<Periode>,
-    ): Boolean =
-        harGyldigeEgenmeldinger(sykmeldingsperioder) &&
-            (
-                erAgpForespurt ||
-                    erGyldigSomIkkeForespurt(egenmeldingerFraForespoersel, sykmeldingsperioder)
-            )
+    ): Set<String> =
+        validerMotSykmeldingsperioderIntern(
+            erAgpForespurt = erAgpForespurt,
+            egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
+            sykmeldingsperioder = sykmeldingsperioder,
+        ).map(FeiletValidering::feilmelding)
+            .toSet()
 
     fun utledEgenmeldinger(sykmeldingsperioder: List<Periode>): List<Periode> {
         val agpStart = perioder.minOfOrNull { it.fom }
@@ -130,6 +131,29 @@ data class Arbeidsgiverperiode(
             redusertLoennIAgp?.valider(),
         )
     }
+
+    internal fun validerMotSykmeldingsperioderIntern(
+        erAgpForespurt: Boolean,
+        egenmeldingerFraForespoersel: List<Periode>,
+        sykmeldingsperioder: List<Periode>,
+    ): List<FeiletValidering> =
+        if (sykmeldingsperioder.isEmpty()) {
+            // Validering krever ikke-tom sykmeldingsperioder
+            emptyList()
+        } else {
+            listOfNotNull(
+                valider(
+                    vilkaar = harGyldigeEgenmeldinger(sykmeldingsperioder),
+                    feilmelding = Feilmelding.AGP_EGENMELDING_ETTER_GJENOPPTATT_ARBEID,
+                ),
+                valider(
+                    vilkaar =
+                        erAgpForespurt ||
+                            erGyldigSomIkkeForespurt(egenmeldingerFraForespoersel, sykmeldingsperioder),
+                    feilmelding = Feilmelding.AGP_IKKE_FORESPURT_KREVER_ARBEID_I_START_AV_SYKEFRAVAER,
+                ),
+            )
+        }
 
     private fun erBehandlingsdager(): Boolean {
         val agpDager = perioder.tilDager()

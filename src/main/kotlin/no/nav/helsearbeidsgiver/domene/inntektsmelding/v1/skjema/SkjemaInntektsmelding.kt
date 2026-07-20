@@ -77,6 +77,12 @@ data class SkjemaInntektsmeldingSelvbestemt(
             ),
             avsender.valider(),
             agp?.valider(),
+            agp?.validerMotSykmeldingsperioderIntern(
+                // For selvbestemt så ber vi alltid om AGP, derfor anser vi den som forespurt
+                erAgpForespurt = true,
+                egenmeldingerFraForespoersel = emptyList(),
+                sykmeldingsperioder = sykmeldingsperioder,
+            ),
             inntekt.valider(),
             naturalytelser.valider(),
             refusjon?.valider(),

@@ -3,9 +3,10 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import io.kotest.datatest.withData
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.utils.test.date.april
 import no.nav.helsearbeidsgiver.utils.test.date.august
 import no.nav.helsearbeidsgiver.utils.test.date.desember
@@ -19,7 +20,7 @@ import no.nav.helsearbeidsgiver.utils.test.date.september
 
 class ArbeidsgiverperiodeTest :
     FunSpec({
-        context(Arbeidsgiverperiode::erGyldig.name) {
+        context(Arbeidsgiverperiode::validerMotSykmeldingsperioder.name) {
 
             context("gyldig dersom AGP er tom") {
                 val tomAgp = mockAgp()
@@ -29,11 +30,11 @@ class ArbeidsgiverperiodeTest :
                     egenmeldingerFraForespoersel = listOf(7.september til 7.september),
                 ) { erAgpForespurt, egenmeldingerFraForespoersel ->
                     tomAgp
-                        .erGyldig(
+                        .validerMotSykmeldingsperioder(
                             erAgpForespurt = erAgpForespurt,
                             egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                             sykmeldingsperioder = sykmeldingsperioder,
-                        ).shouldBeTrue()
+                        ).shouldBeEmpty()
                 }
             }
 
@@ -86,11 +87,11 @@ class ArbeidsgiverperiodeTest :
                     egenmeldingerFraForespoersel = listOf(4.april til 7.april),
                 ) { erAgpForespurt, egenmeldingerFraForespoersel ->
                     agpMedGyldigeEgenmeldiger
-                        .erGyldig(
+                        .validerMotSykmeldingsperioder(
                             erAgpForespurt = erAgpForespurt,
                             egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                             sykmeldingsperioder = sykmeldingsperioder,
-                        ).shouldBeTrue()
+                        ).shouldBeEmpty()
                 }
             }
 
@@ -150,11 +151,11 @@ class ArbeidsgiverperiodeTest :
                         egenmeldingerFraForespoersel = listOf(4.april til 7.april),
                     ) { erAgpForespurt, egenmeldingerFraForespoersel ->
                         agpMedUgyldigeEgenmeldinger
-                            .erGyldig(
+                            .validerMotSykmeldingsperioder(
                                 erAgpForespurt = erAgpForespurt,
                                 egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                                 sykmeldingsperioder = sykmeldingsperioder,
-                            ).shouldBeFalse()
+                            ) shouldContainExactly setOf(Feilmelding.AGP_EGENMELDING_ETTER_GJENOPPTATT_ARBEID)
                     }
                 }
             }
@@ -166,33 +167,33 @@ class ArbeidsgiverperiodeTest :
 
                 // Uten egenmeldinger
                 ugyldigIkkeForespurtAgp
-                    .erGyldig(
+                    .validerMotSykmeldingsperioder(
                         erAgpForespurt = false,
                         egenmeldingerFraForespoersel = emptyList(),
                         sykmeldingsperioder = sykmeldingsperioder,
-                    ).shouldBeFalse()
+                    ) shouldContainExactly setOf(Feilmelding.AGP_IKKE_FORESPURT_KREVER_ARBEID_I_START_AV_SYKEFRAVAER)
 
                 ugyldigIkkeForespurtAgp
-                    .erGyldig(
+                    .validerMotSykmeldingsperioder(
                         erAgpForespurt = true,
                         egenmeldingerFraForespoersel = emptyList(),
                         sykmeldingsperioder = sykmeldingsperioder,
-                    ).shouldBeTrue()
+                    ).shouldBeEmpty()
 
                 // Med egenmeldinger
                 ugyldigIkkeForespurtAgp
-                    .erGyldig(
+                    .validerMotSykmeldingsperioder(
                         erAgpForespurt = false,
                         egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                         sykmeldingsperioder = sykmeldingsperioder,
-                    ).shouldBeFalse()
+                    ) shouldContainExactly setOf(Feilmelding.AGP_IKKE_FORESPURT_KREVER_ARBEID_I_START_AV_SYKEFRAVAER)
 
                 ugyldigIkkeForespurtAgp
-                    .erGyldig(
+                    .validerMotSykmeldingsperioder(
                         erAgpForespurt = true,
                         egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                         sykmeldingsperioder = sykmeldingsperioder,
-                    ).shouldBeTrue()
+                    ).shouldBeEmpty()
             }
 
             test("gyldig dersom AGP fjerner rapporterte egenmeldinger og samtidig legger til nye") {
@@ -201,11 +202,11 @@ class ArbeidsgiverperiodeTest :
                 val egenmeldingerFraForespoersel = listOf(6.september til 7.september)
 
                 agpMedNyeEgenmeldinger
-                    .erGyldig(
+                    .validerMotSykmeldingsperioder(
                         erAgpForespurt = false,
                         egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                         sykmeldingsperioder = sykmeldingsperioder,
-                    ).shouldBeTrue()
+                    ).shouldBeEmpty()
             }
 
             withData(
@@ -221,11 +222,11 @@ class ArbeidsgiverperiodeTest :
                     ),
                 ) { agpMedGyldigeDatoer ->
                     agpMedGyldigeDatoer
-                        .erGyldig(
+                        .validerMotSykmeldingsperioder(
                             erAgpForespurt = false,
                             egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                             sykmeldingsperioder = sykmeldingsperioder,
-                        ).shouldBeTrue()
+                        ).shouldBeEmpty()
                 }
             }
 
@@ -242,11 +243,11 @@ class ArbeidsgiverperiodeTest :
                     ),
                 ) { agpMedUgyldigeDatoer ->
                     agpMedUgyldigeDatoer
-                        .erGyldig(
+                        .validerMotSykmeldingsperioder(
                             erAgpForespurt = false,
                             egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                             sykmeldingsperioder = sykmeldingsperioder,
-                        ).shouldBeFalse()
+                        ) shouldContainExactly setOf(Feilmelding.AGP_IKKE_FORESPURT_KREVER_ARBEID_I_START_AV_SYKEFRAVAER)
                 }
             }
 
@@ -262,11 +263,30 @@ class ArbeidsgiverperiodeTest :
                 val egenmeldingerFraForespoersel = listOf(28.september til 30.september)
 
                 agpMedUgyldigeDatoer
-                    .erGyldig(
+                    .validerMotSykmeldingsperioder(
                         erAgpForespurt = false,
                         egenmeldingerFraForespoersel = egenmeldingerFraForespoersel,
                         sykmeldingsperioder = sykmeldingsperioder,
-                    ).shouldBeFalse()
+                    ) shouldContainExactly setOf(Feilmelding.AGP_IKKE_FORESPURT_KREVER_ARBEID_I_START_AV_SYKEFRAVAER)
+            }
+
+            test("begge feilmeldinger samtidig") {
+                val agp = mockAgp(3.september til 18.september)
+                val sykmeldingsperioder =
+                    listOf(
+                        3.september til 11.september,
+                        17.september til 30.september,
+                    )
+
+                agp.validerMotSykmeldingsperioder(
+                    erAgpForespurt = false,
+                    egenmeldingerFraForespoersel = emptyList(),
+                    sykmeldingsperioder = sykmeldingsperioder,
+                ) shouldContainExactly
+                    setOf(
+                        Feilmelding.AGP_EGENMELDING_ETTER_GJENOPPTATT_ARBEID,
+                        Feilmelding.AGP_IKKE_FORESPURT_KREVER_ARBEID_I_START_AV_SYKEFRAVAER,
+                    )
             }
         }
 

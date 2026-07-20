@@ -22,6 +22,8 @@ internal object Feilmelding {
     const val AGP_MAKS_16 = "Arbeidsgiverperioden kan være maksimum 16 dager"
     const val AGP_UNDER_16_KREVER_REDUSERT_LOENN_ELLER_BEHANDLINGSDAGER =
         "Arbeidsgiverperioden må være 16 dager, med mindre man betaler redusert lønn i perioden eller det gjelder behandlingsdager"
+    const val AGP_EGENMELDING_ETTER_GJENOPPTATT_ARBEID = "Egenmelding kan ikke benyttes dagen etter en sykmeldingsperiode."
+    const val AGP_IKKE_FORESPURT_KREVER_ARBEID_I_START_AV_SYKEFRAVAER = "Arbeidsgiverperioden må indikere at sykmeldt arbeidet i starten av sykefraværet."
     const val REFUSJON_IKKE_OVER_INNTEKT = "Refusjonsbeløp må være mindre eller lik inntekt"
     const val REFUSJON_ENDRING_ETTER_AGP_SLUTT = "Startdato for refusjonsendringer må være etter arbeidsgiverperiode"
     const val REFUSJON_ENDRING_ETTER_INNTEKTDATO = "Startdato for refusjonsendringer må være etter inntektdato"
