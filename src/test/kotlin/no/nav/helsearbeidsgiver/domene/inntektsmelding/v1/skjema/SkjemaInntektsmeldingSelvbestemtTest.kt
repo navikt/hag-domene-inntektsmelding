@@ -222,6 +222,52 @@ class SkjemaInntektsmeldingSelvbestemtTest :
 
                     skjema.valider().shouldBeEmpty()
                 }
+
+                test("AGP kan inneholde egenmeldinger som kommer etter gjenopptatt arbeid") {
+                    val skjemaMedGyldigeEgenmenldinger =
+                        fulltSkjema().copy(
+                            sykmeldingsperioder =
+                                listOf(
+                                    1.juni til 12.juni,
+                                    19.juni til 30.juni,
+                                ),
+                            agp =
+                                Arbeidsgiverperiode(
+                                    perioder =
+                                        listOf(
+                                            1.juni til 12.juni,
+                                            14.juni til 15.juni, // egenmelding er gyldig pga. gjenopptatt arbeid 13.
+                                            19.juni til 20.juni,
+                                        ),
+                                    redusertLoennIAgp = null,
+                                ),
+                        )
+
+                    skjemaMedGyldigeEgenmenldinger.valider().shouldBeEmpty()
+                }
+
+                test("AGP kan _ikke_ inneholde egenmeldinger som kommer rett etter sykmelding") {
+                    val skjemaMedUgyldigeEgenmenldinger =
+                        fulltSkjema().copy(
+                            sykmeldingsperioder =
+                                listOf(
+                                    5.juni til 12.juni,
+                                    19.juni til 30.juni,
+                                ),
+                            agp =
+                                Arbeidsgiverperiode(
+                                    perioder =
+                                        listOf(
+                                            4.juni til 14.juni, // egenmelding 13.-14. er ikke gyldig ettersom arbeid ikke er gjenopptatt før 13.
+                                            19.juni til 23.juni,
+                                        ),
+                                    redusertLoennIAgp = null,
+                                ),
+                        )
+
+                    skjemaMedUgyldigeEgenmenldinger.valider() shouldBe setOf(Feilmelding.AGP_EGENMELDING_ETTER_GJENOPPTATT_ARBEID)
+                }
+
                 context(Arbeidsgiverperiode::redusertLoennIAgp.name) {
                     test("'redusertLoennIAgp' kan være 'null'") {
                         val skjema =
