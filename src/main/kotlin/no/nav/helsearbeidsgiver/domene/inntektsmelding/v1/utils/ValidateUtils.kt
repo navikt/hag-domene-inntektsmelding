@@ -18,9 +18,9 @@ internal fun String.erGyldigEllerBlankString(): Boolean =
 
 internal fun String.erGyldigTlf(): Boolean =
     listOf(
-        Regex("\\d{8}"),
-        Regex("00\\d{10}"),
-        Regex("\\+\\d{10}"),
+        Regex("\\d{8,15}"),
+        Regex("00\\d{10,17}"),
+        Regex("\\+\\d{10,17}"),
     ).any(::matches)
 
 internal fun Double.erStoerreEllerLikNullOgMindreEnnMaks(): Boolean = this in 0.0..<MAKS_GRENSE_BELOEP
