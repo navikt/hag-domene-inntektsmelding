@@ -7,6 +7,17 @@ import java.time.temporal.ChronoUnit
 
 private const val PERIODE_GAP_MAKS_DAGER = 16
 
+fun List<Periode>.tilDager(): Set<LocalDate> =
+    flatMap {
+        List(it.antallDager()) { index ->
+            it.fom.plusDays(index.toLong())
+        }
+    }.toSet()
+
+fun Set<LocalDate>.tilPerioder(): List<Periode> =
+    map { Periode(it, it) }
+        .slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
+
 internal fun Periode.antallDager(): Int = fom.daysUntil(tom) + 1
 
 internal fun agpPaavirkerIkkeInntektsmelding(

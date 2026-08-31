@@ -6,7 +6,8 @@ import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.agpPaavirkerIkkeInntektsmelding
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.antallDager
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.slaaSammenSammenhengendePerioder
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.tilDager
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.tilPerioder
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -199,16 +200,5 @@ data class RedusertLoennIAgp(
             feilmelding = Feilmelding.KREVER_BELOEP_STOERRE_ELLER_LIK_NULL,
         )
 }
-
-private fun List<Periode>.tilDager(): Set<LocalDate> =
-    flatMap {
-        List(it.antallDager()) { index ->
-            it.fom.plusDays(index.toLong())
-        }
-    }.toSet()
-
-private fun Set<LocalDate>.tilPerioder(): List<Periode> =
-    map { Periode(it, it) }
-        .slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
 
 private fun LocalDate.tilUkeAarPair(): Pair<Int, Int> = get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) to get(IsoFields.WEEK_BASED_YEAR)
