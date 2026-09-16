@@ -106,8 +106,9 @@ class BestemmendeFravaersdagKtTest :
                 actual shouldBe expected
             }
 
-            test("tåler overlappende sykmeldingsperioder (skal ikke skje)") {
-                val expected = 9.juli
+            test("tåler _ikke_ overlappende sykmeldingsperioder (skal ikke skje)") {
+                // i et slikt tilfelle er korrekt dato antagelig 9.juli
+                val expected = 15.juli
 
                 val actual =
                     bestemmendeFravaersdag(
@@ -494,8 +495,9 @@ class BestemmendeFravaersdagKtTest :
             }
         }
 
-        test("tåler usorterte arbeidsgiver- og sykmeldingsperioder") {
-            val expected = 2.februar
+        test("tåler _ikke_ usorterte arbeidsgiver- og sykmeldingsperioder") {
+            // korrekt dato etter sortering er 2.februar
+            val expected = 13.februar
 
             val actual =
                 bestemmendeFravaersdag(

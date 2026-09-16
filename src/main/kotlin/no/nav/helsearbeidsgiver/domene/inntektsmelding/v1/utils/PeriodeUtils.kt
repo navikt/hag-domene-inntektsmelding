@@ -18,6 +18,22 @@ fun Set<LocalDate>.tilPerioder(): List<Periode> =
     map { Periode(it, it) }
         .slaaSammenSammenhengendePerioder(ignorerHelgegap = false)
 
+fun erSammenhengendeIgnorerHelgegap(
+    denne: Periode,
+    neste: Periode,
+): Boolean {
+    val dagerAvstand = denne.tom.daysUntil(neste.fom)
+
+    val maksAvstand =
+        when (denne.tom.dayOfWeek) {
+            DayOfWeek.FRIDAY -> 3
+            DayOfWeek.SATURDAY -> 2
+            else -> 1
+        }
+
+    return dagerAvstand in 1..maksAvstand
+}
+
 internal fun Periode.antallDager(): Int = fom.daysUntil(tom) + 1
 
 internal fun agpPaavirkerIkkeInntektsmelding(
@@ -25,6 +41,7 @@ internal fun agpPaavirkerIkkeInntektsmelding(
     sykmeldingsperioderStart: LocalDate,
 ): Boolean = agpSlutt.daysUntil(sykmeldingsperioderStart) > PERIODE_GAP_MAKS_DAGER
 
+/** Slår ikke sammen overlappende perioder eller perioder i feil rekkefølge. */
 internal fun List<Periode>.slaaSammenSammenhengendePerioder(ignorerHelgegap: Boolean): List<Periode> {
     val kanSlaasSammen =
         if (ignorerHelgegap) {
@@ -56,16 +73,4 @@ private fun LocalDate.daysUntil(other: LocalDate): Int = until(other, ChronoUnit
 private fun erSammenhengende(
     denne: Periode,
     neste: Periode,
-): Boolean = denne.tom.daysUntil(neste.fom) <= 1
-
-private fun erSammenhengendeIgnorerHelgegap(
-    denne: Periode,
-    neste: Periode,
-): Boolean {
-    val dagerAvstand = denne.tom.daysUntil(neste.fom)
-    return when (denne.tom.dayOfWeek) {
-        DayOfWeek.FRIDAY -> dagerAvstand <= 3
-        DayOfWeek.SATURDAY -> dagerAvstand <= 2
-        else -> dagerAvstand <= 1
-    }
-}
+): Boolean = denne.tom.daysUntil(neste.fom) == 1
