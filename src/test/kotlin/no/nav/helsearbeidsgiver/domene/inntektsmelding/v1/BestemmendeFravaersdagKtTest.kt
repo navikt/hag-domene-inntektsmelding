@@ -493,6 +493,29 @@ class BestemmendeFravaersdagKtTest :
                     actual shouldBe expected
                 }
             }
+
+            // Før var det feil i hvordan man fastslo hvilke sykmeldingsdager som var etter AGP
+            test("tåler usorterte arbeidsgiverperioder") {
+                val expected = 20.november
+
+                val actual =
+                    bestemmendeFravaersdag(
+                        arbeidsgiverperioder =
+                            listOf(
+                                2.november til 12.november,
+                                20.november til 23.november,
+                                19.oktober til 19.oktober, // feil rekkefølge
+                            ),
+                        sykefravaersperioder =
+                            listOf(
+                                19.oktober til 19.oktober,
+                                2.november til 12.november,
+                                20.november til 23.november,
+                            ),
+                    )
+
+                actual shouldBe expected
+            }
         }
 
         test("tåler _ikke_ usorterte arbeidsgiver- og sykmeldingsperioder") {
