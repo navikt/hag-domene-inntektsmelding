@@ -9,8 +9,8 @@ fun bestemmendeFravaersdag(
     arbeidsgiverperioder: List<Periode>,
     sykefravaersperioder: List<Periode>, // sykmeldingsperioder (+ evt. egenmeldingsperioder)
 ): LocalDate {
-    val agpSlutt = arbeidsgiverperioder.lastOrNull()?.tom
-    val sykefravaersperioderStart = sykefravaersperioder.first().fom
+    val agpSlutt = arbeidsgiverperioder.maxOfOrNull { it.tom }
+    val sykefravaersperioderStart = sykefravaersperioder.minOf { it.fom }
 
     val sammenhengendeFravaer = sykefravaersperioder.slaaSammenSammenhengendePerioder(ignorerHelgegap = true)
 
