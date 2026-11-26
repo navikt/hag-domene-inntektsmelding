@@ -4,15 +4,16 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
 
-class ErGyldigStringTest :
+class ErGyldigYrkesbeskrivelseTest :
     FunSpec({
 
-        context("Input-verdier som string skal inneholde kun lovlige tegn og ha max lengde 128") {
+        context("Yrkesbeskrivelse skal inneholde kun lovlige tegn og ha max lengde 128") {
             withData(
                 nameFn = { (yrkesbeskrivelse, gyldig) ->
                     "$yrkesbeskrivelse er $gyldig"
                 },
                 "Snekker 1234" to true,
+                "TESTROLLE/ANNENTESTROLLE(FIKTIVE TESTORGANISASJONER)" to true,
                 "1.konsulent" to true,
                 "Maler (lærling)" to true,
                 "bla" to true,
@@ -35,7 +36,7 @@ class ErGyldigStringTest :
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaltfor" +
                     " altfor altfor altfor lang tekst, mye lengre enn grensen på 128 tegn" to false,
             ) { (yrkesbeskrivelse, gyldig) ->
-                yrkesbeskrivelse.erGyldigEllerBlankString() shouldBe gyldig
+                yrkesbeskrivelse.erGyldigYrkesbeskrivelse() shouldBe gyldig
             }
         }
     })
