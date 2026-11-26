@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 class ErGyldigYrkesbeskrivelseTest :
     FunSpec({
 
-        context("Yrkesbeskrivelse skal inneholde kun lovlige tegn og ha max lengde 128, eller være blank") {
+        context("Yrkesbeskrivelse skal inneholde kun lovlige tegn og ha max lengde 128") {
             withData(
                 nameFn = { (yrkesbeskrivelse, gyldig) ->
                     "$yrkesbeskrivelse er $gyldig"
