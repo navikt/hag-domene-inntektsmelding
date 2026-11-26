@@ -3,7 +3,7 @@ package no.nav.helsearbeidsgiver.domene.inntektsmelding.v1
 import kotlinx.serialization.Serializable
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.FeiletValidering
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.Feilmelding
-import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erGyldigEllerBlankString
+import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erGyldigYrkesbeskrivelse
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.erStoerreEllerLikNullOgMindreEnnMaks
 import no.nav.helsearbeidsgiver.domene.inntektsmelding.v1.utils.valider
 
@@ -17,7 +17,7 @@ data class Arbeidsforhold(
     internal fun valider(): List<FeiletValidering> =
         listOfNotNull(
             valider(
-                vilkaar = yrkesbeskrivelse.erGyldigEllerBlankString(),
+                vilkaar = yrkesbeskrivelse.erGyldigYrkesbeskrivelse(),
                 feilmelding = Feilmelding.ARBEIDSFORHOLD_YRKESBESKRIVELSE,
             ),
             valider(
